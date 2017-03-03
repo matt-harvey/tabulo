@@ -1,0 +1,21 @@
+#!/usr/bin/env ruby
+
+require "bundler/setup"
+require "tabulator"
+
+# TODO Write proper specs, and get rid of this.
+def main
+
+  tabulator = Tabulator::Tabulator.new(0...10) do |t|
+    t.add_column("N", &:itself)
+    t.add_column("Doubled") { |n| n * 2 }
+    t.add_column("A string N characters long") { |n| "x" * n }
+  end
+
+  tabulator.each do |row|
+    puts row
+  end
+
+end
+
+main
