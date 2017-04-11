@@ -26,9 +26,34 @@ describe Tabulator::Table do
     end
   end
 
-  pending "#each"
-  pending "#header_row"
-  pending "#horizontal_rule"
+  describe "#each" do
+    it "iterates once for each row of the table's source data" do
+      i = 0
+      table.each do |row|
+        i += 1
+      end
+      expect(i).to eq(5)
+    end
+
+    it "iterates over instances of Tabulator::Row" do
+      table.each do |row|
+        expect(row).to be_a(Tabulator::Row)
+      end
+    end
+  end
+
+  describe "#header_row" do
+    it "returns a string representing a header row for the table" do
+      expect(table.header_row).to eq("|     N    |  Doubled |")
+    end
+  end
+
+  describe "#horizontal_rule" do
+    it "returns a horizontal line made up of dashes, of an appropriate width for the table" do
+      expect(table.horizontal_rule).to eq("+----------+----------+")
+    end
+  end
+
   pending "#body_row"
   pending "#formatted_body_row"
 end
