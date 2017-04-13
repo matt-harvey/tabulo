@@ -10,7 +10,7 @@ module Tabulo
     end
 
     def each
-      @table._columns.each do |column|
+      @table.columns.each do |column|
         yield column.body_cell_value(@source)
       end
     end
@@ -20,7 +20,7 @@ module Tabulo
     end
 
     def to_h
-      @table._columns.map(&:label).zip(to_a).to_h
+      @table.columns.map(&:label).zip(to_a).to_h
     end
   end
 end

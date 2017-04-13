@@ -3,6 +3,8 @@ module Tabulo
   class Table
     include Enumerable
 
+    attr_reader :columns
+
     def initialize(sources, options = { })
       opts = {
         header_frequency: :start,
@@ -71,10 +73,6 @@ module Tabulo
       format_row(true, @horizontal_rule_character, @corner_character, &:horizontal_rule)
     end
 
-    def body_row(source, options = { with_header: false })
-      Row.new(self, source, options)
-    end
-
     def formatted_body_row(source, options = { with_header: false })
       inner = format_row { |column| column.body_cell(source) }
       if options[:with_header]
@@ -84,11 +82,11 @@ module Tabulo
       end
     end
 
-    def _columns
-      @columns
-    end
-
     private
+
+    def body_row(source, options = { with_header: false })
+      Row.new(self, source, options)
+    end
 
     def format_row(header = false, padder = @padding_character, joiner = @joiner)
       cell_stacks = @columns.map do |column|

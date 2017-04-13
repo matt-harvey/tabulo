@@ -19,6 +19,7 @@ describe Tabulo::Table do
   end
 
   pending "#initialize"
+  pending "#columns"
   pending "#add_column"
 
   describe "#to_s" do
