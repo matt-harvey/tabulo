@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Tabulator::Column do
+describe Tabulo::Column do
 
   pending "#initialize"
   pending "#label"

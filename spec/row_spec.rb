@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Tabulator::Row do
+describe Tabulo::Row do
 
   pending "#initialize"
   pending "#each"

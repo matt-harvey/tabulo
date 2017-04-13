@@ -1,9 +1,9 @@
 require "spec_helper"
 
-describe Tabulator::Table do
+describe Tabulo::Table do
 
   let(:table) do
-    Tabulator::Table.new(1..5) do |t|
+    Tabulo::Table.new(1..5) do |t|
       t.add_column("N", &:itself)
       t.add_column("Doubled") { |n| n * 2 }
     end
@@ -35,9 +35,9 @@ describe Tabulator::Table do
       expect(i).to eq(5)
     end
 
-    it "iterates over instances of Tabulator::Row" do
+    it "iterates over instances of Tabulo::Row" do
       table.each do |row|
-        expect(row).to be_a(Tabulator::Row)
+        expect(row).to be_a(Tabulo::Row)
       end
     end
   end

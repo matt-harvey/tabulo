@@ -1,11 +1,11 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'tabulator/version'
+require 'tabulo/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "tabulator"
-  spec.version       = Tabulator::VERSION
+  spec.name          = "tabulo"
+  spec.version       = Tabulo::VERSION
   spec.authors       = ["Matthew Harvey"]
   spec.email         = ["software@matthewharvey.net"]
 

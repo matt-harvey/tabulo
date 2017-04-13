@@ -1,4 +1,4 @@
-module Tabulator
+module Tabulo
 
   class Column
 

@@ -1,3 +1,3 @@
-module Tabulator
+module Tabulo
   VERSION = "0.1.0"
 end

@@ -1,4 +1,4 @@
 source 'https://rubygems.org'
 
-# Specify your gem's dependencies in tabulator.gemspec
+# Specify your gem's dependencies in tabulo.gemspec
 gemspec

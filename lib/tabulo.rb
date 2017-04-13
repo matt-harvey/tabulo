@@ -1,7 +1,7 @@
-require "tabulator/version"
-require "tabulator/table"
-require "tabulator/row"
-require "tabulator/column"
+require "tabulo/version"
+require "tabulo/table"
+require "tabulo/row"
+require "tabulo/column"
 
 # TODO Tidy the code.
 # TODO Handle newline in output.

@@ -1,8 +1,8 @@
 require "spec_helper"
 
-describe Tabulator::VERSION do
+describe Tabulo::VERSION do
 
   it "has semver form" do
-    expect(Tabulator::VERSION).to match(/\d+\.\d+\.\d+$/)
+    expect(Tabulo::VERSION).to match(/\d+\.\d+\.\d+$/)
   end
 end
