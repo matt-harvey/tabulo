@@ -70,7 +70,7 @@ module Tabulo
     end
 
     def horizontal_rule
-      format_row(true, @horizontal_rule_character, @corner_character, &:horizontal_rule)
+      format_row(false, @horizontal_rule_character, @corner_character, &:horizontal_rule)
     end
 
     def formatted_body_row(source, options = { with_header: false })
@@ -95,11 +95,12 @@ module Tabulo
         truncate = (column.truncate && wrap)
         column_width = column.width
         cell_body_length = (truncate ? column_width * wrap : raw.length)
+        truncated = (cell_body_length < raw.length)
         cell_body = raw[0...cell_body_length]
         num_subcells = (cell_body_length.to_f / column_width).ceil
         (0...num_subcells).map do |i|
           s = cell_body.slice(i * column_width, column_width)
-          right_padder = ((truncate && i == num_subcells - 1) ? @truncation_indicator : padder)
+          right_padder = ((truncated && i == num_subcells - 1) ? @truncation_indicator : padder)
           "#{padder}#{s}#{padder * (column_width - s.length)}#{right_padder}"
         end
       end

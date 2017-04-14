@@ -3,13 +3,21 @@ require "spec_helper"
 describe Tabulo::Table do
 
   let(:table) do
-    Tabulo::Table.new(1..5, header_frequency: header_frequency) do |t|
+    Tabulo::Table.new(
+      source,
+      header_frequency: header_frequency,
+      wrap_header_cells_to: wrap_header_cells_to,
+      wrap_cells_to: wrap_cells_to
+    ) do |t|
       t.add_column("N", &:itself)
       t.add_column("Doubled") { |n| n * 2 }
     end
   end
 
-  let(:header_frequency) { [:start, nil, 5, 20].sample }
+  let(:source) { 1..5 }
+  let(:header_frequency) { :start }
+  let(:wrap_header_cells_to) { nil }
+  let(:wrap_cells_to) { nil }
 
   specify "is an Enumerable" do
     expect(table).to be_a(Enumerable)
@@ -23,52 +31,127 @@ describe Tabulo::Table do
   pending "#add_column"
 
   describe "#to_s" do
-    context "when table was initialized with `header_frequency: :start`" do
-      let(:header_frequency) { :start }
+    describe "`header_frequency` option" do
+      context "when table was initialized with `header_frequency: :start`" do
+        let(:header_frequency) { :start }
 
-      it "returns a string displaying the formatted table with a header" do
-        expect(table.to_s).to eq \
-          %q(+----------+----------+
-             |     N    |  Doubled |
-             +----------+----------+
-             |        1 |        2 |
-             |        2 |        4 |
-             |        3 |        6 |
-             |        4 |        8 |
-             |        5 |       10 |).gsub(/^ +/, "")
+        it "returns a string displaying the formatted table with a header" do
+          expect(table.to_s).to eq \
+            %q(+----------+----------+
+               |     N    |  Doubled |
+               +----------+----------+
+               |        1 |        2 |
+               |        2 |        4 |
+               |        3 |        6 |
+               |        4 |        8 |
+               |        5 |       10 |).gsub(/^ +/, "")
+        end
+      end
+
+      context "when table was initialized with `header_frequency: nil`" do
+        let(:header_frequency) { nil }
+
+        it "returns a string displaying the formatted table without a header" do
+          expect(table.to_s).to eq \
+            %q(|        1 |        2 |
+               |        2 |        4 |
+               |        3 |        6 |
+               |        4 |        8 |
+               |        5 |       10 |).gsub(/^ +/, "")
+        end
+      end
+
+      context "when table was initialized with `header_frequency: <N>`" do
+        let(:header_frequency) { 3 }
+
+        it "returns a string displaying the formatted table with header at start and then "\
+          "before every Nth row thereafter" do
+          expect(table.to_s).to eq \
+            %q(+----------+----------+
+               |     N    |  Doubled |
+               +----------+----------+
+               |        1 |        2 |
+               |        2 |        4 |
+               |        3 |        6 |
+               +----------+----------+
+               |     N    |  Doubled |
+               +----------+----------+
+               |        4 |        8 |
+               |        5 |       10 |).gsub(/^ +/, "")
+        end
       end
     end
 
-    context "when table was initialized with `header_frequency: nil`" do
-      let(:header_frequency) { nil }
+    describe "`wrap_header_cells_to` option" do
+      before(:each) { table.add_column("N" * 18, &:itself) }
 
-      it "returns a string displaying the formatted table without a header" do
-        expect(table.to_s).to eq \
-          %q(|        1 |        2 |
-             |        2 |        4 |
-             |        3 |        6 |
-             |        4 |        8 |
-             |        5 |       10 |).gsub(/^ +/, "")
+      context "when table was initialized with `wrap_header_cells_to: nil`" do
+        let(:wrap_header_cells_to) { nil }
+
+        it "wraps header cell contents as necessary if they exceed the column width" do
+          expect(table.to_s).to eq \
+            %q(+----------+----------+----------+
+               |     N    |  Doubled | NNNNNNNN |
+               |          |          | NNNNNNNN |
+               |          |          | NN       |
+               +----------+----------+----------+
+               |        1 |        2 |        1 |
+               |        2 |        4 |        2 |
+               |        3 |        6 |        3 |
+               |        4 |        8 |        4 |
+               |        5 |       10 |        5 |).gsub(/^ +/, "")
+        end
+      end
+
+      context "when table was initialized with `wrap_header_cells_to: <N>`" do
+        let(:wrap_header_cells_to) { 2 }
+
+        it "truncates header cell contents to N rows, instead of wrapping them indefinitely" do
+          expect(table.to_s).to eq \
+            %q(+----------+----------+----------+
+               |     N    |  Doubled | NNNNNNNN |
+               |          |          | NNNNNNNN~|
+               +----------+----------+----------+
+               |        1 |        2 |        1 |
+               |        2 |        4 |        2 |
+               |        3 |        6 |        3 |
+               |        4 |        8 |        4 |
+               |        5 |       10 |        5 |).gsub(/^ +/, "")
+        end
       end
     end
 
-    context "when table was initialized with `header_frequency: <N>`" do
-      let(:header_frequency) { 3 }
+    describe "`wrap_cells_to` option" do
+      let(:source) { [1, 2, 50_000_000] }
+      let(:wrap_cells_to) { nil }
 
-      it "returns a string displaying the formatted table with header at start and then "\
-        "before every Nth row thereafter" do
-        expect(table.to_s).to eq \
-          %q(+----------+----------+
-             |     N    |  Doubled |
-             +----------+----------+
-             |        1 |        2 |
-             |        2 |        4 |
-             |        3 |        6 |
-             +----------+----------+
-             |     N    |  Doubled |
-             +----------+----------+
-             |        4 |        8 |
-             |        5 |       10 |).gsub(/^ +/, "")
+      context "when table was initialized with `wrap_cells_to: nil`" do
+        let(:wrap_cells_to) { nil }
+
+        it "wraps cell contents as necessary if they exceed the column width" do
+          expect(table.to_s).to eq \
+            %q(+----------+----------+
+               |     N    |  Doubled |
+               +----------+----------+
+               |        1 |        2 |
+               |        2 |        4 |
+               | 50000000 | 10000000 |
+               |          | 0        |).gsub(/^ +/, "")
+        end
+      end
+
+      context "when table was initialized with `wrap_cells_to: <N>`" do
+        let(:wrap_cells_to) { 1 }
+
+        it "truncates header cell contents to N rows, instead of wrapping them indefinitely" do
+          expect(table.to_s).to eq \
+            %q(+----------+----------+
+               |     N    |  Doubled |
+               +----------+----------+
+               |        1 |        2 |
+               |        2 |        4 |
+               | 50000000 | 10000000~|).gsub(/^ +/, "")
+        end
       end
     end
   end
