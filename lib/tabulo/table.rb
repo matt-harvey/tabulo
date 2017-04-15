@@ -34,8 +34,6 @@ module Tabulo
         label: label.to_sym,
         header: label.to_s,
         truncate: true,
-        wrap_cells_to: @wrap_cells_to,
-        wrap_header_cells_to: @wrap_header_cells_to,
         align_header: :center,
         align_body: nil,
         horizontal_rule_character: @horizontal_rule_character,
