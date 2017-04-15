@@ -47,7 +47,7 @@ module Tabulo
     end
 
     def to_s
-      map(&:to_s).join("\n")
+      join_lines(map(&:to_s))
     end
 
     def each
@@ -76,7 +76,7 @@ module Tabulo
     def formatted_body_row(source, options = { with_header: false })
       inner = format_row { |column| column.body_cell(source) }
       if options[:with_header]
-        [horizontal_rule, header_row, horizontal_rule, inner].join("\n")
+        join_lines([horizontal_rule, header_row, horizontal_rule, inner])
       else
         inner
       end
@@ -115,7 +115,11 @@ module Tabulo
         end
       end
 
-      subrows.map { |subrow| "#{joiner}#{subrow.join(joiner)}#{joiner}" }.join("\n")
+      join_lines(subrows.map { |subrow| "#{joiner}#{subrow.join(joiner)}#{joiner}" })
+    end
+
+    def join_lines(lines)
+      lines.join($/)  # join strings with cross-platform newline
     end
   end
 end
