@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe Tabulo::Table do
 
-  let(:table) do
+  let!(:table) do
     Tabulo::Table.new(
       source,
       header_frequency: header_frequency,
@@ -26,16 +26,13 @@ describe Tabulo::Table do
     expect(table).to respond_to(:to_a)
   end
 
-  pending "#initialize"
-  pending "#columns"
-  pending "#add_column"
-
-  describe "#to_s" do
+  describe "#initialize / #to_s" do
     describe "`header_frequency` option" do
-      context "when table was initialized with `header_frequency: :start`" do
+      context "when table is initialized with `header_frequency: :start`" do
         let(:header_frequency) { :start }
 
-        it "returns a string displaying the formatted table with a header" do
+        it "initializes a table displaying the formatted table with a header" do
+          expect(table).to be_a(Tabulo::Table)
           expect(table.to_s).to eq \
             %q(+----------+----------+
                |     N    |  Doubled |
@@ -48,10 +45,11 @@ describe Tabulo::Table do
         end
       end
 
-      context "when table was initialized with `header_frequency: nil`" do
+      context "when table is initialized with `header_frequency: nil`" do
         let(:header_frequency) { nil }
 
-        it "returns a string displaying the formatted table without a header" do
+        it "initializes a table displaying the formatted table without a header" do
+          expect(table).to be_a(Tabulo::Table)
           expect(table.to_s).to eq \
             %q(|        1 |        2 |
                |        2 |        4 |
@@ -61,11 +59,12 @@ describe Tabulo::Table do
         end
       end
 
-      context "when table was initialized with `header_frequency: <N>`" do
+      context "when table is initialized with `header_frequency: <N>`" do
         let(:header_frequency) { 3 }
 
-        it "returns a string displaying the formatted table with header at start and then "\
+        it "initializes a table displaying the formatted table with header at start and then "\
           "before every Nth row thereafter" do
+          expect(table).to be_a(Tabulo::Table)
           expect(table.to_s).to eq \
             %q(+----------+----------+
                |     N    |  Doubled |
@@ -85,10 +84,11 @@ describe Tabulo::Table do
     describe "`wrap_header_cells_to` option" do
       before(:each) { table.add_column("N" * 18, &:itself) }
 
-      context "when table was initialized with `wrap_header_cells_to: nil`" do
+      context "when table is initialized with `wrap_header_cells_to: nil`" do
         let(:wrap_header_cells_to) { nil }
 
         it "wraps header cell contents as necessary if they exceed the column width" do
+          expect(table).to be_a(Tabulo::Table)
           expect(table.to_s).to eq \
             %q(+----------+----------+----------+
                |     N    |  Doubled | NNNNNNNN |
@@ -103,10 +103,11 @@ describe Tabulo::Table do
         end
       end
 
-      context "when table was initialized with `wrap_header_cells_to: <N>`" do
+      context "when table is initialized with `wrap_header_cells_to: <N>`" do
         let(:wrap_header_cells_to) { 2 }
 
         it "truncates header cell contents to N rows, instead of wrapping them indefinitely" do
+          expect(table).to be_a(Tabulo::Table)
           expect(table.to_s).to eq \
             %q(+----------+----------+----------+
                |     N    |  Doubled | NNNNNNNN |
@@ -125,7 +126,7 @@ describe Tabulo::Table do
       let(:source) { [1, 2, 50_000_000] }
       let(:wrap_cells_to) { nil }
 
-      context "when table was initialized with `wrap_cells_to: nil`" do
+      context "when table is initialized with `wrap_cells_to: nil`" do
         let(:wrap_cells_to) { nil }
 
         it "wraps cell contents as necessary if they exceed the column width" do
@@ -140,7 +141,7 @@ describe Tabulo::Table do
         end
       end
 
-      context "when table was initialized with `wrap_cells_to: <N>`" do
+      context "when table is initialized with `wrap_cells_to: <N>`" do
         let(:wrap_cells_to) { 1 }
 
         it "truncates header cell contents to N rows, instead of wrapping them indefinitely" do
@@ -154,6 +155,23 @@ describe Tabulo::Table do
         end
       end
     end
+  end
+
+  describe "#columns" do
+    it "returns an array of all the table's `Tabulo::Column`s" do
+      result = table.columns
+      expect(result).to be_a(Array)
+      expect(result.count).to eq(2)
+      expect(result.all? { |c| c.is_a?(Tabulo::Column) }).to be_truthy
+    end
+  end
+
+  describe "#add_column" do
+    it "adds to the table's columns" do
+      expect { table.add_column(:even?) }.to change { table.columns.count }.by(1)
+    end
+
+    pending "initializes a `Tabulo::Column` with the passed label, options and extractor"
   end
 
   describe "#each" do
