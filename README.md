@@ -89,7 +89,8 @@ end
 # |        5 |       10 |
 ```
 
-TODO: Finish this...
+TODO: Finish this, including, among other things, the shorthand method for initializing columns with
+Table initializer.
 
 
 ## Development

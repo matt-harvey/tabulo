@@ -3,10 +3,14 @@ module Tabulo
   class Table
     include Enumerable
 
+    DEFAULT_COLUMN_WIDTH = 8
+    DEFAULT_HORIZONTAL_RULE_CHARACTER = "-"
+
     attr_reader :columns
 
     def initialize(sources, options = { })
       opts = {
+        columns: [],
         header_frequency: :start,
 
         # nil to wrap to no max, 1 to wrap to 1 row then truncate, etc..
@@ -24,8 +28,23 @@ module Tabulo
       @horizontal_rule_character = "-"
       @truncation_indicator = "~"
       @padding_character = " "
-      @columns = []
-      @default_column_width = 8
+      @default_column_width = DEFAULT_COLUMN_WIDTH
+      @columns = opts[:columns].map do |item|
+        case item
+        when Column
+          item
+        else
+          Column.new({
+            label: item.to_sym,
+            header: item.to_s,
+            truncate: true,
+            align_header: :center,
+            horizontal_rule_character: @horizontal_rule_character,
+            width: @default_column_width,
+            formatter: :to_s.to_proc
+          })
+        end
+      end
       yield self if block_given?
     end
 
@@ -35,7 +54,6 @@ module Tabulo
         header: label.to_s,
         truncate: true,
         align_header: :center,
-        align_body: nil,
         horizontal_rule_character: @horizontal_rule_character,
         width: @default_column_width,
         extractor: extractor || (label.respond_to?(:to_proc) ? label.to_proc : proc { nil }),

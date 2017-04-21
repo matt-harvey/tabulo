@@ -27,6 +27,36 @@ describe Tabulo::Table do
   end
 
   describe "#initialize / #to_s" do
+    describe "`columns` options" do
+      it "accepts symbols corresponding to methods on the source objects" do
+        expect(Tabulo::Table.new([1, 2, 3], columns: [:itself, :to_f]).to_s).to eq \
+          %q(+----------+----------+
+             |  itself  |   to_f   |
+             +----------+----------+
+             |        1 |      1.0 |
+             |        2 |      2.0 |
+             |        3 |      3.0 |).gsub(/^ +/, "")
+
+      end
+
+      it "accepts instances of `Tabulo::Column`" do
+        expect(
+          Tabulo::Table.new(
+            [1, 2, 3],
+            columns: [
+              Tabulo::Column.new(header: "itself", extractor: proc { |source| source }),
+              Tabulo::Column.new(header: "to_f", extractor: proc { |source| source.to_f })
+            ]
+          ).to_s).to eq \
+            %q(+----------+----------+
+               |  itself  |   to_f   |
+               +----------+----------+
+               |        1 |      1.0 |
+               |        2 |      2.0 |
+               |        3 |      3.0 |).gsub(/^ +/, "")
+      end
+    end
+
     describe "`header_frequency` option" do
       context "when table is initialized with `header_frequency: :start`" do
         let(:header_frequency) { :start }

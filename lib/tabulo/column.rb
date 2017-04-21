@@ -7,10 +7,16 @@ module Tabulo
     def initialize(options)
       @label, @header = options[:label], options[:header]
       @truncate = options[:truncate]
-      @align_header, @align_body = options[:align_header], options[:align_body]
-      @extractor, @formatter = options[:extractor], options[:formatter]
-      @width = options[:width]
-      @horizontal_rule_character = options[:horizontal_rule_character]
+      @align_header = options[:align_header] || :center
+      @align_body = options[:align_body]  || nil
+      @extractor = options[:extractor] || @label.to_proc
+      @formatter = options[:formatter] || :to_s.to_proc
+
+      # TODO Should be able to set these default on a Table-by-Table basis.
+      @width = options[:width] || Table::DEFAULT_COLUMN_WIDTH
+
+      @horizontal_rule_character =
+        options[:horizontal_rule_character] || Table::DEFAULT_HORIZONTAL_RULE_CHARACTER
     end
 
     def header_cell
