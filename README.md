@@ -2,9 +2,9 @@
 
 ## Overview
 
-Tabulo generates ASCII tables for displaying in a terminal or as preformatted text.
+Tabulo generates ASCII tables.
 
-A `Tabulo::Table` can be printed:
+A `Tabulo::Table` can, of course, be printed:
 
 ```
 > puts table
@@ -25,6 +25,17 @@ table.each do |row|
 end
 ```
 
+And rows are also `Enumerable`, providing access to the underlying cell values:
+
+```ruby
+table.each do |row|
+  row.each do |cell|
+    # 1, 2, 50000000...
+    puts cell.class  # Fixnum
+  end
+end
+```
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -41,7 +52,7 @@ Or install it yourself as:
 
     $ gem install tabulo
 
-## Usage
+## Detailed usage
 
 Require the gem:
 
@@ -52,6 +63,8 @@ require 'tabulo'
 Instantiate a `Tabulo::Table` by passing it an underlying `Enumerable` and then telling it
 the columns you want to generate.
 
+### Configuring columns
+
 A simple case involves initializing columns from symbols corresponding to methods on members of the
 `Enumerable`. In this case the symbol also provides the header for each column:
 
@@ -61,37 +74,170 @@ table = Tabulo::Table.new([1, 2, 5]) do |t|
   t.add_column(:even?)
   t.add_column(:odd?)
 end
-
-# > puts table
-# +----------+----------+----------+
-# |  itself  |   even?  |   odd?   |
-# +----------+----------+----------+
-# |        1 |   false  |   true   |
-# |        2 |   true   |   false  |
-# |        5 |   false  |   true   |
 ```
 
-Columns can also be initialized using blocks or procs that are called on each object. In this case
-the first argument provides the column header:
+Or equivalently:
+
+```ruby
+Tabulo::Table.new([1, 2, 5], columns: %i(itself even odd))
+```
+
+The resulting table looks like this:
+
+```
+> puts table
++----------+----------+----------+
+|  itself  |   even?  |   odd?   |
++----------+----------+----------+
+|        1 |   false  |   true   |
+|        2 |   true   |   false  |
+|        5 |   false  |   true   |
+```
+
+Columns can also be initialized using a callable to which each object will be passed to determine
+the value to be displayed in the table. In this case, the first argument to `add_column` provides
+the header text:
 
 ```ruby
 table = Tabulo::Table.new([1, 2, 5]) do |t|
   t.add_column("N", &:itself)
   t.add_column("Doubled") { |n| n * 2 }
+  t.add_column(:odd?)  # we can mix and match
 end
-
-# > puts table
-# +----------+----------+
-# |     N    |  Doubled |
-# +----------+----------+
-# |        1 |        2 |
-# |        2 |        4 |
-# |        5 |       10 |
 ```
 
-TODO: Finish this, including, among other things, the shorthand method for initializing columns with
-Table initializer.
+```
+> puts table
++----------+----------+----------+
+|     N    |  Doubled |   odd?   |
++----------+----------+----------+
+|        1 |        2 |   true   |
+|        2 |        4 |   false  |
+|        5 |       10 |   true   |
+```
 
+### Cell alignment
+
+Note the alignment of cell contents. By default, column header text is center-aligned, while the
+content of each cell in the table body is aligned in a way that tends to look appropriate for its
+data type. Numerical types are right-aligned, text is left-aligned, and booleans (`false` and
+`true`) are center-aligned. This can be customized by passing `:center`, `:left` or `:right` to the
+`align_header` or `align_body` options of `add_column`, e.g.:
+
+```ruby
+  table.add_column("Doubled", align_header: :left, align_body: :left) { |n| n * 2 }
+```
+
+### Column width, wrapping and truncation
+
+By default, column width is fixed at 8 characters, plus 1 character of padding on either side.
+This can be customized using the `width` option of `add_column`:
+
+```ruby
+  table.add_column(:even?, width: 5)
+```
+
+### Overflow handling
+
+By default, if cell contents exceed their column width, they are wrapped for as many rows as
+required:
+
+```ruby
+table = Tabulo::Table.new(["hello", "abcdefghijklmnopqrstuvwxyz"], columns: %i(itself length))
+```
+
+```
+> puts table
++----------+----------+
+|  itself  |  length  |
++----------+----------+
+| hello    |        5 |
+| abcdefgh |       26 |
+| ijklmnop |          |
+| qrstuvwx |          |
+| yz       |          |
+```
+
+Wrapping behaviour is configured for the table as a whole, using the `wrap_header_cells_to` option
+for header cells and `wrap_cells_to` for body cells. The default value of these options is `nil`,
+meaning cells are wrapped to as many rows as required; passing a `Fixnum` limits wrapping to the
+given number of rows, with content truncated from that point on. The `~` character is appended to the
+outputted cell content to show that truncation has occurred:
+
+```ruby
+table = Tabulo::Table.new(["hello", "abcdefghijklmnopqrstuvwxyz"], wrap_cells_to: 1, columns: %i(itself length))
+```
+
+```
+> puts table
++----------+----------+
+|  itself  |  length  |
++----------+----------+
+| hello    |        5 |
+| abcdefgh~|       26 |
+```
+
+### Repeating headers
+
+By default, headers are only shown once, at the top of the table (`header_frequency: :start`). If
+`header_frequency` is passed `nil`, headers are not shown at all; or, if passed a `Fixnum` N,
+headers are shown at the top and then repeated every N rows. This can be handy when you're looking
+at table that's taller than your terminal.
+
+E.g.:
+
+```ruby
+table = Tabulo::Table.new(1..10, columns: %i(itself even?), header_frequency: 5)
+```
+
+```
+> puts table
++----------+----------+
+|  itself  |   even?  |
++----------+----------+
+|        1 |   false  |
+|        2 |   true   |
+|        3 |   false  |
+|        4 |   true   |
+|        5 |   false  |
++----------+----------+
+|  itself  |   even?  |
++----------+----------+
+|        6 |   true   |
+|        7 |   false  |
+|        8 |   true   |
+|        9 |   false  |
+|       10 |   true   |
+```
+
+TODO: Write rdocs, and link to them here "for more".
+
+### Using a Table Enumerator
+
+Because it's an `Enumerable`, a `Tabulo::Table` can also give you an `Enumerator`,
+which is useful when you want to step through rows one at a time. In a Rails console,
+for example, you might do this:
+
+```
+> e = Tabulo::Table.new(User.find_each) do |t|
+  t.add_column(:id)
+  t.add_column(:email, width: 25)
+end.to_enum  # <-- make an Enumerator
+...
+> puts e.next
++----------+--------------------------+
+|    id    |          email           |
++----------+--------------------------+
+|        1 | jane@example.com         |
+=> nil
+> puts e.next
+|        2 | betty@example.net        |
+=> nil
+```
+
+Note the used of `.find_each`: we can start printing the table without having to load the
+entire underlying collection. The tradeoff here is that Tabulo requires us to set column
+widths up front, rather than adapting to the width of the widest value.
 
 ## Development
 
