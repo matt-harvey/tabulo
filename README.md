@@ -16,7 +16,7 @@ A `Tabulo::Table` can, of course, be printed:
 | 50000000 | 10000000 |
 ```
 
-But it is also `Enumerable`, so you can process it one row at a time:
+But it is also `Enumerable`, so you can process one row at a time:
 
 ```ruby
 table.each do |row|
@@ -25,7 +25,7 @@ table.each do |row|
 end
 ```
 
-And rows are also `Enumerable`, providing access to the underlying cell values:
+And rows are themselves `Enumerable`, providing access to the underlying cell values:
 
 ```ruby
 table.each do |row|
@@ -48,25 +48,25 @@ And then execute:
 
     $ bundle
 
-Or install it yourself as:
+Or install it yourself:
 
     $ gem install tabulo
 
 ## Detailed usage
 
-Require the gem:
+### Requiring the gem
 
 ```ruby
 require 'tabulo'
 ```
 
-Instantiate a `Tabulo::Table` by passing it an underlying `Enumerable` and then telling it
-the columns you want to generate.
-
 ### Configuring columns
 
+You instantiate a `Tabulo::Table` by passing it an underlying `Enumerable` and then telling it
+the columns you want to generate.
+
 A simple case involves initializing columns from symbols corresponding to methods on members of the
-`Enumerable`. In this case the symbol also provides the header for each column:
+underlying `Enumerable`. In this case the symbol also provides the header for each column:
 
 ```ruby
 table = Tabulo::Table.new([1, 2, 5]) do |t|
@@ -118,11 +118,10 @@ end
 
 ### Cell alignment
 
-Note the alignment of cell contents. By default, column header text is center-aligned, while the
-content of each cell in the table body is aligned in a way that tends to look appropriate for its
-data type. Numerical types are right-aligned, text is left-aligned, and booleans (`false` and
-`true`) are center-aligned. This can be customized by passing `:center`, `:left` or `:right` to the
-`align_header` or `align_body` options of `add_column`, e.g.:
+By default, column header text is center-aligned, while the content of each body cell is aligned
+according to its data type. Numbers are right-aligned, text is left-aligned, and booleans (`false`
+and `true`) are center-aligned. This can be customized by passing `:center`, `:left` or `:right` to
+the `align_header` or `align_body` options of `add_column`, e.g.:
 
 ```ruby
   table.add_column("Doubled", align_header: :left, align_body: :left) { |n| n * 2 }
@@ -158,10 +157,10 @@ table = Tabulo::Table.new(["hello", "abcdefghijklmnopqrstuvwxyz"], columns: %i(i
 | yz       |          |
 ```
 
-Wrapping behaviour is configured for the table as a whole, using the `wrap_header_cells_to` option
-for header cells and `wrap_cells_to` for body cells. The default value of these options is `nil`,
-meaning cells are wrapped to as many rows as required; passing a `Fixnum` limits wrapping to the
-given number of rows, with content truncated from that point on. The `~` character is appended to the
+Wrapping behaviour is configured for the table as a whole using the `wrap_header_cells_to` option
+for header cells and `wrap_cells_to` for body cells, both of which default to `nil`, meaning that
+cells are wrapped to as many rows as required. Passing a `Fixnum` limits wrapping to the given
+number of rows, with content truncated from that point on. The `~` character is appended to the
 outputted cell content to show that truncation has occurred:
 
 ```ruby
@@ -235,9 +234,9 @@ end.to_enum  # <-- make an Enumerator
 => nil
 ```
 
-Note the used of `.find_each`: we can start printing the table without having to load the
-entire underlying collection. The tradeoff here is that Tabulo requires us to set column
-widths up front, rather than adapting to the width of the widest value.
+Note the used of `.find_each`: we can start printing the table without having to load the entire
+underlying collection. (The cost of supporting this behaviour is that Tabulo requires us to set
+column widths up front, rather than adapting to the width of the widest value.)
 
 ## Development
 
