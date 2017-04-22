@@ -7,7 +7,7 @@ describe Tabulo::Table do
       source,
       header_frequency: header_frequency,
       wrap_header_cells_to: wrap_header_cells_to,
-      wrap_cells_to: wrap_cells_to
+      wrap_body_cells_to: wrap_body_cells_to
     ) do |t|
       t.add_column("N", &:itself)
       t.add_column("Doubled") { |n| n * 2 }
@@ -17,7 +17,7 @@ describe Tabulo::Table do
   let(:source) { 1..5 }
   let(:header_frequency) { :start }
   let(:wrap_header_cells_to) { nil }
-  let(:wrap_cells_to) { nil }
+  let(:wrap_body_cells_to) { nil }
 
   specify "is an Enumerable" do
     expect(table).to be_a(Enumerable)
@@ -152,12 +152,12 @@ describe Tabulo::Table do
       end
     end
 
-    describe "`wrap_cells_to` option" do
+    describe "`wrap_body_cells_to` option" do
       let(:source) { [1, 2, 50_000_000] }
-      let(:wrap_cells_to) { nil }
+      let(:wrap_body_cells_to) { nil }
 
-      context "when table is initialized with `wrap_cells_to: nil`" do
-        let(:wrap_cells_to) { nil }
+      context "when table is initialized with `wrap_body_cells_to: nil`" do
+        let(:wrap_body_cells_to) { nil }
 
         it "wraps cell contents as necessary if they exceed the column width" do
           expect(table.to_s).to eq \
@@ -171,8 +171,8 @@ describe Tabulo::Table do
         end
       end
 
-      context "when table is initialized with `wrap_cells_to: <N>`" do
-        let(:wrap_cells_to) { 1 }
+      context "when table is initialized with `wrap_body_cells_to: <N>`" do
+        let(:wrap_body_cells_to) { 1 }
 
         it "truncates header cell contents to N rows, instead of wrapping them indefinitely" do
           expect(table.to_s).to eq \

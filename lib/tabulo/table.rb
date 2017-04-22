@@ -15,13 +15,13 @@ module Tabulo
 
         # nil to wrap to no max, 1 to wrap to 1 row then truncate, etc..
         wrap_header_cells_to: nil,
-        wrap_cells_to: nil
+        wrap_body_cells_to: nil
 
       }.merge(options)
 
       @header_frequency = opts[:header_frequency]
       @wrap_header_cells_to = opts[:wrap_header_cells_to]
-      @wrap_cells_to = opts[:wrap_cells_to]
+      @wrap_body_cells_to = opts[:wrap_body_cells_to]
       @sources = sources
       @joiner = "|"
       @corner_character = "+"
@@ -106,7 +106,7 @@ module Tabulo
     def format_row(header = false, padder = @padding_character, joiner = @joiner)
       cell_stacks = @columns.map do |column|
         raw = yield column
-        wrap = (header ? @wrap_header_cells_to : @wrap_cells_to)
+        wrap = (header ? @wrap_header_cells_to : @wrap_body_cells_to)
         column_width = column.width
         cell_body_length = (wrap ? column_width * wrap : raw.length)
         truncated = (cell_body_length < raw.length)

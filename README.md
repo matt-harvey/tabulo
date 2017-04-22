@@ -158,13 +158,13 @@ table = Tabulo::Table.new(["hello", "abcdefghijklmnopqrstuvwxyz"], columns: %i(i
 ```
 
 Wrapping behaviour is configured for the table as a whole using the `wrap_header_cells_to` option
-for header cells and `wrap_cells_to` for body cells, both of which default to `nil`, meaning that
-cells are wrapped to as many rows as required. Passing a `Fixnum` limits wrapping to the given
+for header cells and `wrap_body_cells_to` for body cells, both of which default to `nil`, meaning
+that cells are wrapped to as many rows as required. Passing a `Fixnum` limits wrapping to the given
 number of rows, with content truncated from that point on. The `~` character is appended to the
 outputted cell content to show that truncation has occurred:
 
 ```ruby
-table = Tabulo::Table.new(["hello", "abcdefghijklmnopqrstuvwxyz"], wrap_cells_to: 1, columns: %i(itself length))
+table = Tabulo::Table.new(["hello", "abcdefghijklmnopqrstuvwxyz"], wrap_body_cells_to: 1, columns: %i(itself length))
 ```
 
 ```
