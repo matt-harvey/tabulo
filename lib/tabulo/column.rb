@@ -2,11 +2,10 @@ module Tabulo
 
   class Column
 
-    attr_reader :label, :truncate, :width
+    attr_reader :label, :width
 
     def initialize(options)
       @label, @header = options[:label], options[:header]
-      @truncate = options[:truncate]
       @align_header = options[:align_header] || :center
       @align_body = options[:align_body]  || nil
       @extractor = options[:extractor] || @label.to_proc

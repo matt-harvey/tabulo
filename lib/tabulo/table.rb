@@ -37,7 +37,6 @@ module Tabulo
           Column.new({
             label: item.to_sym,
             header: item.to_s,
-            truncate: true,
             align_header: :center,
             horizontal_rule_character: @horizontal_rule_character,
             width: @default_column_width,
@@ -108,9 +107,8 @@ module Tabulo
       cell_stacks = @columns.map do |column|
         raw = yield column
         wrap = (header ? @wrap_header_cells_to : @wrap_cells_to)
-        truncate = (column.truncate && wrap)
         column_width = column.width
-        cell_body_length = (truncate ? column_width * wrap : raw.length)
+        cell_body_length = (wrap ? column_width * wrap : raw.length)
         truncated = (cell_body_length < raw.length)
         cell_body = raw[0...cell_body_length]
         num_subcells = (cell_body_length.to_f / column_width).ceil
