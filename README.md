@@ -79,7 +79,7 @@ end
 Or equivalently:
 
 ```ruby
-Tabulo::Table.new([1, 2, 5], columns: %i(itself even odd))
+Tabulo::Table.new([1, 2, 5], columns: %i(itself even? odd?))
 ```
 
 The resulting table looks like this:
@@ -102,7 +102,7 @@ the header text:
 table = Tabulo::Table.new([1, 2, 5]) do |t|
   t.add_column("N", &:itself)
   t.add_column("Doubled") { |n| n * 2 }
-  t.add_column(:odd?)  # we can mix and match
+  t.add_column(:odd?)
 end
 ```
 
