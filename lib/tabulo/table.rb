@@ -1,14 +1,56 @@
 module Tabulo
 
+  # Represents a table primarily intended for "pretty-printing" in a fixed-width font.
+  #
+  # A Table is also an Enumerable, of which each element is a Tabulo::Row.
   class Table
     include Enumerable
 
     DEFAULT_COLUMN_WIDTH = 8
+
     HORIZONTAL_RULE_CHARACTER = "-"
     CORNER_CHARACTER = "+"
 
     attr_reader :columns
 
+    # Public: Initializes and returns a new Table.
+    #
+    # sources - the underlying Enumerable from which the table will derive its data
+    #
+    # options - a Hash of options providing for customization of the Table:
+    #
+    #           :columns  - An Array (default: []) specifying the initial columns (note more can be
+    #                       added later using #add_column). Each element of the Array
+    #                       should be either a Symbol or a Column. If it's a Symbol,
+    #                       it will be used to initialize a Column whose content is
+    #                       created by calling the corresponding method on each
+    #                       element of sources.
+    #
+    #           :header_frequency - Controls the display of Column headers. Possible values:
+    #
+    #                               <tt>:start</tt> (default) - show column headers at top of table only
+    #
+    #                               <tt>nil</tt>              - do not show column headers.
+    #
+    #                               N (a Fixnum > 0)   - show column headers at start, then repeated
+    #                                                    every N rows.
+    #
+    #           :wrap_header_cells_to - Controls wrapping behaviour for header cells if the content
+    #                                   thereof is longer than the Column's fixed width. Possible
+    #                                   values:
+    #
+    #                                   <tt>nil</tt>      - wrap content for as many rows as necessary
+    #
+    #                                   N (a Fixnum > 0) - wrap content for up to N rows and
+    #                                                      truncate thereafter
+    #
+    #           :wrap_body_cells_to   - Controls wrapping behaviour for table cells (excluding
+    #                                   headers). Possible values:
+    #
+    #                                   <tt>nil</tt>       - wrap content for as many rows as necessary
+    #
+    #                                   N (a `Fixnum` > 0) - wrap content for up to N rows and
+    #                                                      truncate thereafter
     def initialize(sources, options = { })
       opts = {
         columns: [],
