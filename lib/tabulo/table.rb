@@ -121,6 +121,7 @@ module Tabulo
     end
 
     def format_row(header = false, padder = @padding_character, joiner = @joiner)
+      # TODO Tidy this up -- or at least comment it.
       cell_stacks = @columns.map do |column|
         raw = yield column
         wrap = (header ? @wrap_header_cells_to : @wrap_body_cells_to)
