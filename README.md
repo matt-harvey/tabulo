@@ -268,7 +268,7 @@ License](http://opensource.org/licenses/MIT).
 [Dependency Status]: https://gemnasium.com/matt-harvey/tabulo
 [Coverage Status]: https://coveralls.io/r/matt-harvey/tabulo
 
-[GV img]: https://badge.fury.io/rb/tabulo.png
-[BS img]: https://travis-ci.org/matt-harvey/tabulo.png
-[DS img]: https://gemnasium.com/matt-harvey/tabulo.png
-[CS img]: https://coveralls.io/repos/matt-harvey/tabulo/badge.png?branch=master
+[GV img]: https://img.shields.io/gem/v/tabulo.svg
+[BS img]: https://img.shields.io/travis/matt-harvey/tabulo.svg
+[DS img]: https://img.shields.io/gemnasium/matt-harvey/tabulo.svg
+[CS img]: https://img.shields.io/coveralls/matt-harvey/tabulo.svg
