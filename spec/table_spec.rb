@@ -19,7 +19,7 @@ describe Tabulo::Table do
   let(:wrap_header_cells_to) { nil }
   let(:wrap_body_cells_to) { nil }
 
-  specify "is an Enumerable" do
+  it "is an Enumerable" do
     expect(table).to be_a(Enumerable)
     expect(table).to respond_to(:each)
     expect(table).to respond_to(:map)
