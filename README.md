@@ -2,6 +2,7 @@
 
 [![Gem Version][GV img]][Gem Version]
 [![Build Status][BS img]][Build Status]
+[![Dependency Status][DS img]][Dependency Status]
 [![Coverage Status][CS img]][Coverage Status]
 
 ## Overview
@@ -264,8 +265,10 @@ License](http://opensource.org/licenses/MIT).
 
 [Gem Version]: https://rubygems.org/gems/tabulo
 [Build Status]: https://travis-ci.org/matt-harvey/tabulo
+[Dependency Status]: https://gemnasium.com/matt-harvey/tabulo
 [Coverage Status]: https://coveralls.io/r/matt-harvey/tabulo
 
 [GV img]: https://badge.fury.io/rb/tabulo.png
 [BS img]: https://travis-ci.org/matt-harvey/tabulo.png
+[DS img]: https://gemnasium.com/matt-harvey/tabulo.png
 [CS img]: https://coveralls.io/repos/matt-harvey/tabulo/badge.png?branch=master
