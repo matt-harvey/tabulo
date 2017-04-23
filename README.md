@@ -1,5 +1,8 @@
 # Tabulo
 
+[![Gem Version][GV img]][Gem Version]
+[![Build Status][BS img]][Build Status]
+
 ## Overview
 
 Tabulo generates ASCII tables.
@@ -258,3 +261,8 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/matt-h
 The gem is available as open source under the terms of the [MIT
 License](http://opensource.org/licenses/MIT).
 
+[Gem Version]: https://rubygems.org/gems/tabulo
+[Build Status]: https://travis-ci.org/matt-harvey/tabulo
+
+[GV img]: https://badge.fury.io/rb/tabulo.png
+[BS img]: https://travis-ci.org/matt-harvey/tabulo.png
