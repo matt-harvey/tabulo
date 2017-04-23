@@ -28,34 +28,12 @@ module Tabulo
       @truncation_indicator = "~"
       @padding_character = " "
       @default_column_width = DEFAULT_COLUMN_WIDTH
-      @columns = opts[:columns].map do |item|
-        case item
-        when Column
-          item
-        else
-          Column.new({
-            label: item.to_sym,
-            header: item.to_s,
-            align_header: :center,
-            width: @default_column_width,
-            formatter: :to_s.to_proc
-          })
-        end
-      end
+      @columns = opts[:columns].map { |item| make_column(item) }
       yield self if block_given?
     end
 
     def add_column(label, options = {}, &extractor)
-      @columns << Column.new({
-        label: label.to_sym,
-        header: label.to_s,
-        truncate: true,
-        align_header: :center,
-        width: @default_column_width,
-        extractor: extractor || (label.respond_to?(:to_proc) ? label.to_proc : proc { nil }),
-        formatter: :to_s.to_proc
-
-      }.merge(options))
+      @columns << make_column(label, extractor: extractor)
     end
 
     def to_s
@@ -131,6 +109,22 @@ module Tabulo
 
     def join_lines(lines)
       lines.join($/)  # join strings with cross-platform newline
+    end
+
+    def make_column(item, options = { })
+      case item
+      when Column
+        item
+      else
+        Column.new({
+          label: item.to_sym,
+          header: item.to_s,
+          align_header: :center,
+          width: @default_column_width,
+          formatter: :to_s.to_proc
+
+        }.merge(options))
+      end
     end
   end
 end
