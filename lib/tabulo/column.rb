@@ -47,8 +47,6 @@ module Tabulo
           [0, padding]
         when :right
           [padding, 0]
-        else
-          raise "Unrecognized alignment: #{real_alignment}"
         end
 
       "#{' ' * left_padding}#{content}#{' ' * right_padding}"
