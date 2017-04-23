@@ -217,8 +217,6 @@ table = Tabulo::Table.new(1..10, columns: %i(itself even?), header_frequency: 5)
 |       10 |   true   |
 ```
 
-TODO: Write rdocs, and link to them here "for more".
-
 ### Using a Table Enumerator
 
 Because it's an `Enumerable`, a `Tabulo::Table` can also give you an `Enumerator`,
@@ -242,7 +240,7 @@ end.to_enum  # <-- make an Enumerator
 => nil
 ```
 
-Note the used of `.find_each`: we can start printing the table without having to load the entire
+Note the use of `.find_each`: we can start printing the table without having to load the entire
 underlying collection. (The cost of supporting this behaviour is that Tabulo requires us to set
 column widths up front, rather than adapting to the width of the widest value.)
 
