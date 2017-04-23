@@ -9,6 +9,13 @@
 
 Tabulo generates ASCII tables.
 
+```ruby
+table = Tabulo::Table.new([1, 2, 50000000]) do |t|
+  t.add_column("N", &:itself)
+  t.add_column("Doubled") { |n| n * 2 }
+end
+```
+
 ```
 > puts table
 +----------+----------+
@@ -28,7 +35,7 @@ table.each do |row|
 end
 ```
 
-And the rows themselves are `Enumerable`, providing access to the underlying cell values:
+Each `Tabulo::Row` is also an `Enumerable`, which provides access to the underlying cell values:
 
 ```ruby
 table.each do |row|
@@ -84,8 +91,6 @@ Or equivalently:
 ```ruby
 Tabulo::Table.new([1, 2, 5], columns: %i(itself even? odd?))
 ```
-
-The resulting table looks like this:
 
 ```
 > puts table
