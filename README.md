@@ -9,8 +9,6 @@
 
 Tabulo generates ASCII tables.
 
-A `Tabulo::Table` can, of course, be printed:
-
 ```
 > puts table
 +----------+----------+
@@ -21,7 +19,7 @@ A `Tabulo::Table` can, of course, be printed:
 | 50000000 | 10000000 |
 ```
 
-But it is also `Enumerable`, so you can process one row at a time:
+A `Tabulo::Table` is an `Enumerable`, so you can process one row at a time:
 
 ```ruby
 table.each do |row|
@@ -30,7 +28,7 @@ table.each do |row|
 end
 ```
 
-And rows are themselves `Enumerable`, providing access to the underlying cell values:
+And the rows themselves are `Enumerable`, providing access to the underlying cell values:
 
 ```ruby
 table.each do |row|
