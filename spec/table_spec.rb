@@ -185,6 +185,24 @@ describe Tabulo::Table do
         end
       end
     end
+
+    describe "column alignment" do
+      it "by default, aligns text left, booleans center and numbers right, with header text centered" do
+        table.add_column(:to_s)
+        table.add_column(:even?)
+        table.add_column(:to_f)
+
+        expect(table.to_s).to eq \
+          %q(+----------+----------+----------+----------+----------+
+             |     N    |  Doubled |   to_s   |   even?  |   to_f   |
+             +----------+----------+----------+----------+----------+
+             |        1 |        2 | 1        |   false  |      1.0 |
+             |        2 |        4 | 2        |   true   |      2.0 |
+             |        3 |        6 | 3        |   false  |      3.0 |
+             |        4 |        8 | 4        |   true   |      4.0 |
+             |        5 |       10 | 5        |   false  |      5.0 |).gsub(/^ +/, "")
+      end
+    end
   end
 
   describe "#columns" do
