@@ -4,7 +4,8 @@ module Tabulo
     include Enumerable
 
     DEFAULT_COLUMN_WIDTH = 8
-    DEFAULT_HORIZONTAL_RULE_CHARACTER = "-"
+    HORIZONTAL_RULE_CHARACTER = "-"
+    CORNER_CHARACTER = "+"
 
     attr_reader :columns
 
@@ -24,8 +25,6 @@ module Tabulo
       @wrap_body_cells_to = opts[:wrap_body_cells_to]
       @sources = sources
       @joiner = "|"
-      @corner_character = "+"
-      @horizontal_rule_character = "-"
       @truncation_indicator = "~"
       @padding_character = " "
       @default_column_width = DEFAULT_COLUMN_WIDTH
@@ -38,7 +37,6 @@ module Tabulo
             label: item.to_sym,
             header: item.to_s,
             align_header: :center,
-            horizontal_rule_character: @horizontal_rule_character,
             width: @default_column_width,
             formatter: :to_s.to_proc
           })
@@ -53,7 +51,6 @@ module Tabulo
         header: label.to_s,
         truncate: true,
         align_header: :center,
-        horizontal_rule_character: @horizontal_rule_character,
         width: @default_column_width,
         extractor: extractor || (label.respond_to?(:to_proc) ? label.to_proc : proc { nil }),
         formatter: :to_s.to_proc
@@ -85,7 +82,7 @@ module Tabulo
     end
 
     def horizontal_rule
-      format_row(false, @horizontal_rule_character, @corner_character, &:horizontal_rule)
+      format_row(false, HORIZONTAL_RULE_CHARACTER, CORNER_CHARACTER, &:horizontal_rule)
     end
 
     def formatted_body_row(source, options = { with_header: false })

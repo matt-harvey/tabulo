@@ -13,9 +13,6 @@ module Tabulo
 
       # TODO Should be able to set these default on a Table-by-Table basis.
       @width = options[:width] || Table::DEFAULT_COLUMN_WIDTH
-
-      @horizontal_rule_character =
-        options[:horizontal_rule_character] || Table::DEFAULT_HORIZONTAL_RULE_CHARACTER
     end
 
     def header_cell
@@ -23,7 +20,7 @@ module Tabulo
     end
 
     def horizontal_rule
-      @horizontal_rule_character * @width
+      Table::HORIZONTAL_RULE_CHARACTER * @width
     end
 
     def body_cell(source)
