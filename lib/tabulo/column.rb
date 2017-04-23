@@ -10,8 +10,6 @@ module Tabulo
       @align_body = options[:align_body]  || nil
       @extractor = options[:extractor] || @label.to_proc
       @formatter = options[:formatter] || :to_s.to_proc
-
-      # TODO Should be able to set these default on a Table-by-Table basis.
       @width = options[:width] || Table::DEFAULT_COLUMN_WIDTH
     end
 
