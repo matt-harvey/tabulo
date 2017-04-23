@@ -9,7 +9,7 @@ describe Tabulo::Table do
       wrap_header_cells_to: wrap_header_cells_to,
       wrap_body_cells_to: wrap_body_cells_to
     ) do |t|
-      t.add_column("N", &:itself)
+      t.add_column("N") { |n| n }
       t.add_column("Doubled") { |n| n * 2 }
     end
   end
@@ -29,9 +29,9 @@ describe Tabulo::Table do
   describe "#initialize / #to_s" do
     describe "`columns` options" do
       it "accepts symbols corresponding to methods on the source objects" do
-        expect(Tabulo::Table.new([1, 2, 3], columns: [:itself, :to_f]).to_s).to eq \
+        expect(Tabulo::Table.new([1, 2, 3], columns: [:to_i, :to_f]).to_s).to eq \
           %q(+----------+----------+
-             |  itself  |   to_f   |
+             |   to_i   |   to_f   |
              +----------+----------+
              |        1 |      1.0 |
              |        2 |      2.0 |
@@ -44,12 +44,12 @@ describe Tabulo::Table do
           Tabulo::Table.new(
             [1, 2, 3],
             columns: [
-              Tabulo::Column.new(header: "itself", extractor: proc { |source| source }),
+              Tabulo::Column.new(header: "to_i", extractor: proc { |source| source }),
               Tabulo::Column.new(header: "to_f", extractor: proc { |source| source.to_f })
             ]
           ).to_s).to eq \
             %q(+----------+----------+
-               |  itself  |   to_f   |
+               |   to_i   |   to_f   |
                +----------+----------+
                |        1 |      1.0 |
                |        2 |      2.0 |
@@ -112,7 +112,7 @@ describe Tabulo::Table do
     end
 
     describe "`wrap_header_cells_to` option" do
-      before(:each) { table.add_column("N" * 18, &:itself) }
+      before(:each) { table.add_column("N" * 18, &:to_i) }
 
       context "when table is initialized with `wrap_header_cells_to: nil`" do
         let(:wrap_header_cells_to) { nil }
