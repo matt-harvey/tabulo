@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.2.2
+
+* Write documentation
+* Create a TODO file
 
 ## v0.2.1
 
