@@ -16,7 +16,6 @@ module Tabulo
     # Public: Initializes and returns a new Table.
     #
     # sources - the underlying Enumerable from which the table will derive its data
-    #
     # options - a Hash of options providing for customization of the Table:
     #
     #           :columns  - An Array (default: []) specifying the initial columns (note more can be
@@ -74,10 +73,45 @@ module Tabulo
       yield self if block_given?
     end
 
-    def add_column(label, options = {}, &extractor)
+    # Public: Initializes a Column and adds it to the Table.
+    #
+    # label   - A Symbol or String being a unique identifier for this column, which by default will
+    #           also be used as the column header text (see also the header option). If the
+    #           extractor argument is not provided, then the label argument should correspond to
+    #           a method to be called on each item in the table sources to provide the content
+    #           for this column.
+    #
+    # options - A Hash of options providing for customization of the column:
+    #
+    #           :header       - Text to be displayed in the column header. By default the column
+    #                           label will also be used as its header text.
+    #
+    #           :align_header - Specifies how the header text should be aligned. Possible values
+    #                           are <tt>:left</tt>, <tt>:center</tt> and <tt>:right</tt>.
+    #
+    #           :width        - Specifies the width of the column, not including the single
+    #                           character of padding.
+    #
+    #           :formatter    - A callable (e.g. a lambda) that will be passed the calculated
+    #                           value of each cell to determine how it should be displayed. This
+    #                           is distinct from the extractor (see below). For
+    #                           example, if the extractor for this column generates a Date, then
+    #                           the formatter might format that Date in a particular way.
+    #                           If no formatter is provided, then <tt>.to_s</tt> will be called on
+    #                           the extracted value of each cell to determine its displayed
+    #                           content.
+    #
+    # extractor - A callable, e.g. a block or lambda, that will be passed each of the Table
+    #             sources to determined the value in each cell of this column. If this is not
+    #             provided, then the column label will be treated as a method to be called on each
+    #             source item to determine each cell's value.
+    #
+    def add_column(label, options = { }, &extractor)
       @columns << make_column(label, extractor: extractor)
     end
 
+    # Public: Returns a String being a graphical "ASCII" representation of the Table, suitable for
+    # display in a fixed-width font.
     def to_s
       join_lines(map(&:to_s))
     end
