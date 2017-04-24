@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.3.0
+
+* Rename Table#header_row to Table#formatted_header
+* Improve documentation, and use Yardoc instead of Tomdoc
+* Remove Tabulo::Column from the publicly documented API.
+
 ## v0.2.2
 
 * Write documentation
