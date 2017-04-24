@@ -8,3 +8,6 @@
   a library!)
 * Document :formatter option in README.
 * Allow default column width to be configured at level of Table.
+* Rename Table#header_row to Table#header to avoid confusion as it does not
+  return a Row.
+* Column#initialize should have the same signature as Table#add_column.

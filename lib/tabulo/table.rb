@@ -77,7 +77,7 @@ module Tabulo
     #
     # label   - A Symbol or String being a unique identifier for this column, which by default will
     #           also be used as the column header text (see also the header option). If the
-    #           extractor argument is not provided, then the label argument should correspond to
+    #           extractor argument is not also provided, then the label argument should correspond to
     #           a method to be called on each item in the table sources to provide the content
     #           for this column.
     #
@@ -89,8 +89,17 @@ module Tabulo
     #           :align_header - Specifies how the header text should be aligned. Possible values
     #                           are <tt>:left</tt>, <tt>:center</tt> and <tt>:right</tt>.
     #
+    #           :align_body   - Specifies how the cell body contents will be aligned. Possible
+    #                           values are <tt>:left</tt>, <tt>:center</tt>, <tt>:right</tt>
+    #                           and <tt>nil</tt>. If <tt>nil</tt> is passed (the default), then
+    #                           the alignment is determined by the type of the cell value,
+    #                           with numbers aligned right, booleans center-aligned, and
+    #                           other values left-aligned. Note header text alignment is
+    #                           configured separately using the :align_header option.
+    #
     #           :width        - Specifies the width of the column, not including the single
-    #                           character of padding.
+    #                           character of padding. The default is given by
+    #                           Table::DEFAULT_COLUMN_WIDTH.
     #
     #           :formatter    - A callable (e.g. a lambda) that will be passed the calculated
     #                           value of each cell to determine how it should be displayed. This
@@ -102,7 +111,7 @@ module Tabulo
     #                           content.
     #
     # extractor - A callable, e.g. a block or lambda, that will be passed each of the Table
-    #             sources to determined the value in each cell of this column. If this is not
+    #             sources to determine the value in each cell of this column. If this is not
     #             provided, then the column label will be treated as a method to be called on each
     #             source item to determine each cell's value.
     #
@@ -116,6 +125,16 @@ module Tabulo
       join_lines(map(&:to_s))
     end
 
+    # Public: Calls the given block once for each Row in the Table, passing that Row as parameter.
+    #
+    # Examples
+    #
+    #   table.each do |row|
+    #     puts row
+    #   end
+    #
+    # Note that when printed, the first row will visually include the headers (assuming these
+    # were not disabled when the Table was initialized).
     def each
       @sources.each_with_index do |source, index|
         include_header =
@@ -131,14 +150,28 @@ module Tabulo
       end
     end
 
+    # Public: Returns a String being an "ASCII" graphical representation of the Table column
+    # headers.
     def header_row
       format_row(true, &:header_cell)
     end
 
+    # Public: Returns a String being an "ASCII" graphical representation of a horizontal
+    # dividing line suitable for printing at any point in the table.
+    #
+    # Examples
+    #
+    #   # To print a horizontal divider after every row:
+    #   table.each do |row|
+    #     puts row
+    #     puts table.horizontal_rule
+    #   end
+    #
     def horizontal_rule
       format_row(false, HORIZONTAL_RULE_CHARACTER, CORNER_CHARACTER, &:horizontal_rule)
     end
 
+    # Internal
     def formatted_body_row(source, options = { with_header: false })
       inner = format_row { |column| column.body_cell(source) }
       if options[:with_header]
@@ -150,10 +183,12 @@ module Tabulo
 
     private
 
+    # Internal
     def body_row(source, options = { with_header: false })
       Row.new(self, source, options)
     end
 
+    # Internal
     def format_row(header = false, padder = @padding_character, joiner = @joiner)
       # TODO Tidy this up -- or at least comment it.
       cell_stacks = @columns.map do |column|
@@ -184,10 +219,12 @@ module Tabulo
       join_lines(subrows.map { |subrow| "#{joiner}#{subrow.join(joiner)}#{joiner}" })
     end
 
+    # Internal
     def join_lines(lines)
       lines.join($/)  # join strings with cross-platform newline
     end
 
+    # Internal
     def make_column(item, options = { })
       case item
       when Column
