@@ -123,7 +123,7 @@ module Tabulo
     end
 
     # @return [String] an "ASCII" graphical representation of the Table column headers.
-    def header_row
+    def formatted_header
       format_row(true, &:header_cell)
     end
 
@@ -144,7 +144,7 @@ module Tabulo
     def formatted_body_row(source, options = { with_header: false })
       inner = format_row { |column| column.body_cell(source) }
       if options[:with_header]
-        join_lines([horizontal_rule, header_row, horizontal_rule, inner])
+        join_lines([horizontal_rule, formatted_header, horizontal_rule, inner])
       else
         inner
       end

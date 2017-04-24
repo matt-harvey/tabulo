@@ -238,9 +238,9 @@ describe Tabulo::Table do
     end
   end
 
-  describe "#header_row" do
+  describe "#formatted_header" do
     it "returns a string representing a header row for the table" do
-      expect(table.header_row).to eq("|     N    |  Doubled |")
+      expect(table.formatted_header).to eq("|     N    |  Doubled |")
     end
   end
 
