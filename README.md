@@ -138,17 +138,29 @@ the `align_header` or `align_body` options of `add_column`, e.g.:
 ### Column width, wrapping and truncation
 
 By default, column width is fixed at 12 characters, plus 1 character of padding on either side.
-This can be customized using the `width` option of `add_column`:
+This can be adjusted on a column-by-column basis using the `width` option of `add_column`:
 
 ```ruby
-  table.add_column(:even?, width: 5)
+  table = Tabulo::Table.new([1, 2]) do |t|
+    t.add_column(:itself, width: 6)
+    t.add_column(:even?, width: 9)
+  end
+```
+
+```
+> puts table
++--------+-----------+
+| itself |   even?   |
++--------+-----------+
+|      1 |   false   |
+|      2 |    true   |
 ```
 
 If you want to set the default column width for all columns of the table to something other
 than 12, use the `column_width` option when initializing the table:
 
 ```ruby
-  Tabulo::Table.new([1, 2], columns: %i(itself even?), column_width: 6)
+  table = Tabulo::Table.new([1, 2], columns: %i(itself even?), column_width: 6)
 ```
 
 ```
@@ -158,9 +170,9 @@ than 12, use the `column_width` option when initializing the table:
 +--------+--------+
 |      1 |  false |
 |      2 |  true  |
-``` 
+```
 
-The widths set for individual columns will override the default column width for the table.
+Widths set for individual columns always override the default column width for the table.
 
 ### Overflow handling
 
@@ -207,6 +219,40 @@ table = Tabulo::Table.new(
 | hello        |            5 |
 | abcdefghijkl~|           26 |
 ```
+
+### Formatting cell values
+
+While the callable passed to `add_column` determines the underyling, calculated value in each
+cell of the column, there is a separate concept, of a "formatter", that determines how that value will
+be visually displayed. By default, `.to_s` is called on the underlying cell value to "format"
+it; however, you can format it differently by passing another callable to the `:formatter` option
+of `add_column`:
+
+```ruby
+table = Tabulo::Table.new(1..3) do |t|
+  t.add_column("N", &:itself)
+  t.add_column("Reciprocal", formatter: -> (n) { "%.2f" % n }) do |n|
+    1.0 / n
+  end
+end
+```
+
+```
+puts table
++--------------+--------------+
+|       N      |  Reciprocal  |
++--------------+--------------+
+|            1 |         1.00 |
+|            2 |         0.50 |
+|            3 |         0.33 |
+```
+
+Note the numbers in the "Reciprocal" column in this example are still right-aligned, even though
+the callable passed to `:formatter` returns a String. Default cell alignment is determined by the type
+of the underlying cell value, not the way it is formatted. This is usually the desired result.
+
+Note also that the item yielded to `.each` for each cell when enumerating over a `Tabulo::Row` is
+the underlying value of that cell, not its formatted value.
 
 ### Repeating headers
 
