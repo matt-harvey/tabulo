@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.4.1
+
+* Update README to reflect default column width of 12.
+
 ## v0.4.0
 
 * Increase default column width from 8 to 12
