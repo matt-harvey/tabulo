@@ -59,10 +59,10 @@ describe Tabulo::Row do
 
       it "returns a string showing the column headers and the row contents" do
         expect(row.to_s).to eq \
-          %q(+----------+----------+
-             |     N    |  Doubled |
-             +----------+----------+
-             |        3 |        6 |).gsub(/^ +/, "")
+          %q(+--------------+--------------+
+             |       N      |    Doubled   |
+             +--------------+--------------+
+             |            3 |            6 |).gsub(/^ +/, "")
       end
     end
 
@@ -70,7 +70,7 @@ describe Tabulo::Row do
       let(:with_header) { false }
 
       it "returns a string showing the row contents without the column headers" do
-        expect(row.to_s).to eq("|        3 |        6 |")
+        expect(row.to_s).to eq("|            3 |            6 |")
       end
     end
   end

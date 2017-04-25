@@ -6,7 +6,7 @@ module Tabulo
   class Table
     include Enumerable
 
-    DEFAULT_COLUMN_WIDTH = 8
+    DEFAULT_COLUMN_WIDTH = 12
 
     HORIZONTAL_RULE_CHARACTER = "-"
     CORNER_CHARACTER = "+"

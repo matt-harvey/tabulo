@@ -137,7 +137,7 @@ the `align_header` or `align_body` options of `add_column`, e.g.:
 
 ### Column width, wrapping and truncation
 
-By default, column width is fixed at 8 characters, plus 1 character of padding on either side.
+By default, column width is fixed at 12 characters, plus 1 character of padding on either side.
 This can be customized using the `width` option of `add_column`:
 
 ```ruby
@@ -145,7 +145,7 @@ This can be customized using the `width` option of `add_column`:
 ```
 
 If you want to set the default column width for all columns of the table to something other
-than 8, use the `column_width` option when initializing the table:
+than 12, use the `column_width` option when initializing the table:
 
 ```ruby
   Tabulo::Table.new([1, 2], columns: %i(itself even?), column_width: 6)
