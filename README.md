@@ -225,7 +225,7 @@ table = Tabulo::Table.new(
 While the callable passed to `add_column` determines the underyling, calculated value in each
 cell of the column, there is a separate concept, of a "formatter", that determines how that value will
 be visually displayed. By default, `.to_s` is called on the underlying cell value to "format"
-it; however, you can format it differently by passing another callable to the `:formatter` option
+it; however, you can format it differently by passing another callable to the `formatter` option
 of `add_column`:
 
 ```ruby
@@ -248,7 +248,7 @@ puts table
 ```
 
 Note the numbers in the "Reciprocal" column in this example are still right-aligned, even though
-the callable passed to `:formatter` returns a String. Default cell alignment is determined by the type
+the callable passed to `formatter` returns a String. Default cell alignment is determined by the type
 of the underlying cell value, not the way it is formatted. This is usually the desired result.
 
 Note also that the item yielded to `.each` for each cell when enumerating over a `Tabulo::Row` is
@@ -319,11 +319,6 @@ column widths up front, rather than adapting to the width of the widest value.)
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run
 the tests. You can also run `bin/console` for an interactive prompt that will allow you to
 experiment.
-
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new
-version, update the version number in `version.rb`, and then run `bundle exec rake release`, which
-will create a git tag for the version, push git commits and tags, and push the `.gem` file to
-[rubygems.org](https://rubygems.org).
 
 ## Contributing
 
