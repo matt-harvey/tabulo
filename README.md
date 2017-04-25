@@ -144,6 +144,15 @@ This can be customized using the `width` option of `add_column`:
   table.add_column(:even?, width: 5)
 ```
 
+If you want to set the default column width for all columns of the table to something other
+than 8, use the `column_width` option when initializing the table:
+
+```ruby
+  Tabulo::Table.new([1, 2], columns: %i(itself even?), column_width: 6)
+```
+
+The widths set for individual columns will override the default column width for the table.
+
 ### Overflow handling
 
 By default, if cell contents exceed their column width, they are wrapped for as many rows as

@@ -5,6 +5,7 @@ describe Tabulo::Table do
   let!(:table) do
     Tabulo::Table.new(
       source,
+      column_width: column_width,
       header_frequency: header_frequency,
       wrap_header_cells_to: wrap_header_cells_to,
       wrap_body_cells_to: wrap_body_cells_to
@@ -15,6 +16,7 @@ describe Tabulo::Table do
   end
 
   let(:source) { 1..5 }
+  let(:column_width) { nil }
   let(:header_frequency) { :start }
   let(:wrap_header_cells_to) { nil }
   let(:wrap_body_cells_to) { nil }
@@ -165,6 +167,40 @@ describe Tabulo::Table do
                |        1 |        2 |
                |        2 |        4 |
                | 50000000 | 10000000~|).gsub(/^ +/, "")
+        end
+      end
+    end
+
+    describe "`column_width` option" do
+      context "if not specified or passed nil" do
+        it "default to 8" do
+          expect(table.to_s).to eq \
+            %q(+----------+----------+
+               |     N    |  Doubled |
+               +----------+----------+
+               |        1 |        2 |
+               |        2 |        4 |
+               |        3 |        6 |
+               |        4 |        8 |
+               |        5 |       10 |).gsub(/^ +/, "")
+        end
+      end
+
+      context "when passed a Fixnum" do
+        let(:column_width) { 9 }
+
+        it "causes all column widths to default to the given Fixnum, unless overridden for "\
+          "particular columns" do
+          table.add_column(:even?, width: 5)
+          expect(table.to_s).to eq \
+            %q(+-----------+-----------+-------+
+               |     N     |  Doubled  | even? |
+               +-----------+-----------+-------+
+               |         1 |         2 | false |
+               |         2 |         4 |  true |
+               |         3 |         6 | false |
+               |         4 |         8 |  true |
+               |         5 |        10 | false |).gsub(/^ +/, "")
         end
       end
     end

@@ -20,6 +20,8 @@ module Tabulo
     #   Each element of the Array  will be used to create a column whose content is
     #   created by calling the corresponding method on each element of sources. Note
     #   the {#add_column} method is a much more flexible way to set up columns on the table.
+    # @option options [Fixnum, nil] :column_width (nil) The default column width for columns in this
+    #   table, not excluding padding. If nil, then DEFAULT_COLUMN_WIDTH will be used.
     # @option options [:start, nil, Fixnum] :header_frequency (:start) Controls the display of column headers.
     #   If passed <tt>:start</tt>, headers will be shown at the top of the table only. If passed <tt>nil</tt>,
     #   headers will not be shown. If passed a Fixnum N (> 0), headers will be shown at the top of the table,
@@ -37,6 +39,7 @@ module Tabulo
     def initialize(sources, options = { })
       opts = {
         columns: [],
+        column_width: DEFAULT_COLUMN_WIDTH,
         header_frequency: :start,
 
         # nil to wrap to no max, 1 to wrap to 1 row then truncate, etc..
@@ -52,7 +55,7 @@ module Tabulo
       @joiner = "|"
       @truncation_indicator = "~"
       @padding_character = " "
-      @default_column_width = DEFAULT_COLUMN_WIDTH
+      @default_column_width = opts[:column_width] || DEFAULT_COLUMN_WIDTH
       @columns = opts[:columns].map { |item| make_column(item) }
       yield self if block_given?
     end
@@ -75,8 +78,9 @@ module Tabulo
     #   by the type of the cell value, with numbers aligned right, booleans center-aligned, and
     #   other values left-aligned. Note header text alignment is configured separately using the
     #   :align_header option.
-    # @option options [Fixnum] :width (8) Specifies the width of the
-    #   column, excluding padding.
+    # @option options [Fixnum] :width (nil) Specifies the width of the column, excluding padding. If
+    #   nil, then the column will take the width provided by the `column_width` option
+    #   with which the Table was initialized.
     # @option options [#to_proc] :formatter (:to_s.to_proc) A lambda or other callable object that
     #   will be passed the calculated value of each cell to determine how it should be displayed. This
     #   is distinct from the extractor (see below). For example, if the extractor for this column

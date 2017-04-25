@@ -12,7 +12,7 @@ module Tabulo
       @align_body = options[:align_body]  || nil
       @extractor = options[:extractor] || @label.to_proc
       @formatter = options[:formatter] || :to_s.to_proc
-      @width = options[:width] || Table::DEFAULT_COLUMN_WIDTH
+      @width = options[:width]
     end
 
     # @!visibility private
