@@ -40,8 +40,7 @@ Each `Tabulo::Row` is also an `Enumerable`, which provides access to the underly
 ```ruby
 table.each do |row|
   row.each do |cell|
-    # 1, 2, 50000000...
-    puts cell.class  # Fixnum
+    # cell => 1, 2... 2, 4... etc.
   end
 end
 ```
