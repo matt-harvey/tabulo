@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.3.1
+
+* Fix width and other options ignored by Table#add_column.
+
 ## v0.3.0
 
 * Rename Table#header_row to Table#formatted_header
