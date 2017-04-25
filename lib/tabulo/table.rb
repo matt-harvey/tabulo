@@ -89,7 +89,7 @@ module Tabulo
     #   called on each source item to determine each cell's value.
     #
     def add_column(label, options = { }, &extractor)
-      @columns << make_column(label, extractor: extractor)
+      @columns << make_column(label, options.merge(extractor: extractor))
     end
 
     # @return [String] a graphical "ASCII" representation of the Table, suitable for
