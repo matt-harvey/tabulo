@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.4.0
+
+* Increase default column width from 8 to 12
+* Allow default column width to be configured when initializing a Table
+* Minor code tidy-ups, including removal of undocumented ability for
+  Table#add_column to accept a Column instance directly.
+
 ## v0.3.1
 
 * Fix width and other options ignored by Table#add_column.
