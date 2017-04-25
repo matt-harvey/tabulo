@@ -3,7 +3,6 @@ encoding: UTF-8
 static_path: []
 rdoc_include:
 - "."
-- "/Users/matthew/Workbench/versioned/linode/tabulo"
 charset: UTF-8
 exclude: 
 hyperlink_all: false
