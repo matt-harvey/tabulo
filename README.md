@@ -18,12 +18,12 @@ end
 
 ```
 > puts table
-+----------+----------+
-|     N    |  Doubled |
-+----------+----------+
-|        1 |        2 |
-|        2 |        4 |
-| 50000000 | 10000000 |
++--------------+--------------+
+|       N      |    Doubled   |
++--------------+--------------+
+|            1 |            2 |
+|            2 |            4 |
+|      5000000 |     10000000 |
 ```
 
 A `Tabulo::Table` is an `Enumerable`, so you can process one row at a time:
@@ -89,17 +89,17 @@ end
 Or equivalently:
 
 ```ruby
-Tabulo::Table.new([1, 2, 5], columns: %i(itself even? odd?))
+table = Tabulo::Table.new([1, 2, 5], columns: %i(itself even? odd?))
 ```
 
 ```
 > puts table
-+----------+----------+----------+
-|  itself  |   even?  |   odd?   |
-+----------+----------+----------+
-|        1 |   false  |   true   |
-|        2 |   true   |   false  |
-|        5 |   false  |   true   |
++--------------+--------------+--------------+
+|    itself    |     even?    |     odd?     |
++--------------+--------------+--------------+
+|            1 |     false    |     true     |
+|            2 |     true     |     false    |
+|            5 |     false    |     true     |
 ```
 
 Columns can also be initialized using a callable to which each object will be passed to determine
@@ -116,12 +116,12 @@ end
 
 ```
 > puts table
-+----------+----------+----------+
-|     N    |  Doubled |   odd?   |
-+----------+----------+----------+
-|        1 |        2 |   true   |
-|        2 |        4 |   false  |
-|        5 |       10 |   true   |
++--------------+--------------+--------------+
+|       N      |    Doubled   |     odd?     |
++--------------+--------------+--------------+
+|            1 |            2 |     true     |
+|            2 |            4 |     false    |
+|            5 |           10 |     true     |
 ```
 
 ### Cell alignment
@@ -151,6 +151,15 @@ than 12, use the `column_width` option when initializing the table:
   Tabulo::Table.new([1, 2], columns: %i(itself even?), column_width: 6)
 ```
 
+```
+> puts table
++--------+--------+
+| itself |  even? |
++--------+--------+
+|      1 |  false |
+|      2 |  true  |
+``` 
+
 The widths set for individual columns will override the default column width for the table.
 
 ### Overflow handling
@@ -159,19 +168,21 @@ By default, if cell contents exceed their column width, they are wrapped for as 
 required:
 
 ```ruby
-table = Tabulo::Table.new(["hello", "abcdefghijklmnopqrstuvwxyz"], columns: %i(itself length))
+table = Tabulo::Table.new(
+  ["hello", "abcdefghijklmnopqrstuvwxyz"],
+  columns: %i(itself length)
+)
 ```
 
 ```
 > puts table
-+----------+----------+
-|  itself  |  length  |
-+----------+----------+
-| hello    |        5 |
-| abcdefgh |       26 |
-| ijklmnop |          |
-| qrstuvwx |          |
-| yz       |          |
++--------------+--------------+
+|    itself    |    length    |
++--------------+--------------+
+| hello        |            5 |
+| abcdefghijkl |           26 |
+| mnopqrstuvwx |              |
+| yz           |              |
 ```
 
 Wrapping behaviour is configured for the table as a whole using the `wrap_header_cells_to` option
@@ -181,16 +192,20 @@ number of rows, with content truncated from that point on. The `~` character is 
 outputted cell content to show that truncation has occurred:
 
 ```ruby
-table = Tabulo::Table.new(["hello", "abcdefghijklmnopqrstuvwxyz"], wrap_body_cells_to: 1, columns: %i(itself length))
+table = Tabulo::Table.new(
+  ["hello", "abcdefghijklmnopqrstuvwxyz"],
+  wrap_body_cells_to: 1,
+  columns: %i(itself length)
+)
 ```
 
 ```
 > puts table
-+----------+----------+
-|  itself  |  length  |
-+----------+----------+
-| hello    |        5 |
-| abcdefgh~|       26 |
++--------------+--------------+
+|    itself    |    length    |
++--------------+--------------+
+| hello        |            5 |
+| abcdefghijkl~|           26 |
 ```
 
 ### Repeating headers
@@ -208,22 +223,22 @@ table = Tabulo::Table.new(1..10, columns: %i(itself even?), header_frequency: 5)
 
 ```
 > puts table
-+----------+----------+
-|  itself  |   even?  |
-+----------+----------+
-|        1 |   false  |
-|        2 |   true   |
-|        3 |   false  |
-|        4 |   true   |
-|        5 |   false  |
-+----------+----------+
-|  itself  |   even?  |
-+----------+----------+
-|        6 |   true   |
-|        7 |   false  |
-|        8 |   true   |
-|        9 |   false  |
-|       10 |   true   |
++--------------+--------------+
+|    itself    |     even?    |
++--------------+--------------+
+|            1 |     false    |
+|            2 |     true     |
+|            3 |     false    |
+|            4 |     true     |
+|            5 |     false    |
++--------------+--------------+
+|    itself    |     even?    |
++--------------+--------------+
+|            6 |     true     |
+|            7 |     false    |
+|            8 |     true     |
+|            9 |     false    |
+|           10 |     true     |
 ```
 
 ### Using a Table Enumerator
@@ -235,17 +250,17 @@ for example, you might do this:
 ```
 > e = Tabulo::Table.new(User.find_each) do |t|
   t.add_column(:id)
-  t.add_column(:email, width: 25)
+  t.add_column(:email, width: 24)
 end.to_enum  # <-- make an Enumerator
 ...
 > puts e.next
-+----------+--------------------------+
-|    id    |          email           |
-+----------+--------------------------+
-|        1 | jane@example.com         |
++--------------+--------------------------+
+|      id      |          email           |
++--------------+--------------------------+
+|            1 | jane@example.com         |
 => nil
 > puts e.next
-|        2 | betty@example.net        |
+|            2 | betty@example.net        |
 => nil
 ```
 
