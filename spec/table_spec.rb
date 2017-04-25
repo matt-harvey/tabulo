@@ -168,6 +168,21 @@ describe Tabulo::Table do
         end
       end
     end
+  end
+
+  describe "#columns" do
+    it "returns an array of all the table's `Tabulo::Column`s" do
+      result = table.columns
+      expect(result).to be_a(Array)
+      expect(result.count).to eq(2)
+      expect(result.all? { |c| c.is_a?(Tabulo::Column) }).to be_truthy
+    end
+  end
+
+  describe "#add_column" do
+    it "adds to the table's columns" do
+      expect { table.add_column(:even?) }.to change { table.columns.count }.by(1)
+    end
 
     describe "column alignment" do
       it "by default, aligns text left, booleans center and numbers right, with header text centered" do
@@ -185,24 +200,11 @@ describe Tabulo::Table do
              |        4 |        8 | 4        |   true   |      4.0 |
              |        5 |       10 | 5        |   false  |      5.0 |).gsub(/^ +/, "")
       end
-    end
-  end
 
-  describe "#columns" do
-    it "returns an array of all the table's `Tabulo::Column`s" do
-      result = table.columns
-      expect(result).to be_a(Array)
-      expect(result.count).to eq(2)
-      expect(result.all? { |c| c.is_a?(Tabulo::Column) }).to be_truthy
-    end
-  end
-
-  describe "#add_column" do
-    it "adds to the table's columns" do
-      expect { table.add_column(:even?) }.to change { table.columns.count }.by(1)
+      pending "when passed :left, :center and :right"
     end
 
-    pending "initializes a `Tabulo::Column` with the passed label, options and extractor"
+    pending "other options"
   end
 
   describe "#each" do
