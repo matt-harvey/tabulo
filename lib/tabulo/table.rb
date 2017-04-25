@@ -195,19 +195,14 @@ module Tabulo
 
     # @!visibility private
     def make_column(item, options = { })
-      case item
-      when Column
-        item
-      else
-        Column.new({
-          label: item.to_sym,
-          header: item.to_s,
-          align_header: :center,
-          width: @default_column_width,
-          formatter: :to_s.to_proc
+      Column.new({
+        label: item.to_sym,
+        header: item.to_s,
+        align_header: :center,
+        width: @default_column_width,
+        formatter: :to_s.to_proc
 
-        }.merge(options))
-      end
+      }.merge(options))
     end
   end
 end

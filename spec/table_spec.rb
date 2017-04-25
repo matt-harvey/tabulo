@@ -38,23 +38,6 @@ describe Tabulo::Table do
              |        3 |      3.0 |).gsub(/^ +/, "")
 
       end
-
-      it "accepts instances of `Tabulo::Column`" do
-        expect(
-          Tabulo::Table.new(
-            [1, 2, 3],
-            columns: [
-              Tabulo::Column.new(header: "to_i", extractor: proc { |source| source }),
-              Tabulo::Column.new(header: "to_f", extractor: proc { |source| source.to_f })
-            ]
-          ).to_s).to eq \
-            %q(+----------+----------+
-               |   to_i   |   to_f   |
-               +----------+----------+
-               |        1 |      1.0 |
-               |        2 |      2.0 |
-               |        3 |      3.0 |).gsub(/^ +/, "")
-      end
     end
 
     describe "`header_frequency` option" do
