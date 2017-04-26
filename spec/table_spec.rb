@@ -220,6 +220,8 @@ describe Tabulo::Table do
       expect { table.add_column(:even?) }.to change { table.columns.count }.by(1)
     end
 
+    pending "`header` option"
+
     describe "column alignment" do
       let(:column_width) { 8 }
 
@@ -239,10 +241,62 @@ describe Tabulo::Table do
              |        5 |       10 | 5        |   false  |      5.0 |).gsub(/^ +/, "")
       end
 
-      pending "when passed :left, :center and :right"
+      context "when passed `align_header` and `align_body` are passed :left, :center or :right" do
+        it "aligns header and body accordingly, overriding the default alignments" do
+          table.add_column(:to_s, align_header: :left, align_body: :center)
+          table.add_column(:even?, align_header: :left, align_body: :right)
+          table.add_column(:to_f, align_header: :right, align_body: :left)
+          expect(table.to_s).to eq \
+            %q(+----------+----------+----------+----------+----------+
+               |     N    |  Doubled | to_s     | even?    |     to_f |
+               +----------+----------+----------+----------+----------+
+               |        1 |        2 |     1    |    false | 1.0      |
+               |        2 |        4 |     2    |     true | 2.0      |
+               |        3 |        6 |     3    |    false | 3.0      |
+               |        4 |        8 |     4    |     true | 4.0      |
+               |        5 |       10 |     5    |    false | 5.0      |).gsub(/^ +/, "")
+        end
+      end
     end
 
-    pending "other options"
+    describe "`width` option" do
+      it "fixes the column width at the passed value (not including padding), overriding the default "\
+        "column width for the table" do
+        table.add_column("Trebled", width: 16) { |n| n * 3 }
+        expect(table.to_s).to eq \
+          %q(+--------------+--------------+------------------+
+             |       N      |    Doubled   |      Trebled     |
+             +--------------+--------------+------------------+
+             |            1 |            2 |                3 |
+             |            2 |            4 |                6 |
+             |            3 |            6 |                9 |
+             |            4 |            8 |               12 |
+             |            5 |           10 |               15 |).gsub(/^ +/, "")
+      end
+    end
+
+    describe "`formatter` option" do
+      it "formats the cell value for display, without changing the underlying cell value or its "\
+        "default alignment" do
+        table.add_column("Trebled", formatter: -> (val) { "%.2f" % val }) do |n|
+          n * 3
+        end
+        expect(table.to_s).to eq \
+          %q(+--------------+--------------+--------------+
+             |       N      |    Doubled   |    Trebled   |
+             +--------------+--------------+--------------+
+             |            1 |            2 |         3.00 |
+             |            2 |            4 |         6.00 |
+             |            3 |            6 |         9.00 |
+             |            4 |            8 |        12.00 |
+             |            5 |           10 |        15.00 |).gsub(/^ +/, "")
+        top_right_body_cell = table.first.to_a.last
+        expect(top_right_body_cell).to eq(3)
+        expect(top_right_body_cell).to be_a(Fixnum)
+      end
+    end
+
+    pending "`extractor` param"
   end
 
   describe "#each" do
