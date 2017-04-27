@@ -296,7 +296,53 @@ describe Tabulo::Table do
       end
     end
 
-    pending "`extractor` param"
+    describe "`extractor` param" do
+      context "when provided" do
+        let(:table) do
+          Tabulo::Table.new(1..5) do |t|
+            t.add_column("N", &:itself)
+            t.add_column("x 2") do |n|
+              n * 2
+            end
+            t.add_column("x 3", &(proc { |n| n * 3 }))
+            t.add_column("x 4", &(-> (n) { n * 4 }))
+            t.add_column("x 5") { |n| n * 5 }
+          end
+        end
+
+        it "accepts a block or other callable, with which it calculates the cell value" do
+          expect(table.to_s).to eq \
+            %q(+--------------+--------------+--------------+--------------+--------------+
+               |       N      |      x 2     |      x 3     |      x 4     |      x 5     |
+               +--------------+--------------+--------------+--------------+--------------+
+               |            1 |            2 |            3 |            4 |            5 |
+               |            2 |            4 |            6 |            8 |           10 |
+               |            3 |            6 |            9 |           12 |           15 |
+               |            4 |            8 |           12 |           16 |           20 |
+               |            5 |           10 |           15 |           20 |           25 |).gsub(/^ +/, "")
+        end
+      end
+
+      context "when not provided" do
+        let(:table) do
+          Tabulo::Table.new(1..5) do |t|
+            t.add_column(:itself)
+          end
+        end
+
+        specify "the first argument is called as a method on each source item to derive the cell value" do
+          expect(table.to_s).to eq \
+            %q(+--------------+
+               |    itself    |
+               +--------------+
+               |            1 |
+               |            2 |
+               |            3 |
+               |            4 |
+               |            5 |).gsub(/^ +/, "")
+        end
+      end
+    end
   end
 
   describe "#each" do
