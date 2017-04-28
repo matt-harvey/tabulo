@@ -34,7 +34,7 @@ Tabulo is flexible:
   its contents.
 * You can cap total table width when shrinkwrapping, to [stop it overflowing your terminal](#max-table-width)
   horizontally and becoming an unreadable mess.
-* Cell content [alignment](#cell-alignment) is configurable, but with useful defaults, with numbers
+* Cell content alignment is [configurable](#cell-alignment), but with useful defaults, with numbers
   aligned right and strings left.
 * Headers can be [repeated](#repeating-headers) as desired.
 * A `Tabulo::Table` is an `Enumerable`, so you can [step through it](#enumerator) one row at a time,
