@@ -28,12 +28,16 @@ end
 
 Tabulo is flexible:
 
-* Fix individual column widths, then either wrap or truncate the overflow as you prefer.
-* Alternatively, "shrinkwrap" the table so that each column is just wide enough for its contents.
-* Cell content alignment is configurable, but with useful defaults, with numbers aligned right and
-  strings left.
-* Headers can be repeated as desired.
-* A `Tabulo::Table` is an `Enumerable`, so you can [step through](#enumerator) it one row at a time,
+* Fix individual column widths, then either [wrap](#width-wrapping-truncation) or
+  [truncate](#width-wrapping-truncation) the overflow as you prefer.
+* Alternatively, [shrinkwrap](#shrinkwrap) the table so that each column is just wide enough for
+  its contents.
+* You can cap total table width when shrinkwrapping, to [stop it overflowing your terminal](#max-table-width)
+  horizontally and becoming an unreadable mess.
+* Cell content [alignment](#cell-alignment) is configurable, but with useful defaults, with numbers
+  aligned right and strings left.
+* Headers can be [repeated](#repeating-headers) as desired.
+* A `Tabulo::Table` is an `Enumerable`, so you can [step through it](#enumerator) one row at a time,
   without having to wait for the entire underlying collection to load.
 * Each `Tabulo::Row` is also an `Enumerable`.
 
@@ -123,6 +127,7 @@ end
 |            5 |           10 |     true     |
 ```
 
+<a name="cell-alignment"></a>
 ### Cell alignment
 
 By default, column header text is center-aligned, while the content of each body cell is aligned
@@ -134,6 +139,7 @@ the `align_header` or `align_body` options of `add_column`, e.g.:
 table.add_column("Doubled", align_header: :left, align_body: :left) { |n| n * 2 }
 ```
 
+<a name="width-wrapping-truncation"></a>
 ### Column width, wrapping and truncation
 
 By default, column width is fixed at 12 characters, plus 1 character of padding on either side.
@@ -173,6 +179,9 @@ table = Tabulo::Table.new([1, 2], columns: %i(itself even?), column_width: 6)
 
 Widths set for individual columns always override the default column width for the table.
 
+<a name="shrinkwrap"></a>
+### Automating column widths
+
 Instead of setting column widths "manually", you can tell the table to sort out the widths
 itself, so that each column is just wide enough for its header and contents (plus a character
 of padding):
@@ -188,7 +197,7 @@ table.shrinkwrap!
 | itself | even? |
 +--------+-------+
 |      1 | false |
-|      2 | true  |
+|      2 |  true |
 ```
 
 The `shrinkwrap!` method returns the table itself, so you can "wrap-and-print" in one go:
@@ -197,11 +206,33 @@ The `shrinkwrap!` method returns the table itself, so you can "wrap-and-print" i
 puts Tabulo::Table.new([1, 2], columns: %i(itself even?)).shrinkwrap!
 ```
 
+<a name="max-table-width"></a>
+You can place an upper limit on the total width of the table when shrinkwrapping:
+
+```ruby
+puts Tabulo::Table.new([1, 2], columns: %i(itself even?)).shrinkwrap!(max_table_width: 17)
+```
+
+```
++-------+-------+
+| itsel | even? |
+| f     |       |
++-------+-------+
+|     1 | false |
+|     2 |  true |
+```
+
+If the table cannot be fit within `max_column_width`, column widths are reduced as required, with
+wrapping or truncation then occuring as necessary (see [Overflow handling](#overflow-handling)).
+Under the hood, a character of width is deducted column by column&mdash;the widest column being
+targetted each time&mdash;until the table will fit. This is very useful when you want to ensure the
+table will not overflow your terminal horizontally.
+
 Note that shrinkwrapping necessarily involves traversing the entire collection up front as
 the maximum cell width needs to be calculated for each column. You may not want to do this
-if the collection is large.
+if the collection is very large.
 
-
+<a name="overflow-handling"></a>
 ### Overflow handling
 
 By default, if cell contents exceed their column width, they are wrapped for as many rows as
@@ -282,6 +313,7 @@ of the underlying cell value, not the way it is formatted. This is usually the d
 Note also that the item yielded to `.each` for each cell when enumerating over a `Tabulo::Row` is
 the underlying value of that cell, not its formatted value.
 
+<a name="repeating-headers"></a>
 ### Repeating headers
 
 By default, headers are only shown once, at the top of the table (`header_frequency: :start`). If
