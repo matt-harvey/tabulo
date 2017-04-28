@@ -26,21 +26,19 @@ end
 |      5000000 |     10000000 |
 ```
 
-A `Tabulo::Table` is an `Enumerable`, so you can process one row at a time:
+Tabulo is flexible:
 
-```ruby
-table.each do |row|
-  puts row
-  # do some other thing that you want to do for each row
-end
-```
-
-Each `Tabulo::Row` is also an `Enumerable`, which provides access to the underlying cell values:
+* Fix individual column widths, then either wrap or truncate the overflow as you prefer.
+* Alternatively, "shrinkwrap" the table so that each column is just wide enough for its contents.
+* Headers can be repeated as desired.
+* A `Tabulo::Table` is an `Enumerable`, so you can [step through](#enumerator) it one row at a time,
+  without having to wait for the entire underlying collection to load.
+* Each `Tabulo::Row` is also an `Enumerable`.
 
 ```ruby
 table.each do |row|
   row.each do |cell|
-    # cell => 1, 2... 2, 4... etc.
+    # cell => 1, 2 ... 2, 4 ... etc.
   end
 end
 ```
@@ -131,7 +129,7 @@ and `true`) are center-aligned. This can be customized by passing `:center`, `:l
 the `align_header` or `align_body` options of `add_column`, e.g.:
 
 ```ruby
-  table.add_column("Doubled", align_header: :left, align_body: :left) { |n| n * 2 }
+table.add_column("Doubled", align_header: :left, align_body: :left) { |n| n * 2 }
 ```
 
 ### Column width, wrapping and truncation
@@ -140,10 +138,10 @@ By default, column width is fixed at 12 characters, plus 1 character of padding 
 This can be adjusted on a column-by-column basis using the `width` option of `add_column`:
 
 ```ruby
-  table = Tabulo::Table.new([1, 2]) do |t|
-    t.add_column(:itself, width: 6)
-    t.add_column(:even?, width: 9)
-  end
+table = Tabulo::Table.new([1, 2]) do |t|
+  t.add_column(:itself, width: 6)
+  t.add_column(:even?, width: 9)
+end
 ```
 
 ```
@@ -159,7 +157,7 @@ If you want to set the default column width for all columns of the table to some
 than 12, use the `column_width` option when initializing the table:
 
 ```ruby
-  table = Tabulo::Table.new([1, 2], columns: %i(itself even?), column_width: 6)
+table = Tabulo::Table.new([1, 2], columns: %i(itself even?), column_width: 6)
 ```
 
 ```
@@ -172,6 +170,35 @@ than 12, use the `column_width` option when initializing the table:
 ```
 
 Widths set for individual columns always override the default column width for the table.
+
+Instead of setting column widths "manually", you can tell the table to sort out the widths
+itself, so that each column is just wide enough for its header and contents (plus a character
+of padding):
+
+```ruby
+table = Tabulo::Table.new([1, 2], columns: %i(itself even?))
+table.shrinkwrap!
+```
+
+```
+> puts table
++--------+-------+
+| itself | even? |
++--------+-------+
+|      1 | false |
+|      2 | true  |
+```
+
+The `shrinkwrap!` method returns the table itself, so you can "wrap-and-print" in one go:
+
+```ruby
+puts Tabulo::Table.new([1, 2], columns: %i(itself even?)).shrinkwrap!
+```
+
+Note that shrinkwrapping necessarily involves traversing the entire collection up front as
+the maximum cell width needs to be calculated for each column. You may not want to do this
+if the collection is large.
+
 
 ### Overflow handling
 
@@ -286,6 +313,7 @@ table = Tabulo::Table.new(1..10, columns: %i(itself even?), header_frequency: 5)
 |           10 |     true     |
 ```
 
+<a name="enumerator"></a>
 ### Using a Table Enumerator
 
 Because it's an `Enumerable`, a `Tabulo::Table` can also give you an `Enumerator`,
