@@ -30,6 +30,8 @@ Tabulo is flexible:
 
 * Fix individual column widths, then either wrap or truncate the overflow as you prefer.
 * Alternatively, "shrinkwrap" the table so that each column is just wide enough for its contents.
+* Cell content alignment is configurable, but with useful defaults, with numbers aligned right and
+  strings left.
 * Headers can be repeated as desired.
 * A `Tabulo::Table` is an `Enumerable`, so you can [step through](#enumerator) it one row at a time,
   without having to wait for the entire underlying collection to load.
