@@ -31,7 +31,11 @@ module Tabulo
     #   any column headers that appear just above it in the {Table} (depending on where this Row is
     #   in the {Table} and how the {Table} was configured with respect to header frequency).
     def to_s
-      @table.formatted_body_row(@source, with_header: @with_header)
+      if @table.columns.any?
+        @table.formatted_body_row(@source, with_header: @with_header)
+      else
+        ""
+      end
     end
 
     # @return a Hash representation of the {Row}, with column labels acting

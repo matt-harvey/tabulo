@@ -99,7 +99,11 @@ module Tabulo
     # @return [String] a graphical "ASCII" representation of the Table, suitable for
     #   display in a fixed-width font.
     def to_s
-      join_lines(map(&:to_s))
+      if @columns.any?
+        join_lines(map(&:to_s))
+      else
+        ""
+      end
     end
 
     # Calls the given block once for each {Row} in the Table, passing that {Row} as parameter.
@@ -179,7 +183,7 @@ module Tabulo
         end
       end
 
-      subrows = (0...cell_stacks.map(&:size).max).map do |subrow_index|
+      subrows = (0...cell_stacks.map(&:size).max || 1).map do |subrow_index|
         cell_stacks.map.with_index do |cell_stack, column_index|
           if subrow_index < cell_stack.size
             cell_stack[subrow_index]

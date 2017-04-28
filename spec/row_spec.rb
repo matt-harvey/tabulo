@@ -73,6 +73,14 @@ describe Tabulo::Row do
         expect(row.to_s).to eq("|            3 |            6 |")
       end
     end
+
+    context "when the table does not have any columns" do
+      it "returns an empty string" do
+        table = Tabulo::Table.new(0...10)
+        row = table.first
+        expect(row.to_s).to eq("")
+      end
+    end
   end
 
   describe "#to_h" do

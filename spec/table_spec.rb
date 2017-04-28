@@ -94,6 +94,13 @@ describe Tabulo::Table do
                |            5 |           10 |).gsub(/^ +/, "")
         end
       end
+
+      context "when the table doesn't have any columns" do
+        specify "#to_s returns an empty string" do
+          table = Tabulo::Table.new(0..10)
+          expect(table.to_s).to eq("")
+        end
+      end
     end
 
     describe "`wrap_header_cells_to` option" do
