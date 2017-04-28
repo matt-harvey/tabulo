@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.5.0
+
+* Add Table#shrinkwrap! method to automate column widths so they "just fit".
+* Improve documentation.
+* Minor tidy-ups.
+
 ## v0.4.2
 
 * Improve README.
