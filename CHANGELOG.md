@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.4.2
+
+* Improve README.
+* Fix error when printing a Table, or a Row thereof, when the Table doesn't
+  have any columns.
+* Remove unused development dependency on yard-tomdoc.
+* Write more specs.
+
 ## v0.4.1
 
 * Update README to reflect default column width of 12.
