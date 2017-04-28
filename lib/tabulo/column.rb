@@ -3,7 +3,8 @@ module Tabulo
   # @!visibility private
   class Column
 
-    attr_reader :label, :width
+    attr_accessor :width
+    attr_reader :header, :label
 
     # @!visibility private
     def initialize(options)
@@ -28,9 +29,14 @@ module Tabulo
     # @!visibility private
     def body_cell(source)
       cell_datum = body_cell_value(source)
-      formatted_cell_content = @formatter.call(cell_datum)
-      real_alignment = @align_body || infer_alignment(cell_datum)
-      align_cell_content(formatted_cell_content, real_alignment)
+      formatted_content = @formatter.call(cell_datum)
+      real_alignment = (@align_body || infer_alignment(cell_datum))
+      align_cell_content(formatted_content, real_alignment)
+    end
+
+    # @!visibility private
+    def formatted_cell_content(source)
+      @formatter.call(body_cell_value(source))
     end
 
     # @!visibility private

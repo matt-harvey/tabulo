@@ -148,6 +148,32 @@ module Tabulo
       format_row(false, HORIZONTAL_RULE_CHARACTER, CORNER_CHARACTER, &:horizontal_rule)
     end
 
+    # Reset all the column widths so that each column is *just* wide enough to accommodate
+    # its header text as well as the formatted content of each its cells for the entire
+    # collection, together with a single character of padding on either side of the column,
+    # without any wrapping.
+    #
+    # Note that calling this method will cause the entire source Enumerable to
+    # be traversed and all the column extractors and formatters to be applied in order
+    # to calculate the required widths.
+    #
+    # @return [Table] the Table itself
+    def shrinkwrap!
+      # TODO Make this accept a param or option to cap the *total* width of a table,
+      # so that you can shrinkwrap without fear of overflowing your terminal.
+      header_widths = columns.map { |c| c.header.length }
+
+      column_widths = @sources.inject(header_widths) do |widths, source|
+        columns.map { |c| c.formatted_cell_content(source).length }.zip(widths).map(&:max)
+      end
+
+      columns.zip(column_widths).each do |column, width|
+        column.width = width
+      end
+
+      self
+    end
+
     # @!visibility private
     def formatted_body_row(source, options = { with_header: false })
       inner = format_row { |column| column.body_cell(source) }

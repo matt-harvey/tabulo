@@ -380,6 +380,49 @@ describe Tabulo::Table do
     end
   end
 
+  describe "#shrinkwrap" do
+    let(:column_width) { 8 }
+
+    it "returns the Table itself" do
+      expect(table.shrinkwrap!).to eq(table)
+    end
+
+    it "amends the column widths of the table so that they just accommodate their header and "\
+      "formatted body contents without wrapping" do
+      table.add_column(:to_s)
+      table.add_column("e?") { |n| n.even? }
+      table.add_column("dec", formatter: -> (n) { "%.#{n}f" % n }) { |n| n }
+      table.add_column("word", width: 5) { |n| "w" * n * 2 }
+
+      puts table
+
+      expect { table.shrinkwrap! }.to change(table, :to_s).from(
+        %q(+----------+----------+----------+----------+----------+-------+
+           |     N    |  Doubled |   to_s   |    e?    |    dec   |  word |
+           +----------+----------+----------+----------+----------+-------+
+           |        1 |        2 | 1        |   false  |      1.0 | ww    |
+           |        2 |        4 | 2        |   true   |     2.00 | wwww  |
+           |        3 |        6 | 3        |   false  |    3.000 | wwwww |
+           |          |          |          |          |          | w     |
+           |        4 |        8 | 4        |   true   |   4.0000 | wwwww |
+           |          |          |          |          |          | www   |
+           |        5 |       10 | 5        |   false  |  5.00000 | wwwww |
+           |          |          |          |          |          | wwwww |).gsub(/^ +/, "")
+
+      ).to(
+
+        %q(+---+---------+------+-------+---------+------------+
+           | N | Doubled | to_s |   e?  |   dec   |    word    |
+           +---+---------+------+-------+---------+------------+
+           | 1 |       2 | 1    | false |     1.0 | ww         |
+           | 2 |       4 | 2    |  true |    2.00 | wwww       |
+           | 3 |       6 | 3    | false |   3.000 | wwwwww     |
+           | 4 |       8 | 4    |  true |  4.0000 | wwwwwwww   |
+           | 5 |      10 | 5    | false | 5.00000 | wwwwwwwwww |).gsub(/^ +/, "")
+      )
+    end
+  end
+
   describe "#formatted_body_row" do
     context "when passed `with_header: true`" do
       it "returns a string representing a row in the body of the table, with a header" do
