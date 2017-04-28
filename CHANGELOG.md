@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.5.1
+
+* Fix Rubydocs Markdown parsing.
+
 ## v0.5.0
 
 * Add Table#shrinkwrap! method to automate column widths so they "just fit".
