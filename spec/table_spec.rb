@@ -394,8 +394,6 @@ describe Tabulo::Table do
       table.add_column("dec", formatter: -> (n) { "%.#{n}f" % n }) { |n| n }
       table.add_column("word", width: 5) { |n| "w" * n * 2 }
 
-      puts table
-
       expect { table.shrinkwrap! }.to change(table, :to_s).from(
         %q(+----------+----------+----------+----------+----------+-------+
            |     N    |  Doubled |   to_s   |    e?    |    dec   |  word |
