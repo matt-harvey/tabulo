@@ -383,41 +383,116 @@ describe Tabulo::Table do
   describe "#shrinkwrap" do
     let(:column_width) { 8 }
 
-    it "returns the Table itself" do
-      expect(table.shrinkwrap!).to eq(table)
-    end
-
-    it "amends the column widths of the table so that they just accommodate their header and "\
-      "formatted body contents without wrapping" do
+    before(:each) do
       table.add_column(:to_s)
       table.add_column("e?") { |n| n.even? }
       table.add_column("dec", formatter: -> (n) { "%.#{n}f" % n }) { |n| n }
       table.add_column("word", width: 5) { |n| "w" * n * 2 }
+    end
 
-      expect { table.shrinkwrap! }.to change(table, :to_s).from(
-        %q(+----------+----------+----------+----------+----------+-------+
-           |     N    |  Doubled |   to_s   |    e?    |    dec   |  word |
-           +----------+----------+----------+----------+----------+-------+
-           |        1 |        2 | 1        |   false  |      1.0 | ww    |
-           |        2 |        4 | 2        |   true   |     2.00 | wwww  |
-           |        3 |        6 | 3        |   false  |    3.000 | wwwww |
-           |          |          |          |          |          | w     |
-           |        4 |        8 | 4        |   true   |   4.0000 | wwwww |
-           |          |          |          |          |          | www   |
-           |        5 |       10 | 5        |   false  |  5.00000 | wwwww |
-           |          |          |          |          |          | wwwww |).gsub(/^ +/, "")
+    context "when `max_table_width` is not provided" do
+      it "returns the Table itself" do
+        expect(table.shrinkwrap!).to eq(table)
+      end
 
-      ).to(
+      # TODO Test that it will expand the table if required, not just shrink it.
 
-        %q(+---+---------+------+-------+---------+------------+
-           | N | Doubled | to_s |   e?  |   dec   |    word    |
-           +---+---------+------+-------+---------+------------+
-           | 1 |       2 | 1    | false |     1.0 | ww         |
-           | 2 |       4 | 2    |  true |    2.00 | wwww       |
-           | 3 |       6 | 3    | false |   3.000 | wwwwww     |
-           | 4 |       8 | 4    |  true |  4.0000 | wwwwwwww   |
-           | 5 |      10 | 5    | false | 5.00000 | wwwwwwwwww |).gsub(/^ +/, "")
-      )
+      it "amends the column widths of the table so that they just accommodate their header and "\
+        "formatted body contents without wrapping (assuming source data is constant)" do
+
+        expect { table.shrinkwrap! }.to change(table, :to_s).from(
+          %q(+----------+----------+----------+----------+----------+-------+
+             |     N    |  Doubled |   to_s   |    e?    |    dec   |  word |
+             +----------+----------+----------+----------+----------+-------+
+             |        1 |        2 | 1        |   false  |      1.0 | ww    |
+             |        2 |        4 | 2        |   true   |     2.00 | wwww  |
+             |        3 |        6 | 3        |   false  |    3.000 | wwwww |
+             |          |          |          |          |          | w     |
+             |        4 |        8 | 4        |   true   |   4.0000 | wwwww |
+             |          |          |          |          |          | www   |
+             |        5 |       10 | 5        |   false  |  5.00000 | wwwww |
+             |          |          |          |          |          | wwwww |).gsub(/^ +/, "")
+
+        ).to(
+
+          %q(+---+---------+------+-------+---------+------------+
+             | N | Doubled | to_s |   e?  |   dec   |    word    |
+             +---+---------+------+-------+---------+------------+
+             | 1 |       2 | 1    | false |     1.0 | ww         |
+             | 2 |       4 | 2    |  true |    2.00 | wwww       |
+             | 3 |       6 | 3    | false |   3.000 | wwwwww     |
+             | 4 |       8 | 4    |  true |  4.0000 | wwwwwwww   |
+             | 5 |      10 | 5    | false | 5.00000 | wwwwwwwwww |).gsub(/^ +/, "")
+        )
+      end
+    end
+
+    context "when `max_table_width` is provided (assuming source data is constant)" do
+      context "when `max_table_width` is wider than the existing table width" do
+        it "amends the column widths of the table so that they just accommodate their header and "\
+          "formatted body contents without wrapping (assuming source data is constant)" do
+
+          expect { table.shrinkwrap!(max_table_width: 64) }.to change(table, :to_s).from(
+            %q(+----------+----------+----------+----------+----------+-------+
+               |     N    |  Doubled |   to_s   |    e?    |    dec   |  word |
+               +----------+----------+----------+----------+----------+-------+
+               |        1 |        2 | 1        |   false  |      1.0 | ww    |
+               |        2 |        4 | 2        |   true   |     2.00 | wwww  |
+               |        3 |        6 | 3        |   false  |    3.000 | wwwww |
+               |          |          |          |          |          | w     |
+               |        4 |        8 | 4        |   true   |   4.0000 | wwwww |
+               |          |          |          |          |          | www   |
+               |        5 |       10 | 5        |   false  |  5.00000 | wwwww |
+               |          |          |          |          |          | wwwww |).gsub(/^ +/, "")
+
+          ).to(
+
+            %q(+---+---------+------+-------+---------+------------+
+               | N | Doubled | to_s |   e?  |   dec   |    word    |
+               +---+---------+------+-------+---------+------------+
+               | 1 |       2 | 1    | false |     1.0 | ww         |
+               | 2 |       4 | 2    |  true |    2.00 | wwww       |
+               | 3 |       6 | 3    | false |   3.000 | wwwwww     |
+               | 4 |       8 | 4    |  true |  4.0000 | wwwwwwww   |
+               | 5 |      10 | 5    | false | 5.00000 | wwwwwwwwww |).gsub(/^ +/, "")
+          )
+        end
+      end
+
+      context "when `max_table_width` is too narrow to accommodate the shrinkwrapped columns" do
+        it "amends the column widths of the table so that they just accommodate their header and "\
+          "formatted body contents (assuming source data is constant), except that width is progressively "\
+          "removed from the widest column until the table fits the passed width" do
+
+          expect { table.shrinkwrap!(max_table_width: 47) }.to change(table, :to_s).from(
+            %q(+----------+----------+----------+----------+----------+-------+
+               |     N    |  Doubled |   to_s   |    e?    |    dec   |  word |
+               +----------+----------+----------+----------+----------+-------+
+               |        1 |        2 | 1        |   false  |      1.0 | ww    |
+               |        2 |        4 | 2        |   true   |     2.00 | wwww  |
+               |        3 |        6 | 3        |   false  |    3.000 | wwwww |
+               |          |          |          |          |          | w     |
+               |        4 |        8 | 4        |   true   |   4.0000 | wwwww |
+               |          |          |          |          |          | www   |
+               |        5 |       10 | 5        |   false  |  5.00000 | wwwww |
+               |          |          |          |          |          | wwwww |).gsub(/^ +/, "")
+          ).to(
+            %q(+---+--------+------+-------+--------+--------+
+               | N | Double | to_s |   e?  |   dec  |  word  |
+               |   | d      |      |       |        |        |
+               +---+--------+------+-------+--------+--------+
+               | 1 |      2 | 1    | false |    1.0 | ww     |
+               | 2 |      4 | 2    |  true |   2.00 | wwww   |
+               | 3 |      6 | 3    | false |  3.000 | wwwwww |
+               | 4 |      8 | 4    |  true | 4.0000 | wwwwww |
+               |   |        |      |       |        | ww     |
+               | 5 |     10 | 5    | false | 5.0000 | wwwwww |
+               |   |        |      |       | 0      | wwww   |).gsub(/^ +/, "")
+          )
+        end
+      end
+
+      pending "when `max_table_width` is so narrow that not even column borders can be accommodated"
     end
   end
 

@@ -157,10 +157,19 @@ module Tabulo
     # be traversed and all the column extractors and formatters to be applied in order
     # to calculate the required widths.
     #
+    # @param [Hash] options
+    # @option options [String] :max_table_width (nil) If provided, stops the total table
+    #   width (including padding and borders) from expanding beyond this number of characters.
+    #   Width is deducted from columns if required to achieve this, with one character progressively
+    #   deducted from the width of the widest column until the target is reached. When the
+    #   table is printed, wrapping or truncation will then occur in these columns as required
+    #   (depending on how they were configured).
+    #
     # @return [Table] the Table itself
-    def shrinkwrap!
-      # TODO Make this accept a param or option to cap the *total* width of a table,
-      # so that you can shrinkwrap without fear of overflowing your terminal.
+    def shrinkwrap!(options = { })
+      return self if columns.none?
+      max_table_width = options[:max_table_width]
+
       header_widths = columns.map { |c| c.header.length }
 
       column_widths = @sources.inject(header_widths) do |widths, source|
@@ -169,6 +178,29 @@ module Tabulo
 
       columns.zip(column_widths).each do |column, width|
         column.width = width
+      end
+
+      if max_table_width
+        total_columns_width = columns.inject(0) { |sum, column| sum + column.width }
+        total_padding = columns.count * 2
+        total_borders = columns.count + 1
+        unadjusted_table_width = total_columns_width + total_padding + total_borders
+
+        # Ensure max table width is at least wide enough to accommodate table borders and padding
+        # and one character of content.
+        # TODO Document this behaviour.
+        min_table_width = total_padding + total_borders + columns.count
+        max_table_width = min_table_width if min_table_width > max_table_width
+
+        required_reduction = [unadjusted_table_width - max_table_width, 0].max
+
+        required_reduction.times do
+          widest_column = columns.inject(columns.first) do |widest, column|
+            column.width >= widest.width ? column : widest
+          end
+
+          widest_column.width -= 1
+        end
       end
 
       self
