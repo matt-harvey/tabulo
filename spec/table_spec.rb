@@ -29,7 +29,7 @@ describe Tabulo::Table do
   end
 
   describe "#initialize / #to_s" do
-    describe "`columns` options" do
+    describe "`columns` param" do
       it "accepts symbols corresponding to methods on the source objects" do
         expect(Tabulo::Table.new([1, 2, 3], columns: [:to_i, :to_f]).to_s).to eq \
           %q(+--------------+--------------+
@@ -42,7 +42,7 @@ describe Tabulo::Table do
       end
     end
 
-    describe "`header_frequency` option" do
+    describe "`header_frequency` param" do
       context "when table is initialized with `header_frequency: :start`" do
         let(:header_frequency) { :start }
 
@@ -103,7 +103,7 @@ describe Tabulo::Table do
       end
     end
 
-    describe "`wrap_header_cells_to` option" do
+    describe "`wrap_header_cells_to` param" do
       before(:each) { table.add_column("N" * 26, &:to_i) }
 
       context "when table is initialized with `wrap_header_cells_to: nil`" do
@@ -144,7 +144,7 @@ describe Tabulo::Table do
       end
     end
 
-    describe "`wrap_body_cells_to` option" do
+    describe "`wrap_body_cells_to` param" do
       let(:source) { [1, 2, 500_000_000_000] }
       let(:wrap_body_cells_to) { nil }
 
@@ -178,7 +178,7 @@ describe Tabulo::Table do
       end
     end
 
-    describe "`column_width` option" do
+    describe "`column_width` param" do
       context "if not specified or passed nil" do
         it "defaults to 12" do
           expect(table.to_s).to eq \
@@ -227,7 +227,7 @@ describe Tabulo::Table do
       expect { table.add_column(:even?) }.to change { table.columns.count }.by(1)
     end
 
-    describe "`header` option" do
+    describe "`header` param" do
       it "sets the column header, independently of the `label` argument" do
         table.add_column(:even?, header: "Armadillo")
         expect(table.to_s).to eq \
@@ -279,7 +279,7 @@ describe Tabulo::Table do
       end
     end
 
-    describe "`width` option" do
+    describe "`width` param" do
       it "fixes the column width at the passed value (not including padding), overriding the default "\
         "column width for the table" do
         table.add_column("Trebled", width: 16) { |n| n * 3 }
@@ -295,7 +295,7 @@ describe Tabulo::Table do
       end
     end
 
-    describe "`formatter` option" do
+    describe "`formatter` param" do
       it "formats the cell value for display, without changing the underlying cell value or its "\
         "default alignment" do
         table.add_column("Trebled", formatter: -> (val) { "%.2f" % val }) do |n|

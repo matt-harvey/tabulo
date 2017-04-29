@@ -15,73 +15,67 @@ module Tabulo
     attr_reader :columns
 
     # @param [Enumerable] sources the underlying Enumerable from which the table will derive its data
-    # @param [Hash] options
-    # @option options [Array[Symbol]] :columns ([]) Specifies the initial columns.
+    # @param [Array[Symbol]] :columns Specifies the initial columns.
     #   Each element of the Array  will be used to create a column whose content is
     #   created by calling the corresponding method on each element of sources. Note
     #   the {#add_column} method is a much more flexible way to set up columns on the table.
-    # @option options [Fixnum, nil] :column_width (nil) The default column width for columns in this
+    # @param [Fixnum, nil] :column_width The default column width for columns in this
     #   table, not excluding padding. If nil, then DEFAULT_COLUMN_WIDTH will be used.
-    # @option options [:start, nil, Fixnum] :header_frequency (:start) Controls the display of column headers.
+    # @param [:start, nil, Fixnum] :header_frequency Controls the display of column headers.
     #   If passed <tt>:start</tt>, headers will be shown at the top of the table only. If passed <tt>nil</tt>,
     #   headers will not be shown. If passed a Fixnum N (> 0), headers will be shown at the top of the table,
     #   then repeated every N rows.
-    # @option options [nil, Fixnum] :wrap_header_cells_to (nil) Controls wrapping behaviour for header
+    # @param [nil, Fixnum] :wrap_header_cells_to Controls wrapping behaviour for header
     #   cells if the content thereof is longer than the column's fixed width. If passed <tt>nil</tt> (default),
     #   content will be wrapped for as many rows as required to accommodate it. If passed a Fixnum N (> 0),
     #   content will be wrapped up to N rows and then truncated thereafter.
-    # @option options [nil, Fixnum] :wrap_body_cells_to (nil) Controls wrapping behaviour for table cells (excluding
+    # @param [nil, Fixnum] :wrap_body_cells_to Controls wrapping behaviour for table cells (excluding
     #   headers), if their content is longer than the column's fixed width. If passed <tt>nil</tt>, content will
     #   be wrapped for as many rows as required to accommodate it. If passed a Fixnum N (> 0), content will be
     #   wrapped up to N rows and then truncated thereafter.
     #
     # @return [Table] a new Table
-    def initialize(sources, options = { })
-      opts = {
-        columns: [],
-        column_width: DEFAULT_COLUMN_WIDTH,
-        header_frequency: :start,
+    def initialize(sources, columns: [], column_width: nil, header_frequency: :start,
+      wrap_header_cells_to: nil, wrap_body_cells_to: nil)
 
-        # nil to wrap to no max, 1 to wrap to 1 row then truncate, etc..
-        wrap_header_cells_to: nil,
-        wrap_body_cells_to: nil
-
-      }.merge(options)
-
-      @header_frequency = opts[:header_frequency]
-      @wrap_header_cells_to = opts[:wrap_header_cells_to]
-      @wrap_body_cells_to = opts[:wrap_body_cells_to]
       @sources = sources
+      @header_frequency = header_frequency
+      @wrap_header_cells_to = wrap_header_cells_to
+      @wrap_body_cells_to = wrap_body_cells_to
+
+      @default_column_width = (column_width || DEFAULT_COLUMN_WIDTH)
+
       @joiner = "|"
       @truncation_indicator = "~"
       @padding_character = " "
-      @default_column_width = opts[:column_width] || DEFAULT_COLUMN_WIDTH
-      @columns = opts[:columns].map { |item| make_column(item) }
+
+      @columns = []
+      columns.each { |item| add_column(item) }
+
       yield self if block_given?
     end
 
     # Adds a column to the Table.
     #
     # @param [Symbol, String] label A unique identifier for this column, which by default will
-    #   also be used as the column header text (see also the header option). If the
+    #   also be used as the column header text (see also the header param). If the
     #   extractor argument is not also provided, then the label argument should correspond to
     #   a method to be called on each item in the table sources to provide the content
     #   for this column.
     #
-    # @param [Hash] options
-    # @option options [String] :header Text to be displayed in the column header. By default the column
-    #   label will also be used as its header text.
-    # @option options [:left, :center, :right] :align_header (:center) Specifies how the header text
+    # @param [nil, #to_s] :header (nil) Text to be displayed in the column header. If passed nil,
+    #   the column's label will also be used as its header text.
+    # @param [:left, :center, :right] :align_header (:center) Specifies how the header text
     #   should be aligned.
-    # @option options [:left, :center, :right, nil] :align_body (nil) Specifies how the cell body contents
+    # @param [:left, :center, :right, nil] :align_body (nil) Specifies how the cell body contents
     #   should be aligned. Possible If <tt>nil</tt> is passed, then the alignment is determined
     #   by the type of the cell value, with numbers aligned right, booleans center-aligned, and
     #   other values left-aligned. Note header text alignment is configured separately using the
-    #   :align_header option.
-    # @option options [Fixnum] :width (nil) Specifies the width of the column, excluding padding. If
-    #   nil, then the column will take the width provided by the `column_width` option
+    #   :align_header param.
+    # @param [Fixnum] :width (nil) Specifies the width of the column, excluding padding. If
+    #   nil, then the column will take the width provided by the `column_width` param
     #   with which the Table was initialized.
-    # @option options [#to_proc] :formatter (:to_s.to_proc) A lambda or other callable object that
+    # @param [#to_proc] :formatter (:to_s.to_proc) A lambda or other callable object that
     #   will be passed the calculated value of each cell to determine how it should be displayed. This
     #   is distinct from the extractor (see below). For example, if the extractor for this column
     #   generates a Date, then the formatter might format that Date in a particular way.
@@ -92,8 +86,18 @@ module Tabulo
     #   column. If this is not provided, then the column label will be treated as a method to be
     #   called on each source item to determine each cell's value.
     #
-    def add_column(label, options = { }, &extractor)
-      @columns << make_column(label, options.merge(extractor: extractor))
+    def add_column(label, header: nil, align_header: :center, align_body: nil,
+      width: nil, formatter: :to_s.to_proc, &extractor)
+
+      @columns << Column.new(
+        label: label.to_sym,
+        header: (header || label).to_s,
+        align_header: align_header,
+        align_body: align_body,
+        width: (width || @default_column_width),
+        formatter: formatter,
+        extractor: (extractor || label.to_proc)
+      )
     end
 
     # @return [String] a graphical "ASCII" representation of the Table, suitable for
@@ -157,8 +161,7 @@ module Tabulo
     # be traversed and all the column extractors and formatters to be applied in order
     # to calculate the required widths.
     #
-    # @param [Hash] options
-    # @option options [String] :max_table_width (nil) If provided, stops the total table
+    # @param [nil, Numeric] :max_table_width (nil) If provided, stops the total table
     #   width (including padding and borders) from expanding beyond this number of characters.
     #   Width is deducted from columns if required to achieve this, with one character progressively
     #   deducted from the width of the widest column until the target is reached. When the
@@ -166,9 +169,8 @@ module Tabulo
     #   (depending on how they were configured).
     #
     # @return [Table] the Table itself
-    def shrinkwrap!(options = { })
+    def shrinkwrap!(max_table_width: nil)
       return self if columns.none?
-      max_table_width = options[:max_table_width]
 
       header_widths = columns.map { |c| c.header.length }
 
@@ -207,9 +209,9 @@ module Tabulo
     end
 
     # @!visibility private
-    def formatted_body_row(source, options = { with_header: false })
+    def formatted_body_row(source, with_header: false)
       inner = format_row { |column| column.body_cell(source) }
-      if options[:with_header]
+      if with_header
         join_lines([horizontal_rule, formatted_header, horizontal_rule, inner])
       else
         inner
@@ -219,8 +221,8 @@ module Tabulo
     private
 
     # @!visibility private
-    def body_row(source, options = { with_header: false })
-      Row.new(self, source, options)
+    def body_row(source, with_header: false)
+      Row.new(self, source, with_header: with_header)
     end
 
     # @!visibility private
@@ -257,18 +259,6 @@ module Tabulo
     # @!visibility private
     def join_lines(lines)
       lines.join($/)  # join strings with cross-platform newline
-    end
-
-    # @!visibility private
-    def make_column(item, options = { })
-      Column.new({
-        label: item.to_sym,
-        header: item.to_s,
-        align_header: :center,
-        width: @default_column_width,
-        formatter: :to_s.to_proc
-
-      }.merge(options))
     end
   end
 end

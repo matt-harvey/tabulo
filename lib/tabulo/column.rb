@@ -7,13 +7,16 @@ module Tabulo
     attr_reader :header, :label
 
     # @!visibility private
-    def initialize(options)
-      @label, @header = options[:label], options[:header]
-      @align_header = options[:align_header] || :center
-      @align_body = options[:align_body]  || nil
-      @extractor = options[:extractor] || @label.to_proc
-      @formatter = options[:formatter] || :to_s.to_proc
-      @width = options[:width]
+    def initialize(label:, header:, width:, align_header:, align_body:,
+      formatter:, extractor:)
+
+      @label = label
+      @header = header
+      @width = width
+      @align_header = align_header
+      @align_body = align_body
+      @formatter = formatter
+      @extractor = extractor
     end
 
     # @!visibility private

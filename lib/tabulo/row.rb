@@ -4,10 +4,10 @@ module Tabulo
     include Enumerable
 
     # @!visibility private
-    def initialize(table, source, options = { with_header: true })
+    def initialize(table, source, with_header: true)
       @table = table
       @source = source
-      @with_header = options[:with_header]
+      @with_header = with_header
     end
 
     # Calls the given block once for each cell in the {Row}, passing that cell as parameter.
