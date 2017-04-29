@@ -28,8 +28,8 @@ end
 
 Tabulo is flexible:
 
-* Fix individual column widths, then either [wrap](#width-wrapping-truncation) or
-  [truncate](#width-wrapping-truncation) the overflow as you prefer.
+* [Fix](#fixed-column-widths) individual column widths, then either [wrap](#overflow-handling) or
+  [truncate](#overflow-handling) the overflow as you prefer.
 * Alternatively, [shrinkwrap](#shrinkwrap) the table so that each column is just wide enough for
   its contents.
 * You can cap total table width when shrinkwrapping, to [stop it overflowing your terminal](#max-table-width)
@@ -139,8 +139,10 @@ the `align_header` or `align_body` options of `add_column`, e.g.:
 table.add_column("Doubled", align_header: :left, align_body: :left) { |n| n * 2 }
 ```
 
-<a name="width-wrapping-truncation"></a>
 ### Column width, wrapping and truncation
+
+<a name="fixed-column-widths"></a>
+#### Configuring fixed widths
 
 By default, column width is fixed at 12 characters, plus 1 character of padding on either side.
 This can be adjusted on a column-by-column basis using the `width` option of `add_column`:
@@ -180,7 +182,7 @@ table = Tabulo::Table.new([1, 2], columns: %i(itself even?), column_width: 6)
 Widths set for individual columns always override the default column width for the table.
 
 <a name="shrinkwrap"></a>
-### Automating column widths
+#### Automating column widths
 
 Instead of setting column widths "manually", you can tell the table to sort out the widths
 itself, so that each column is just wide enough for its header and contents (plus a character
@@ -233,7 +235,7 @@ the maximum cell width needs to be calculated for each column. You may not want 
 if the collection is very large.
 
 <a name="overflow-handling"></a>
-### Overflow handling
+#### Overflow handling
 
 By default, if cell contents exceed their column width, they are wrapped for as many rows as
 required:
