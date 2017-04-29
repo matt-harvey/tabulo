@@ -224,7 +224,7 @@ puts Tabulo::Table.new([1, 2], columns: %i(itself even?)).shrinkwrap!(max_table_
 |     2 |  true |
 ```
 
-If the table cannot be fit within `max_column_width`, column widths are reduced as required, with
+If the table cannot be fit within `max_table_width`, column widths are reduced as required, with
 wrapping or truncation then occuring as necessary (see [Overflow handling](#overflow-handling)).
 Under the hood, a character of width is deducted column by column&mdash;the widest column being
 targetted each time&mdash;until the table will fit. This is very useful when you want to ensure the
