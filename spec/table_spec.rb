@@ -227,7 +227,20 @@ describe Tabulo::Table do
       expect { table.add_column(:even?) }.to change { table.columns.count }.by(1)
     end
 
-    pending "`header` option"
+    describe "`header` option" do
+      it "sets the column header, independently of the `label` argument" do
+        table.add_column(:even?, header: "Armadillo")
+        expect(table.to_s).to eq \
+          %q(+--------------+--------------+--------------+
+             |       N      |    Doubled   |   Armadillo  |
+             +--------------+--------------+--------------+
+             |            1 |            2 |     false    |
+             |            2 |            4 |     true     |
+             |            3 |            6 |     false    |
+             |            4 |            8 |     true     |
+             |            5 |           10 |     false    |).gsub(/^ +/, "")
+      end
+    end
 
     describe "column alignment" do
       let(:column_width) { 8 }
@@ -492,7 +505,29 @@ describe Tabulo::Table do
         end
       end
 
-      pending "when `max_table_width` is so narrow that not even column borders can be accommodated"
+      context "when `max_table_width` is very small" do
+        it "only reduces column widths to the extent that there is at least a character's width "\
+          "available in each column for content, plus one character of padding on either side" do
+          table =
+            Tabulo::Table.new(%w(hi there), columns: %i(itself length)).shrinkwrap!(max_table_width: 3)
+          expect(table.to_s).to eq \
+            %q(+---+---+
+               | i | l |
+               | t | e |
+               | s | n |
+               | e | g |
+               | l | t |
+               | f | h |
+               +---+---+
+               | h | 2 |
+               | i |   |
+               | t | 5 |
+               | h |   |
+               | e |   |
+               | r |   |
+               | e |   |).gsub(/^ +/, "")
+        end
+      end
     end
   end
 
