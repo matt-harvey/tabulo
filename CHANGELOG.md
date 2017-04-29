@@ -2,7 +2,7 @@
 
 ## v0.5.1
 
-* Fix Rubydocs Markdown parsing.
+* Unsuccessful attempt to fix broken appearance of http://www.rubydoc.info/gems/tabulo/0.5.1
 
 ## v0.5.0
 
