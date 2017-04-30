@@ -136,7 +136,7 @@ module Tabulo
 
     # @return [String] an "ASCII" graphical representation of the Table column headers.
     def formatted_header
-      format_row(true, &:header_cell)
+      format_row(@wrap_header_cells_to, &:header_cell)
     end
 
     # @return [String] an "ASCII" graphical representation of a horizontal
@@ -149,7 +149,8 @@ module Tabulo
     #   end
     #
     def horizontal_rule
-      format_row(false, HORIZONTAL_RULE_CHARACTER, CORNER_CHARACTER, &:horizontal_rule)
+      inner = @columns.map { |column| surround(column.horizontal_rule, HORIZONTAL_RULE_CHARACTER) }
+      surround_join(inner, CORNER_CHARACTER)
     end
 
     # Reset all the column widths so that each column is *just* wide enough to accommodate
@@ -214,7 +215,7 @@ module Tabulo
 
     # @!visibility private
     def formatted_body_row(source, with_header: false)
-      inner = format_row { |column| column.body_cell(source) }
+      inner = format_row(@wrap_body_cells_to) { |column| column.body_cell(source) }
       if with_header
         join_lines([horizontal_rule, formatted_header, horizontal_rule, inner])
       else
@@ -230,34 +231,47 @@ module Tabulo
     end
 
     # @!visibility private
-    def format_row(header = false, padder = @padding_character, joiner = @joiner)
+    def format_row(wrap)
       # TODO Tidy this up -- or at least comment it.
       cell_stacks = @columns.map do |column|
         raw = yield column
-        wrap = (header ? @wrap_header_cells_to : @wrap_body_cells_to)
+
         column_width = column.width
         cell_body_length = (wrap ? column_width * wrap : raw.length)
         truncated = (cell_body_length < raw.length)
         cell_body = raw[0...cell_body_length]
         num_subcells = (cell_body_length.to_f / column_width).ceil
+
         (0...num_subcells).map do |i|
           s = cell_body.slice(i * column_width, column_width)
-          right_padder = ((truncated && i == num_subcells - 1) ? @truncation_indicator : padder)
-          "#{padder}#{s}#{padder * (column_width - s.length)}#{right_padder}"
+          right_padder = ((truncated && i == num_subcells - 1) ? @truncation_indicator : @padding_character)
+          inner = "#{s}#{@padding_character * (column_width - s.length)}"
+          "#{@padding_character}#{inner}#{right_padder}"
         end
       end
 
-      subrows = (0...cell_stacks.map(&:size).max || 1).map do |subrow_index|
+      max_cell_stack_height = cell_stacks.map(&:size).max || 1
+      subrows = (0...max_cell_stack_height).map do |subrow_index|
         cell_stacks.map.with_index do |cell_stack, column_index|
           if subrow_index < cell_stack.size
             cell_stack[subrow_index]
           else
-            "#{padder}#{' ' * @columns[column_index].width}#{padder}"
+            surround(' ' * @columns[column_index].width, @padding_character)
           end
         end
       end
 
-      join_lines(subrows.map { |subrow| "#{joiner}#{subrow.join(joiner)}#{joiner}" })
+      join_lines(subrows.map { |subrow| surround_join(subrow, @joiner) })
+    end
+
+    # @!visibility private
+    def surround(str, ch0)
+      "#{ch0}#{str}#{ch0}"
+    end
+
+    # @!visibility private
+    def surround_join(arr, ch)
+      surround(arr.join(ch), ch)
     end
 
     # @!visibility private

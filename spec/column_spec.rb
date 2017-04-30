@@ -25,6 +25,12 @@ describe Tabulo::Column do
     end
   end
 
+  describe "#horizontal_rule" do
+    it "returns a horizontal line of dashes matching the width of the column including internal padding" do
+      expect(column.horizontal_rule).to eq("----------")
+    end
+  end
+
   describe "#body_cell" do
     it "returns a string being the formatted content for this column for the passed source item, "\
       "with internal padding" do
