@@ -4,6 +4,7 @@
 [![Build Status][BS img]][Build Status]
 [![Dependency Status][DS img]][Dependency Status]
 [![Coverage Status][CS img]][Coverage Status]
+[![Code Climate][CC img]][Code Climate]
 
 ## Overview
 
@@ -396,8 +397,10 @@ License](http://opensource.org/licenses/MIT).
 [Build Status]: https://travis-ci.org/matt-harvey/tabulo
 [Dependency Status]: https://gemnasium.com/matt-harvey/tabulo
 [Coverage Status]: https://coveralls.io/r/matt-harvey/tabulo
+[Code Climate]: https://codeclimate.com/github/matt-harvey/tabulo
 
 [GV img]: https://img.shields.io/gem/v/tabulo.svg
 [BS img]: https://img.shields.io/travis/matt-harvey/tabulo.svg
 [DS img]: https://img.shields.io/gemnasium/matt-harvey/tabulo.svg
 [CS img]: https://img.shields.io/coveralls/matt-harvey/tabulo.svg
+[CC img]: https://img.shields.io/codeclimate/github/matt-harvey/tabulo.svg
