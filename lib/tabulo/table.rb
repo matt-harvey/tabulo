@@ -231,17 +231,30 @@ module Tabulo
     end
 
     # @!visibility private
-    def format_row(wrap)
-      # TODO Tidy this up -- or at least comment it.
+    #
+    # Yields each column to passed block, then wraps and joins the results to form
+    # a formatted row.
+    def format_row(wrap_cells_to)
+
+      # Create an array of "cell stacks", each of which is an array of strings that
+      # will be stacked on top of each other to form a wrapped cell.
       cell_stacks = @columns.map do |column|
+        column_width = column.width
+
+        # Get the raw, non-wrapped, non-truncated content of the cell.
         raw = yield column
 
-        column_width = column.width
-        cell_body_length = (wrap ? column_width * wrap : raw.length)
+        # Eventual length of wrapped cell body. If wrap_cells_to is nil, there is
+        # no truncation, so this is just the length of the raw content.
+        cell_body_length = (wrap_cells_to ? column_width * wrap_cells_to : raw.length)
+
         truncated = (cell_body_length < raw.length)
         cell_body = raw[0...cell_body_length]
+
+        # How high does the cell stack need to be to accommodate the wrapped content of this column?
         num_subcells = (cell_body_length.to_f / column_width).ceil
 
+        # Make the cell stack for this column.
         (0...num_subcells).map do |i|
           s = cell_body.slice(i * column_width, column_width)
           right_padder = ((truncated && i == num_subcells - 1) ? @truncation_indicator : @padding_character)
@@ -251,16 +264,25 @@ module Tabulo
       end
 
       max_cell_stack_height = cell_stacks.map(&:size).max || 1
+
+      # A subrow is a string representing a single horizontal slice of this row that's
+      # strictly one character high.
       subrows = (0...max_cell_stack_height).map do |subrow_index|
         cell_stacks.map.with_index do |cell_stack, column_index|
           if subrow_index < cell_stack.size
+            # This cell stack is at least as "deep" as the subrow we're on. So just
+            # grab the subcell for this subrow from this cell stack.
             cell_stack[subrow_index]
           else
+            # This cell stack is not "deep" enough. So we make an empty subcell to
+            # add to this subrow for this column
             surround(' ' * @columns[column_index].width, @padding_character)
           end
         end
       end
 
+      # Join each subrow with border characters, then join these with newlines, to form
+      # the wrapped, formatted row as a single string.
       join_lines(subrows.map { |subrow| surround_join(subrow, @joiner) })
     end
 
