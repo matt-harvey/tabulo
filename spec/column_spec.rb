@@ -19,9 +19,10 @@ describe Tabulo::Column do
     end
   end
 
-  describe "#header_cell" do
-    it "returns a string being content for the column's header cell, with internal padding" do
-      expect(column.header_cell).to eq("X10       ")
+  describe "#header_subcells" do
+    it 'returns an array of strings representing the components (one per wrapped "subrow") of the '\
+      'header cell for this column including internal padding' do
+      expect(column.header_subcells).to eq(["X10       "])
     end
   end
 
@@ -31,10 +32,10 @@ describe Tabulo::Column do
     end
   end
 
-  describe "#body_cell" do
-    it "returns a string being the formatted content for this column for the passed source item, "\
-      "with internal padding" do
-      expect(column.body_cell(3)).to eq("30.00     ")
+  describe "#body_subcells" do
+    it 'returns an array of strings representing the components (one per wrapped "subrow") of the '\
+      'body cell for this column for the passed source item, including internal padding' do
+      expect(column.body_subcells(3)).to eq(["30.00     "])
     end
   end
 

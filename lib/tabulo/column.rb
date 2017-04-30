@@ -20,21 +20,21 @@ module Tabulo
     end
 
     # @!visibility private
-    def header_cell
-      align_cell_content(@header, @align_header)
+    def header_subcells
+      infilled_subcells(@header, @align_header)
     end
 
     # @!visibility private
     def horizontal_rule
-      Table::HORIZONTAL_RULE_CHARACTER * @width
+      Table::HORIZONTAL_RULE_CHARACTER * width
     end
 
     # @!visibility private
-    def body_cell(source)
+    def body_subcells(source)
       cell_datum = body_cell_value(source)
       formatted_content = @formatter.call(cell_datum)
       real_alignment = (@align_body || infer_alignment(cell_datum))
-      align_cell_content(formatted_content, real_alignment)
+      infilled_subcells(formatted_content, real_alignment)
     end
 
     # @!visibility private
@@ -48,6 +48,16 @@ module Tabulo
     end
 
     private
+
+    # @!visibility private
+    def infilled_subcells(str, real_alignment)
+      str.split($/, -1).flat_map do |substr|
+        num_subsubcells = [1, (substr.length.to_f / width).ceil].max
+        (0...num_subsubcells).map do |i|
+          align_cell_content(substr.slice(i * width, width), real_alignment)
+        end
+      end
+    end
 
     # @!visibility private
     def align_cell_content(content, real_alignment)

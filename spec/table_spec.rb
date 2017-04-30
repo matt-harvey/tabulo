@@ -115,7 +115,7 @@ describe Tabulo::Table do
             %q(+--------------+--------------+--------------+
                |       N      |    Doubled   | NNNNNNNNNNNN |
                |              |              | NNNNNNNNNNNN |
-               |              |              | NN           |
+               |              |              |      NN      |
                +--------------+--------------+--------------+
                |            1 |            2 |            1 |
                |            2 |            4 |            2 |
@@ -159,7 +159,7 @@ describe Tabulo::Table do
                |            1 |            2 |
                |            2 |            4 |
                | 500000000000 | 100000000000 |
-               |              | 0            |).gsub(/^ +/, "")
+               |              |            0 |).gsub(/^ +/, "")
         end
       end
 
@@ -208,6 +208,58 @@ describe Tabulo::Table do
                |         3 |         6 | false |
                |         4 |         8 |  true |
                |         5 |        10 | false |).gsub(/^ +/, "")
+        end
+      end
+    end
+
+    context "when there are newlines in headers or body cell contents" do
+      context "with unlimited wrapping" do
+        it "respects newlines within header and cells" do
+          table = Tabulo::Table.new(["Two\nlines", "\nInitial", "Final\n", "Multiple\nnew\nlines"]) do |t|
+            t.add_column(:itself, header: "Firstpart\nsecondpart", width: 7)
+            t.add_column(:length)
+            t.add_column("Lines\nin\nheader", align_body: :right, &:itself)
+          end
+
+          expect(table.to_s).to eq \
+            %q(+---------+--------------+--------------+
+               | Firstpa |    length    |     Lines    |
+               |    rt   |              |      in      |
+               | secondp |              |    header    |
+               |   art   |              |              |
+               +---------+--------------+--------------+
+               | Two     |            9 |          Two |
+               | lines   |              |        lines |
+               |         |            8 |              |
+               | Initial |              |      Initial |
+               | Final   |            6 |        Final |
+               |         |              |              |
+               | Multipl |           18 |     Multiple |
+               | e       |              |          new |
+               | new     |              |        lines |
+               | lines   |              |              |).gsub(/^ +/, "")
+
+        end
+      end
+
+      context "with truncation" do
+        it "accounts for newlines within header and cells" do
+          table = Tabulo::Table.new(["Two\nlines", "\nInitial", "Final\n", "Multiple\nnew\nlines"],
+            wrap_header_cells_to: 2, wrap_body_cells_to: 1) do |t|
+            t.add_column(:itself)
+            t.add_column(:length)
+            t.add_column("Lines\nin\nheader", align_body: :right, &:itself)
+          end
+
+          expect(table.to_s).to eq \
+            %q(+--------------+--------------+--------------+
+               |    itself    |    length    |     Lines    |
+               |              |              |      in     ~|
+               +--------------+--------------+--------------+
+               | Two         ~|            9 |          Two~|
+               |             ~|            8 |             ~|
+               | Final       ~|            6 |        Final~|
+               | Multiple    ~|           18 |     Multiple~|).gsub(/^ +/, "")
         end
       end
     end
@@ -400,42 +452,47 @@ describe Tabulo::Table do
       table.add_column(:to_s)
       table.add_column("e?") { |n| n.even? }
       table.add_column("dec", formatter: -> (n) { "%.#{n}f" % n }) { |n| n }
-      table.add_column("word", width: 5) { |n| "w" * n * 2 }
+      table.add_column("word\nyep", width: 5) { |n| "w" * n * 2 }
+      table.add_column("cool") { |n| "two\nlines" if n == 3 }
+    end
+
+    it "returns the Table itself" do
+      expect(table.shrinkwrap!(max_table_width: [nil, 64, 47].sample)).to eq(table)
     end
 
     context "when `max_table_width` is not provided" do
-      it "returns the Table itself" do
-        expect(table.shrinkwrap!).to eq(table)
-      end
-
       # TODO Test that it will expand the table if required, not just shrink it.
 
       it "amends the column widths of the table so that they just accommodate their header and "\
-        "formatted body contents without wrapping (assuming source data is constant)" do
+        "formatted body contents without wrapping (assuming source data is constant), except insofar "\
+        "as is required to honour newlines within the cell content" do
 
         expect { table.shrinkwrap! }.to change(table, :to_s).from(
-          %q(+----------+----------+----------+----------+----------+-------+
-             |     N    |  Doubled |   to_s   |    e?    |    dec   |  word |
-             +----------+----------+----------+----------+----------+-------+
-             |        1 |        2 | 1        |   false  |      1.0 | ww    |
-             |        2 |        4 | 2        |   true   |     2.00 | wwww  |
-             |        3 |        6 | 3        |   false  |    3.000 | wwwww |
-             |          |          |          |          |          | w     |
-             |        4 |        8 | 4        |   true   |   4.0000 | wwwww |
-             |          |          |          |          |          | www   |
-             |        5 |       10 | 5        |   false  |  5.00000 | wwwww |
-             |          |          |          |          |          | wwwww |).gsub(/^ +/, "")
+          %q(+----------+----------+----------+----------+----------+-------+----------+
+             |     N    |  Doubled |   to_s   |    e?    |    dec   |  word |   cool   |
+             |          |          |          |          |          |  yep  |          |
+             +----------+----------+----------+----------+----------+-------+----------+
+             |        1 |        2 | 1        |   false  |      1.0 | ww    |          |
+             |        2 |        4 | 2        |   true   |     2.00 | wwww  |          |
+             |        3 |        6 | 3        |   false  |    3.000 | wwwww | two      |
+             |          |          |          |          |          | w     | lines    |
+             |        4 |        8 | 4        |   true   |   4.0000 | wwwww |          |
+             |          |          |          |          |          | www   |          |
+             |        5 |       10 | 5        |   false  |  5.00000 | wwwww |          |
+             |          |          |          |          |          | wwwww |          |).gsub(/^ +/, "")
 
         ).to(
 
-          %q(+---+---------+------+-------+---------+------------+
-             | N | Doubled | to_s |   e?  |   dec   |    word    |
-             +---+---------+------+-------+---------+------------+
-             | 1 |       2 | 1    | false |     1.0 | ww         |
-             | 2 |       4 | 2    |  true |    2.00 | wwww       |
-             | 3 |       6 | 3    | false |   3.000 | wwwwww     |
-             | 4 |       8 | 4    |  true |  4.0000 | wwwwwwww   |
-             | 5 |      10 | 5    | false | 5.00000 | wwwwwwwwww |).gsub(/^ +/, "")
+          %q(+---+---------+------+-------+---------+------------+-------+
+             | N | Doubled | to_s |   e?  |   dec   |    word    |  cool |
+             |   |         |      |       |         |     yep    |       |
+             +---+---------+------+-------+---------+------------+-------+
+             | 1 |       2 | 1    | false |     1.0 | ww         |       |
+             | 2 |       4 | 2    |  true |    2.00 | wwww       |       |
+             | 3 |       6 | 3    | false |   3.000 | wwwwww     | two   |
+             |   |         |      |       |         |            | lines |
+             | 4 |       8 | 4    |  true |  4.0000 | wwwwwwww   |       |
+             | 5 |      10 | 5    | false | 5.00000 | wwwwwwwwww |       |).gsub(/^ +/, "")
         )
       end
     end
@@ -443,64 +500,71 @@ describe Tabulo::Table do
     context "when `max_table_width` is provided (assuming source data is constant)" do
       context "when `max_table_width` is wider than the existing table width" do
         it "amends the column widths of the table so that they just accommodate their header and "\
-          "formatted body contents without wrapping (assuming source data is constant)" do
+          "formatted body contents without wrapping (assuming source data is constant), except "\
+          "insofar as is required to honour newlines within the cell content " do
 
           expect { table.shrinkwrap!(max_table_width: 64) }.to change(table, :to_s).from(
-            %q(+----------+----------+----------+----------+----------+-------+
-               |     N    |  Doubled |   to_s   |    e?    |    dec   |  word |
-               +----------+----------+----------+----------+----------+-------+
-               |        1 |        2 | 1        |   false  |      1.0 | ww    |
-               |        2 |        4 | 2        |   true   |     2.00 | wwww  |
-               |        3 |        6 | 3        |   false  |    3.000 | wwwww |
-               |          |          |          |          |          | w     |
-               |        4 |        8 | 4        |   true   |   4.0000 | wwwww |
-               |          |          |          |          |          | www   |
-               |        5 |       10 | 5        |   false  |  5.00000 | wwwww |
-               |          |          |          |          |          | wwwww |).gsub(/^ +/, "")
+            %q(+----------+----------+----------+----------+----------+-------+----------+
+               |     N    |  Doubled |   to_s   |    e?    |    dec   |  word |   cool   |
+               |          |          |          |          |          |  yep  |          |
+               +----------+----------+----------+----------+----------+-------+----------+
+               |        1 |        2 | 1        |   false  |      1.0 | ww    |          |
+               |        2 |        4 | 2        |   true   |     2.00 | wwww  |          |
+               |        3 |        6 | 3        |   false  |    3.000 | wwwww | two      |
+               |          |          |          |          |          | w     | lines    |
+               |        4 |        8 | 4        |   true   |   4.0000 | wwwww |          |
+               |          |          |          |          |          | www   |          |
+               |        5 |       10 | 5        |   false  |  5.00000 | wwwww |          |
+               |          |          |          |          |          | wwwww |          |).gsub(/^ +/, "")
 
           ).to(
+            %q(+---+---------+------+-------+---------+------------+-------+
+               | N | Doubled | to_s |   e?  |   dec   |    word    |  cool |
+               |   |         |      |       |         |     yep    |       |
+               +---+---------+------+-------+---------+------------+-------+
+               | 1 |       2 | 1    | false |     1.0 | ww         |       |
+               | 2 |       4 | 2    |  true |    2.00 | wwww       |       |
+               | 3 |       6 | 3    | false |   3.000 | wwwwww     | two   |
+               |   |         |      |       |         |            | lines |
+               | 4 |       8 | 4    |  true |  4.0000 | wwwwwwww   |       |
+               | 5 |      10 | 5    | false | 5.00000 | wwwwwwwwww |       |).gsub(/^ +/, "")
 
-            %q(+---+---------+------+-------+---------+------------+
-               | N | Doubled | to_s |   e?  |   dec   |    word    |
-               +---+---------+------+-------+---------+------------+
-               | 1 |       2 | 1    | false |     1.0 | ww         |
-               | 2 |       4 | 2    |  true |    2.00 | wwww       |
-               | 3 |       6 | 3    | false |   3.000 | wwwwww     |
-               | 4 |       8 | 4    |  true |  4.0000 | wwwwwwww   |
-               | 5 |      10 | 5    | false | 5.00000 | wwwwwwwwww |).gsub(/^ +/, "")
           )
         end
       end
 
       context "when `max_table_width` is too narrow to accommodate the shrinkwrapped columns" do
         it "amends the column widths of the table so that they just accommodate their header and "\
-          "formatted body contents (assuming source data is constant), except that width is progressively "\
+          "formatted body contents (assuming source data is constant) (except insofar as it required "\
+          "to honour newlines within existing cell content), except that width is progressively "\
           "removed from the widest column until the table fits the passed width" do
 
-          expect { table.shrinkwrap!(max_table_width: 47) }.to change(table, :to_s).from(
-            %q(+----------+----------+----------+----------+----------+-------+
-               |     N    |  Doubled |   to_s   |    e?    |    dec   |  word |
-               +----------+----------+----------+----------+----------+-------+
-               |        1 |        2 | 1        |   false  |      1.0 | ww    |
-               |        2 |        4 | 2        |   true   |     2.00 | wwww  |
-               |        3 |        6 | 3        |   false  |    3.000 | wwwww |
-               |          |          |          |          |          | w     |
-               |        4 |        8 | 4        |   true   |   4.0000 | wwwww |
-               |          |          |          |          |          | www   |
-               |        5 |       10 | 5        |   false  |  5.00000 | wwwww |
-               |          |          |          |          |          | wwwww |).gsub(/^ +/, "")
+          expect { table.shrinkwrap!(max_table_width: 55) }.to change(table, :to_s).from(
+            %q(+----------+----------+----------+----------+----------+-------+----------+
+               |     N    |  Doubled |   to_s   |    e?    |    dec   |  word |   cool   |
+               |          |          |          |          |          |  yep  |          |
+               +----------+----------+----------+----------+----------+-------+----------+
+               |        1 |        2 | 1        |   false  |      1.0 | ww    |          |
+               |        2 |        4 | 2        |   true   |     2.00 | wwww  |          |
+               |        3 |        6 | 3        |   false  |    3.000 | wwwww | two      |
+               |          |          |          |          |          | w     | lines    |
+               |        4 |        8 | 4        |   true   |   4.0000 | wwwww |          |
+               |          |          |          |          |          | www   |          |
+               |        5 |       10 | 5        |   false  |  5.00000 | wwwww |          |
+               |          |          |          |          |          | wwwww |          |).gsub(/^ +/, "")
           ).to(
-            %q(+---+--------+------+-------+--------+--------+
-               | N | Double | to_s |   e?  |   dec  |  word  |
-               |   | d      |      |       |        |        |
-               +---+--------+------+-------+--------+--------+
-               | 1 |      2 | 1    | false |    1.0 | ww     |
-               | 2 |      4 | 2    |  true |   2.00 | wwww   |
-               | 3 |      6 | 3    | false |  3.000 | wwwwww |
-               | 4 |      8 | 4    |  true | 4.0000 | wwwwww |
-               |   |        |      |       |        | ww     |
-               | 5 |     10 | 5    | false | 5.0000 | wwwwww |
-               |   |        |      |       | 0      | wwww   |).gsub(/^ +/, "")
+            %q(+---+--------+------+-------+--------+--------+-------+
+               | N | Double | to_s |   e?  |   dec  |  word  |  cool |
+               |   |    d   |      |       |        |   yep  |       |
+               +---+--------+------+-------+--------+--------+-------+
+               | 1 |      2 | 1    | false |    1.0 | ww     |       |
+               | 2 |      4 | 2    |  true |   2.00 | wwww   |       |
+               | 3 |      6 | 3    | false |  3.000 | wwwwww | two   |
+               |   |        |      |       |        |        | lines |
+               | 4 |      8 | 4    |  true | 4.0000 | wwwwww |       |
+               |   |        |      |       |        | ww     |       |
+               | 5 |     10 | 5    | false | 5.0000 | wwwwww |       |
+               |   |        |      |       |      0 | wwww   |       |).gsub(/^ +/, "")
           )
         end
       end

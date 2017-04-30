@@ -136,7 +136,7 @@ module Tabulo
 
     # @return [String] an "ASCII" graphical representation of the Table column headers.
     def formatted_header
-      format_row(@wrap_header_cells_to, &:header_cell)
+      format_row(@wrap_header_cells_to, &:header_subcells)
     end
 
     # @return [String] an "ASCII" graphical representation of a horizontal
@@ -181,7 +181,9 @@ module Tabulo
       header_widths = columns.map { |c| c.header.length }
 
       column_widths = @sources.inject(header_widths) do |widths, source|
-        columns.map { |c| c.formatted_cell_content(source).length }.zip(widths).map(&:max)
+        columns.map do |c|
+          c.formatted_cell_content(source).split($/, -1).map(&:length).max || 1
+        end.zip(widths).map(&:max)
       end
 
       columns.zip(column_widths).each do |column, width|
@@ -215,7 +217,7 @@ module Tabulo
 
     # @!visibility private
     def formatted_body_row(source, with_header: false)
-      inner = format_row(@wrap_body_cells_to) { |column| column.body_cell(source) }
+      inner = format_row(@wrap_body_cells_to) { |column| column.body_subcells(source) }
       if with_header
         join_lines([horizontal_rule, formatted_header, horizontal_rule, inner])
       else
@@ -242,24 +244,15 @@ module Tabulo
         column_width = column.width
 
         # Get the raw, non-wrapped, non-truncated content of the cell.
-        raw = yield column
+        raw_subcells = yield column
 
-        # Eventual length of wrapped cell body. If wrap_cells_to is nil, there is
-        # no truncation, so this is just the length of the raw content.
-        cell_body_length = (wrap_cells_to ? column_width * wrap_cells_to : raw.length)
+        truncated = (wrap_cells_to && (raw_subcells.size > wrap_cells_to))
+        subcells = (wrap_cells_to ? raw_subcells[0...wrap_cells_to] : raw_subcells)
 
-        truncated = (cell_body_length < raw.length)
-        cell_body = raw[0...cell_body_length]
-
-        # How high does the cell stack need to be to accommodate the wrapped content of this column?
-        num_subcells = (cell_body_length.to_f / column_width).ceil
-
-        # Make the cell stack for this column.
-        (0...num_subcells).map do |i|
-          s = cell_body.slice(i * column_width, column_width)
-          right_padder = ((truncated && i == num_subcells - 1) ? @truncation_indicator : @padding_character)
-          inner = "#{s}#{@padding_character * (column_width - s.length)}"
-          "#{@padding_character}#{inner}#{right_padder}"
+        subcells.map.with_index do |subcell, i|
+          lpad = @padding_character
+          rpad = (truncated && (i == subcells.size - 1) ? @truncation_indicator : @padding_character)
+          "#{lpad}#{subcell}#{rpad}"
         end
       end
 
