@@ -37,19 +37,20 @@ end
   horizontally and becoming an unreadable mess.
 * Cell content alignment is [configurable](#cell-alignment), but with useful defaults, with numbers
   aligned right and strings left.
-* Headers can be [repeated](#repeating-headers) as desired.
+* Headers are [repeatable](#repeating-headers)
 * Newlines within cell content are correctly handled.
 * A `Tabulo::Table` is an `Enumerable`, so you can [step through it](#enumerator) one row at a time,
   without having to wait for the entire underlying collection to load.
-* Each `Tabulo::Row` is also an `Enumerable`.
+* Each `Tabulo::Row` is also an `Enumerable`:
 
-```ruby
-table.each do |row|
-  row.each do |cell|
-    # cell => 1, 2 ... 2, 4 ... etc.
-  end
-end
-```
+>
+  ```ruby
+    table.each do |row|
+      row.each do |cell|
+        # cell => 1, 2 ... 2, 4 ... etc.
+      end
+    end
+  ```
 
 ## Installation
 
