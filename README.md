@@ -27,7 +27,7 @@ end
 |      5000000 |     10000000 |
 ```
 
-### Features
+## Features
 
 * [Fix](#fixed-column-widths) individual column widths, then either [wrap](#overflow-handling) or
   [truncate](#overflow-handling) the overflow as you prefer.
@@ -38,10 +38,10 @@ end
 * Cell content alignment is [configurable](#cell-alignment), but with useful defaults, with numbers
   aligned right and strings left.
 * Headers can be [repeated](#repeating-headers) as desired.
+* Newlines within cell content are correctly handled.
 * A `Tabulo::Table` is an `Enumerable`, so you can [step through it](#enumerator) one row at a time,
   without having to wait for the entire underlying collection to load.
 * Each `Tabulo::Row` is also an `Enumerable`.
-* Newlines within cell content are correctly handled.
 
 ```ruby
 table.each do |row|
