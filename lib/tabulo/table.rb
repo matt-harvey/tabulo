@@ -241,17 +241,20 @@ module Tabulo
       # Create an array of "cell stacks", each of which is an array of strings that
       # will be stacked on top of each other to form a wrapped cell.
       cell_stacks = @columns.map do |column|
-        column_width = column.width
 
         # Get the raw, non-wrapped, non-truncated content of the cell.
         raw_subcells = yield column
 
-        truncated = (wrap_cells_to && (raw_subcells.size > wrap_cells_to))
-        subcells = (wrap_cells_to ? raw_subcells[0...wrap_cells_to] : raw_subcells)
+        num_raw_subcells = raw_subcells.size
+        num_wrapped_subcells = (wrap_cells_to || num_raw_subcells)
+
+        truncated = (num_raw_subcells > num_wrapped_subcells)
+        subcells = raw_subcells[0...num_wrapped_subcells]
 
         subcells.map.with_index do |subcell, i|
+          subcell_truncated = (truncated && (i == subcells.size - 1))
           lpad = @padding_character
-          rpad = (truncated && (i == subcells.size - 1) ? @truncation_indicator : @padding_character)
+          rpad = (subcell_truncated ? @truncation_indicator : @padding_character)
           "#{lpad}#{subcell}#{rpad}"
         end
       end
