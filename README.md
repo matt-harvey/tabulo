@@ -29,17 +29,17 @@ end
 
 ## Features
 
-* [Fix](#fixed-column-widths) individual column widths, then either [wrap](#overflow-handling) or
+* Set [fixed widths](#fixed-column-widths) on individual columns, then either [wrap](#overflow-handling) or
   [truncate](#overflow-handling) the overflow.
-* Alternatively, [shrinkwrap](#shrinkwrap) the table so that each column is just wide enough for
-  its contents.
-* Put an upper limit on table width when shrinkwrapping, to [stop it overflowing your terminal](#max-table-width) horizontally.
-* Alignment of cell content is [configurable](#cell-alignment), but has useful defaults (numbers right,
-  text left).
-* Headers are [repeatable](#repeating-headers)
+* Alternatively, [shrinkwrap](#shrinkwrap) the table so that each column is just wide enough for its
+  contents.
+* Put an upper limit on table width when shrinkwrapping, to [stop it overflowing your terminal horizontally](#max-table-width).
+* Alignment of cell content is [configurable](#cell-alignment), but has helpful content-based defaults
+  (numbers right, strings left).
+* Headers are [repeatable](#repeating-headers).
 * Newlines within cell content are correctly handled.
 * A `Tabulo::Table` is an `Enumerable`, so you can [step through it](#enumerator) a row at a time,
-  printing as you go, without waiting for the entire collection to load.
+  printing as you go, without waiting for the entire underlying collection to load.
 * Each `Tabulo::Row` is also an `Enumerable`, providing access to the underlying cell values.
 
 ## Installation
