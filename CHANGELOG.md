@@ -1,5 +1,11 @@
 # Changelog
 
+### v0.6.0
+
+* Correctly handle newlines in cell content.
+* Use keyword arguments instead of option hashes.
+* Write remaining pending specs.
+
 ### v0.5.1
 
 * Unsuccessful attempt to fix broken appearance of http://www.rubydoc.info/gems/tabulo/0.5.1
