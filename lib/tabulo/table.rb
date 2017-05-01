@@ -15,21 +15,21 @@ module Tabulo
     attr_reader :columns
 
     # @param [Enumerable] sources the underlying Enumerable from which the table will derive its data
-    # @param [Array[Symbol]] :columns Specifies the initial columns.
+    # @param [Array[Symbol]] columns Specifies the initial columns.
     #   Each element of the Array  will be used to create a column whose content is
     #   created by calling the corresponding method on each element of sources. Note
     #   the {#add_column} method is a much more flexible way to set up columns on the table.
-    # @param [Fixnum, nil] :column_width The default column width for columns in this
+    # @param [Fixnum, nil] column_width The default column width for columns in this
     #   table, not excluding padding. If nil, then DEFAULT_COLUMN_WIDTH will be used.
-    # @param [:start, nil, Fixnum] :header_frequency Controls the display of column headers.
+    # @param [:start, nil, Fixnum] header_frequency Controls the display of column headers.
     #   If passed <tt>:start</tt>, headers will be shown at the top of the table only. If passed <tt>nil</tt>,
     #   headers will not be shown. If passed a Fixnum N (> 0), headers will be shown at the top of the table,
     #   then repeated every N rows.
-    # @param [nil, Fixnum] :wrap_header_cells_to Controls wrapping behaviour for header
+    # @param [nil, Fixnum] wrap_header_cells_to Controls wrapping behaviour for header
     #   cells if the content thereof is longer than the column's fixed width. If passed <tt>nil</tt> (default),
     #   content will be wrapped for as many rows as required to accommodate it. If passed a Fixnum N (> 0),
     #   content will be wrapped up to N rows and then truncated thereafter.
-    # @param [nil, Fixnum] :wrap_body_cells_to Controls wrapping behaviour for table cells (excluding
+    # @param [nil, Fixnum] wrap_body_cells_to Controls wrapping behaviour for table cells (excluding
     #   headers), if their content is longer than the column's fixed width. If passed <tt>nil</tt>, content will
     #   be wrapped for as many rows as required to accommodate it. If passed a Fixnum N (> 0), content will be
     #   wrapped up to N rows and then truncated thereafter.
@@ -63,19 +63,19 @@ module Tabulo
     #   a method to be called on each item in the table sources to provide the content
     #   for this column.
     #
-    # @param [nil, #to_s] :header (nil) Text to be displayed in the column header. If passed nil,
+    # @param [nil, #to_s] header (nil) Text to be displayed in the column header. If passed nil,
     #   the column's label will also be used as its header text.
-    # @param [:left, :center, :right] :align_header (:center) Specifies how the header text
+    # @param [:left, :center, :right] align_header (:center) Specifies how the header text
     #   should be aligned.
-    # @param [:left, :center, :right, nil] :align_body (nil) Specifies how the cell body contents
+    # @param [:left, :center, :right, nil] align_body (nil) Specifies how the cell body contents
     #   should be aligned. Possible If <tt>nil</tt> is passed, then the alignment is determined
     #   by the type of the cell value, with numbers aligned right, booleans center-aligned, and
     #   other values left-aligned. Note header text alignment is configured separately using the
     #   :align_header param.
-    # @param [Fixnum] :width (nil) Specifies the width of the column, excluding padding. If
+    # @param [Fixnum] width (nil) Specifies the width of the column, excluding padding. If
     #   nil, then the column will take the width provided by the `column_width` param
     #   with which the Table was initialized.
-    # @param [#to_proc] :formatter (:to_s.to_proc) A lambda or other callable object that
+    # @param [#to_proc] formatter (:to_s.to_proc) A lambda or other callable object that
     #   will be passed the calculated value of each cell to determine how it should be displayed. This
     #   is distinct from the extractor (see below). For example, if the extractor for this column
     #   generates a Date, then the formatter might format that Date in a particular way.
@@ -162,7 +162,7 @@ module Tabulo
     # be traversed and all the column extractors and formatters to be applied in order
     # to calculate the required widths.
     #
-    # @param [nil, Numeric] :max_table_width (nil) If provided, stops the total table
+    # @param [nil, Numeric] max_table_width (nil) If provided, stops the total table
     #   width (including padding and borders) from expanding beyond this number of characters.
     #   Width is deducted from columns if required to achieve this, with one character progressively
     #   deducted from the width of the widest column until the target is reached. When the
