@@ -30,27 +30,17 @@ end
 ## Features
 
 * [Fix](#fixed-column-widths) individual column widths, then either [wrap](#overflow-handling) or
-  [truncate](#overflow-handling) the overflow as you prefer.
+  [truncate](#overflow-handling) the overflow.
 * Alternatively, [shrinkwrap](#shrinkwrap) the table so that each column is just wide enough for
   its contents.
-* You can cap total table width when shrinkwrapping, to [stop it overflowing your terminal](#max-table-width)
-  horizontally and becoming an unreadable mess.
-* Cell content alignment is [configurable](#cell-alignment), but with useful defaults, with numbers
-  aligned right and strings left.
+* Put an upper limit on table width when shrinkwrapping, to [stop it overflowing your terminal](#max-table-width) horizontally.
+* Alignment of cell content is [configurable](#cell-alignment), but has useful defaults (numbers right,
+  text left).
 * Headers are [repeatable](#repeating-headers)
 * Newlines within cell content are correctly handled.
-* A `Tabulo::Table` is an `Enumerable`, so you can [step through it](#enumerator) one row at a time,
-  without having to wait for the entire underlying collection to load.
-* Each `Tabulo::Row` is also an `Enumerable`:
-
->
-  ```ruby
-    table.each do |row|
-      row.each do |cell|
-        # cell => 1, 2 ... 2, 4 ... etc.
-      end
-    end
-  ```
+* A `Tabulo::Table` is an `Enumerable`, so you can [step through it](#enumerator) a row at a time,
+  printing as you go, without waiting for the entire collection to load.
+* Each `Tabulo::Row` is also an `Enumerable`, providing access to the underlying cell values.
 
 ## Installation
 
