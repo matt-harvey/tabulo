@@ -1,5 +1,10 @@
 # Changelog
 
+### v0.6.1
+
+* Fix Table#shrinkwrap! handling of newlines within header cell content.
+* README now correctly formatted by rubydoc.info.
+
 ### v0.6.0
 
 * Correctly handle newlines in cell content.
