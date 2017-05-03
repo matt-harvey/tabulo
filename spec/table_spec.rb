@@ -450,7 +450,7 @@ describe Tabulo::Table do
 
     before(:each) do
       table.add_column(:to_s)
-      table.add_column("e?") { |n| n.even? }
+      table.add_column("Is it\neven?") { |n| n.even? }
       table.add_column("dec", formatter: -> (n) { "%.#{n}f" % n }) { |n| n }
       table.add_column("word\nyep", width: 5) { |n| "w" * n * 2 }
       table.add_column("cool") { |n| "two\nlines" if n == 3 }
@@ -469,8 +469,8 @@ describe Tabulo::Table do
         # Check that it adjusts column widths by shrinking
         expect { table.shrinkwrap! }.to change(table, :to_s).from(
           %q(+----------+----------+----------+----------+----------+-------+----------+
-             |     N    |  Doubled |   to_s   |    e?    |    dec   |  word |   cool   |
-             |          |          |          |          |          |  yep  |          |
+             |     N    |  Doubled |   to_s   |   Is it  |    dec   |  word |   cool   |
+             |          |          |          |   even?  |          |  yep  |          |
              +----------+----------+----------+----------+----------+-------+----------+
              |        1 |        2 | 1        |   false  |      1.0 | ww    |          |
              |        2 |        4 | 2        |   true   |     2.00 | wwww  |          |
@@ -483,8 +483,8 @@ describe Tabulo::Table do
 
         ).to(
           %q(+---+---------+------+-------+---------+------------+-------+
-             | N | Doubled | to_s |   e?  |   dec   |    word    |  cool |
-             |   |         |      |       |         |     yep    |       |
+             | N | Doubled | to_s | Is it |   dec   |    word    |  cool |
+             |   |         |      | even? |         |     yep    |       |
              +---+---------+------+-------+---------+------------+-------+
              | 1 |       2 | 1    | false |     1.0 | ww         |       |
              | 2 |       4 | 2    |  true |    2.00 | wwww       |       |
@@ -524,8 +524,8 @@ describe Tabulo::Table do
 
           expect { table.shrinkwrap!(max_table_width: 64) }.to change(table, :to_s).from(
             %q(+----------+----------+----------+----------+----------+-------+----------+
-               |     N    |  Doubled |   to_s   |    e?    |    dec   |  word |   cool   |
-               |          |          |          |          |          |  yep  |          |
+               |     N    |  Doubled |   to_s   |   Is it  |    dec   |  word |   cool   |
+               |          |          |          |   even?  |          |  yep  |          |
                +----------+----------+----------+----------+----------+-------+----------+
                |        1 |        2 | 1        |   false  |      1.0 | ww    |          |
                |        2 |        4 | 2        |   true   |     2.00 | wwww  |          |
@@ -538,8 +538,8 @@ describe Tabulo::Table do
 
           ).to(
             %q(+---+---------+------+-------+---------+------------+-------+
-               | N | Doubled | to_s |   e?  |   dec   |    word    |  cool |
-               |   |         |      |       |         |     yep    |       |
+               | N | Doubled | to_s | Is it |   dec   |    word    |  cool |
+               |   |         |      | even? |         |     yep    |       |
                +---+---------+------+-------+---------+------------+-------+
                | 1 |       2 | 1    | false |     1.0 | ww         |       |
                | 2 |       4 | 2    |  true |    2.00 | wwww       |       |
@@ -560,8 +560,8 @@ describe Tabulo::Table do
 
           expect { table.shrinkwrap!(max_table_width: 55) }.to change(table, :to_s).from(
             %q(+----------+----------+----------+----------+----------+-------+----------+
-               |     N    |  Doubled |   to_s   |    e?    |    dec   |  word |   cool   |
-               |          |          |          |          |          |  yep  |          |
+               |     N    |  Doubled |   to_s   |   Is it  |    dec   |  word |   cool   |
+               |          |          |          |   even?  |          |  yep  |          |
                +----------+----------+----------+----------+----------+-------+----------+
                |        1 |        2 | 1        |   false  |      1.0 | ww    |          |
                |        2 |        4 | 2        |   true   |     2.00 | wwww  |          |
@@ -573,8 +573,8 @@ describe Tabulo::Table do
                |          |          |          |          |          | wwwww |          |).gsub(/^ +/, "")
           ).to(
             %q(+---+--------+------+-------+--------+--------+-------+
-               | N | Double | to_s |   e?  |   dec  |  word  |  cool |
-               |   |    d   |      |       |        |   yep  |       |
+               | N | Double | to_s | Is it |   dec  |  word  |  cool |
+               |   |    d   |      | even? |        |   yep  |       |
                +---+--------+------+-------+--------+--------+-------+
                | 1 |      2 | 1    | false |    1.0 | ww     |       |
                | 2 |      4 | 2    |  true |   2.00 | wwww   |       |

@@ -178,16 +178,17 @@ module Tabulo
     def shrinkwrap!(max_table_width: nil)
       return self if columns.none?
 
-      header_widths = columns.map { |c| c.header.length }
+      wrapped_width = -> (str) { str.split($/).map(&:length).max || 1 }
 
-      column_widths = @sources.inject(header_widths) do |widths, source|
-        columns.map do |c|
-          c.formatted_cell_content(source).split($/, -1).map(&:length).max || 1
-        end.zip(widths).map(&:max)
+      columns.each do |column|
+        column.width = wrapped_width.call(column.header)
       end
 
-      columns.zip(column_widths).each do |column, width|
-        column.width = width
+      @sources.each do |source|
+        columns.each do |column|
+          width = wrapped_width.call(column.formatted_cell_content(source))
+          column.width = width if width > column.width
+        end
       end
 
       if max_table_width
