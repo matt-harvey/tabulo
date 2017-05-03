@@ -461,12 +461,12 @@ describe Tabulo::Table do
     end
 
     context "when `max_table_width` is not provided" do
-      # TODO Test that it will expand the table if required, not just shrink it.
+      it "expands or contracts the column widths of the table as necessary so that they just "\
+        "accommodate their header and formatted body contents without wrapping (assuming "\
+        "source data is constant), except insofar as is required to honour newlines within "\
+        "the cell content", :aggregate_failures do
 
-      it "amends the column widths of the table so that they just accommodate their header and "\
-        "formatted body contents without wrapping (assuming source data is constant), except insofar "\
-        "as is required to honour newlines within the cell content" do
-
+        # Check that it adjusts column widths by shrinking
         expect { table.shrinkwrap! }.to change(table, :to_s).from(
           %q(+----------+----------+----------+----------+----------+-------+----------+
              |     N    |  Doubled |   to_s   |    e?    |    dec   |  word |   cool   |
@@ -482,7 +482,6 @@ describe Tabulo::Table do
              |          |          |          |          |          | wwwww |          |).gsub(/^ +/, "")
 
         ).to(
-
           %q(+---+---------+------+-------+---------+------------+-------+
              | N | Doubled | to_s |   e?  |   dec   |    word    |  cool |
              |   |         |      |       |         |     yep    |       |
@@ -493,6 +492,26 @@ describe Tabulo::Table do
              |   |         |      |       |         |            | lines |
              | 4 |       8 | 4    |  true |  4.0000 | wwwwwwww   |       |
              | 5 |      10 | 5    | false | 5.00000 | wwwwwwwwww |       |).gsub(/^ +/, "")
+        )
+
+        # Let's do a quick check to make sure that it will also expand the total table width if required.
+        small_table = Tabulo::Table.new(%w(hello goodbye), column_width: 3, columns: %i(itself))
+        expect { small_table.shrinkwrap! }.to change(small_table, :to_s).from(
+          %q(+-----+
+             | its |
+             | elf |
+             +-----+
+             | hel |
+             | lo  |
+             | goo |
+             | dby |
+             | e   |).gsub(/^ +/, "")
+        ).to(
+          %q(+---------+
+             |  itself |
+             +---------+
+             | hello   |
+             | goodbye |).gsub(/^ +/, "")
         )
       end
     end
