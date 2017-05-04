@@ -247,45 +247,31 @@ module Tabulo
     #   before truncating.
     # @return [String] the entire formatted row including all padding and borders.
     def format_row(cells, wrap_cells_to)
+      max_cell_height = (wrap_cells_to || cells.map(&:size).max || 1)
 
-      # Create an array of "cell stacks", each of which is an array of strings that
-      # will be stacked on top of each other to form a wrapped cell.
-      cell_stacks = cells.map do |raw_subcells|
-        num_raw_subcells = raw_subcells.size
-        num_wrapped_subcells = (wrap_cells_to || num_raw_subcells)
+      subrows = (0...max_cell_height).map do |subrow_index|
+        subrow_components = cells.map.with_index do |cell, column_index|
+          num_subcells = cell.size
+          cell_truncated = (num_subcells > max_cell_height)
+          append_truncator = (cell_truncated && subrow_index + 1 == max_cell_height)
 
-        truncated = (num_raw_subcells > num_wrapped_subcells)
-        subcells = raw_subcells[0...num_wrapped_subcells]
-
-        subcells.map.with_index do |subcell, i|
-          subcell_truncated = (truncated && (i == subcells.size - 1))
           lpad = PADDING_CHARACTER
-          rpad = (subcell_truncated ? TRUNCATION_INDICATOR : PADDING_CHARACTER)
-          "#{lpad}#{subcell}#{rpad}"
+          rpad = (append_truncator ? TRUNCATION_INDICATOR : PADDING_CHARACTER)
+
+          inner = if subrow_index < num_subcells
+                    cell[subrow_index]
+                  else
+                    column_width = @columns[column_index].width
+                    PADDING_CHARACTER * column_width
+                  end
+
+          "#{lpad}#{inner}#{rpad}"
         end
+
+        surround_join(subrow_components, VERTICAL_RULE_CHARACTER)
       end
 
-      max_cell_stack_height = cell_stacks.map(&:size).max || 1
-
-      # A subrow is a string representing a single horizontal slice of this row that's
-      # strictly one character high.
-      subrows = (0...max_cell_stack_height).map do |subrow_index|
-        cell_stacks.map.with_index do |cell_stack, column_index|
-          if subrow_index < cell_stack.size
-            # This cell stack is at least as "deep" as the subrow we're on. So just
-            # grab the subcell for this subrow from this cell stack.
-            cell_stack[subrow_index]
-          else
-            # This cell stack is not "deep" enough. So we make an empty subcell to
-            # add to this subrow for this column
-            surround(' ' * @columns[column_index].width, PADDING_CHARACTER)
-          end
-        end
-      end
-
-      # Join each subrow with border characters, then join these with newlines, to form
-      # the wrapped, formatted row as a single string.
-      join_lines(subrows.map { |subrow| surround_join(subrow, VERTICAL_RULE_CHARACTER) })
+      join_lines(subrows)
     end
 
     # @!visibility private
