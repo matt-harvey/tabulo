@@ -79,7 +79,6 @@ describe Tabulo::Table do
 
         it "initializes a table displaying the formatted table with header at start and then "\
           "before every Nth row thereafter" do
-          expect(table).to be_a(Tabulo::Table)
           expect(table.to_s).to eq \
             %q(+--------------+--------------+
                |       N      |    Doubled   |
@@ -110,7 +109,6 @@ describe Tabulo::Table do
         let(:wrap_header_cells_to) { nil }
 
         it "wraps header cell contents as necessary if they exceed the column width" do
-          expect(table).to be_a(Tabulo::Table)
           expect(table.to_s).to eq \
             %q(+--------------+--------------+--------------+
                |       N      |    Doubled   | NNNNNNNNNNNN |
@@ -126,20 +124,59 @@ describe Tabulo::Table do
       end
 
       context "when table is initialized with `wrap_header_cells_to: <N>`" do
-        let(:wrap_header_cells_to) { 2 }
+        context "when N rows are insufficient to accommodate the header content" do
+          let(:wrap_header_cells_to) { 2 }
 
-        it "truncates header cell contents to N rows, instead of wrapping them indefinitely" do
-          expect(table).to be_a(Tabulo::Table)
-          expect(table.to_s).to eq \
-            %q(+--------------+--------------+--------------+
-               |       N      |    Doubled   | NNNNNNNNNNNN |
-               |              |              | NNNNNNNNNNNN~|
-               +--------------+--------------+--------------+
-               |            1 |            2 |            1 |
-               |            2 |            4 |            2 |
-               |            3 |            6 |            3 |
-               |            4 |            8 |            4 |
-               |            5 |           10 |            5 |).gsub(/^ +/, "")
+          it "truncates header cell contents to N subrows, instead of wrapping them indefinitely, "\
+            "and shows a truncation indicator" do
+            expect(table.to_s).to eq \
+              %q(+--------------+--------------+--------------+
+                 |       N      |    Doubled   | NNNNNNNNNNNN |
+                 |              |              | NNNNNNNNNNNN~|
+                 +--------------+--------------+--------------+
+                 |            1 |            2 |            1 |
+                 |            2 |            4 |            2 |
+                 |            3 |            6 |            3 |
+                 |            4 |            8 |            4 |
+                 |            5 |           10 |            5 |).gsub(/^ +/, "")
+          end
+        end
+
+        context "when N rows are just insufficient to accommodate the header content" do
+          let(:wrap_header_cells_to) { 3 }
+
+          it "does not truncate the header cells and does not show a truncation indicator" do
+            expect(table.to_s).to eq \
+              %q(+--------------+--------------+--------------+
+                 |       N      |    Doubled   | NNNNNNNNNNNN |
+                 |              |              | NNNNNNNNNNNN |
+                 |              |              |      NN      |
+                 +--------------+--------------+--------------+
+                 |            1 |            2 |            1 |
+                 |            2 |            4 |            2 |
+                 |            3 |            6 |            3 |
+                 |            4 |            8 |            4 |
+                 |            5 |           10 |            5 |).gsub(/^ +/, "")
+          end
+        end
+
+        context "when N rows are more than sufficient to accommodate the header content" do
+          let(:wrap_header_cells_to) { 4 }
+
+          it 'only produces the number of "subrows" that are necessary to accommodate the contents, '\
+            'and does not show a truncation indicator' do
+            expect(table.to_s).to eq \
+              %q(+--------------+--------------+--------------+
+                 |       N      |    Doubled   | NNNNNNNNNNNN |
+                 |              |              | NNNNNNNNNNNN |
+                 |              |              |      NN      |
+                 +--------------+--------------+--------------+
+                 |            1 |            2 |            1 |
+                 |            2 |            4 |            2 |
+                 |            3 |            6 |            3 |
+                 |            4 |            8 |            4 |
+                 |            5 |           10 |            5 |).gsub(/^ +/, "")
+          end
         end
       end
     end
@@ -164,16 +201,49 @@ describe Tabulo::Table do
       end
 
       context "when table is initialized with `wrap_body_cells_to: <N>`" do
-        let(:wrap_body_cells_to) { 1 }
+        context "when N is insufficient to accommodate the cell content" do
+          let(:wrap_body_cells_to) { 1 }
 
-        it "truncates header cell contents to N rows, instead of wrapping them indefinitely" do
-          expect(table.to_s).to eq \
-            %q(+--------------+--------------+
-               |       N      |    Doubled   |
-               +--------------+--------------+
-               |            1 |            2 |
-               |            2 |            4 |
-               | 500000000000 | 100000000000~|).gsub(/^ +/, "")
+          it "truncates body cell contents to N subrows, instead of wrapping them indefinitely" do
+            expect(table.to_s).to eq \
+              %q(+--------------+--------------+
+                 |       N      |    Doubled   |
+                 +--------------+--------------+
+                 |            1 |            2 |
+                 |            2 |            4 |
+                 | 500000000000 | 100000000000~|).gsub(/^ +/, "")
+          end
+        end
+
+        context "when N is just sufficient to accommodate the cell content" do
+          let(:wrap_body_cells_to) { 2 }
+
+          it "does not truncate the cell content, and does not show a truncation indicator" do
+            expect(table.to_s).to eq \
+              %q(+--------------+--------------+
+                 |       N      |    Doubled   |
+                 +--------------+--------------+
+                 |            1 |            2 |
+                 |            2 |            4 |
+                 | 500000000000 | 100000000000 |
+                 |              |            0 |).gsub(/^ +/, "")
+          end
+        end
+
+        context "when N is more than sufficient to accommodate the cell content" do
+          let(:wrap_body_cells_to) { 3 }
+
+          it "does not truncate the cell content, does not show a truncation indicator, and "\
+            "produces only just enough subrows to accommodate the content" do
+            expect(table.to_s).to eq \
+              %q(+--------------+--------------+
+                 |       N      |    Doubled   |
+                 +--------------+--------------+
+                 |            1 |            2 |
+                 |            2 |            4 |
+                 | 500000000000 | 100000000000 |
+                 |              |            0 |).gsub(/^ +/, "")
+          end
         end
       end
     end

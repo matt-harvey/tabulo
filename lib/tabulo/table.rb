@@ -247,23 +247,24 @@ module Tabulo
     #   before truncating.
     # @return [String] the entire formatted row including all padding and borders.
     def format_row(cells, wrap_cells_to)
-      max_cell_height = (wrap_cells_to || cells.map(&:size).max || 1)
+      row_height = ([wrap_cells_to, cells.map(&:size).max].compact.min || 1)
 
-      subrows = (0...max_cell_height).map do |subrow_index|
+      subrows = (0...row_height).map do |subrow_index|
         subrow_components = cells.map.with_index do |cell, column_index|
           num_subcells = cell.size
-          cell_truncated = (num_subcells > max_cell_height)
-          append_truncator = (cell_truncated && subrow_index + 1 == max_cell_height)
+          cell_truncated = (num_subcells > row_height)
+          append_truncator = (cell_truncated && subrow_index + 1 == row_height)
 
           lpad = PADDING_CHARACTER
           rpad = (append_truncator ? TRUNCATION_INDICATOR : PADDING_CHARACTER)
 
-          inner = if subrow_index < num_subcells
-                    cell[subrow_index]
-                  else
-                    column_width = @columns[column_index].width
-                    PADDING_CHARACTER * column_width
-                  end
+          inner =
+            if subrow_index < num_subcells
+              cell[subrow_index]
+            else
+              column_width = @columns[column_index].width
+              PADDING_CHARACTER * column_width
+            end
 
           "#{lpad}#{inner}#{rpad}"
         end
