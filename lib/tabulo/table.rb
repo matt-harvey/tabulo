@@ -7,9 +7,11 @@ module Tabulo
     include Enumerable
 
     DEFAULT_COLUMN_WIDTH = 12
-
     HORIZONTAL_RULE_CHARACTER = "-"
+    VERTICAL_RULE_CHARACTER = "|"
     CORNER_CHARACTER = "+"
+    PADDING_CHARACTER = " "
+    TRUNCATION_INDICATOR = "~"
 
     # @!visibility private
     attr_reader :columns
@@ -44,10 +46,6 @@ module Tabulo
       @wrap_body_cells_to = wrap_body_cells_to
 
       @default_column_width = (column_width || DEFAULT_COLUMN_WIDTH)
-
-      @joiner = "|"
-      @truncation_indicator = "~"
-      @padding_character = " "
 
       @columns = []
       columns.each { |item| add_column(item) }
@@ -136,7 +134,8 @@ module Tabulo
 
     # @return [String] an "ASCII" graphical representation of the Table column headers.
     def formatted_header
-      format_row(@wrap_header_cells_to, &:header_subcells)
+      cells = @columns.map(&:header_subcells)
+      format_row(cells, @wrap_header_cells_to)
     end
 
     # @return [String] an "ASCII" graphical representation of a horizontal
@@ -218,7 +217,8 @@ module Tabulo
 
     # @!visibility private
     def formatted_body_row(source, with_header: false)
-      inner = format_row(@wrap_body_cells_to) { |column| column.body_subcells(source) }
+      cells = @columns.map { |column| column.body_subcells(source) }
+      inner = format_row(cells, @wrap_body_cells_to)
       if with_header
         join_lines([horizontal_rule, formatted_header, horizontal_rule, inner])
       else
@@ -235,17 +235,22 @@ module Tabulo
 
     # @!visibility private
     #
-    # Yields each column to passed block, then wraps and joins the results to form
-    # a formatted row.
-    def format_row(wrap_cells_to)
+    # Formats a single header row or body row as a String.
+    #
+    # @param [String[][]] cells an Array of Array-of-Strings, each of which represents a
+    #   "stack" of "subcells". Each such stack represents the wrapped content of a given
+    #   "cell" in this row, from the top down, one String for each "line".
+    #   Each String includes the spaces, if any, on either side required for the
+    #   "internal padding" of the cell to carry out the cell content alignment -- but
+    #   does not include the single character of padding around each column.
+    # @param [Fixnum] wrap_cells_to the number of "lines" of wrapped content to allow
+    #   before truncating.
+    # @return [String] the entire formatted row including all padding and borders.
+    def format_row(cells, wrap_cells_to)
 
       # Create an array of "cell stacks", each of which is an array of strings that
       # will be stacked on top of each other to form a wrapped cell.
-      cell_stacks = @columns.map do |column|
-
-        # Get the raw, non-wrapped, non-truncated content of the cell.
-        raw_subcells = yield column
-
+      cell_stacks = cells.map do |raw_subcells|
         num_raw_subcells = raw_subcells.size
         num_wrapped_subcells = (wrap_cells_to || num_raw_subcells)
 
@@ -254,8 +259,8 @@ module Tabulo
 
         subcells.map.with_index do |subcell, i|
           subcell_truncated = (truncated && (i == subcells.size - 1))
-          lpad = @padding_character
-          rpad = (subcell_truncated ? @truncation_indicator : @padding_character)
+          lpad = PADDING_CHARACTER
+          rpad = (subcell_truncated ? TRUNCATION_INDICATOR : PADDING_CHARACTER)
           "#{lpad}#{subcell}#{rpad}"
         end
       end
@@ -273,14 +278,14 @@ module Tabulo
           else
             # This cell stack is not "deep" enough. So we make an empty subcell to
             # add to this subrow for this column
-            surround(' ' * @columns[column_index].width, @padding_character)
+            surround(' ' * @columns[column_index].width, PADDING_CHARACTER)
           end
         end
       end
 
       # Join each subrow with border characters, then join these with newlines, to form
       # the wrapped, formatted row as a single string.
-      join_lines(subrows.map { |subrow| surround_join(subrow, @joiner) })
+      join_lines(subrows.map { |subrow| surround_join(subrow, VERTICAL_RULE_CHARACTER) })
     end
 
     # @!visibility private
