@@ -1,10 +1,11 @@
 # Tabulo
 
 [![Gem Version][GV img]][Gem Version]
-[![Build Status][BS img]][Build Status]
 [![Dependency Status][DS img]][Dependency Status]
 [![Coverage Status][CS img]][Coverage Status]
+[![Build Status][BS img]][Build Status]
 [![Code Climate][CC img]][Code Climate]
+[![Documentation][DC img]][Documentation]
 
 ## Overview
 
@@ -29,11 +30,11 @@ end
 
 ## Features
 
-* Set [fixed widths](#fixed-column-widths) on individual columns, then either [wrap](#overflow-handling) or
+* Set [fixed column widths](#fixed-column-widths), then either [wrap](#overflow-handling) or
   [truncate](#overflow-handling) the overflow.
-* Alternatively, [shrinkwrap](#shrinkwrap) the table so that each column is just wide enough for its
-  contents.
-* Put an upper limit on table width when shrinkwrapping, to [stop it overflowing your terminal horizontally](#max-table-width).
+* Alternatively, [shrinkwrap](#shrinkwrap) the table so that each column is just wide enough for its contents.
+* Put an upper limit on total table width when shrinkwrapping, to
+  [stop it overflowing your terminal horizontally](#max-table-width).
 * Alignment of cell content is [configurable](#cell-alignment), but has helpful content-based defaults
   (numbers right, strings left).
 * Headers are [repeatable](#repeating-headers).
@@ -390,9 +391,11 @@ License](http://opensource.org/licenses/MIT).
 [Dependency Status]: https://gemnasium.com/matt-harvey/tabulo
 [Coverage Status]: https://coveralls.io/r/matt-harvey/tabulo
 [Code Climate]: https://codeclimate.com/github/matt-harvey/tabulo
+[Documentation]: http://www.rubydoc.info/gems/tabulo/0.6.1
 
-[GV img]: https://img.shields.io/gem/v/tabulo.svg
-[BS img]: https://img.shields.io/travis/matt-harvey/tabulo.svg
-[DS img]: https://img.shields.io/gemnasium/matt-harvey/tabulo.svg
-[CS img]: https://img.shields.io/coveralls/matt-harvey/tabulo.svg
-[CC img]: https://img.shields.io/codeclimate/github/matt-harvey/tabulo.svg
+[GV img]: https://img.shields.io/gem/v/tabulo.svg?style=plastic
+[BS img]: https://img.shields.io/travis/matt-harvey/tabulo.svg?style=plastic
+[DS img]: https://img.shields.io/gemnasium/matt-harvey/tabulo.svg?style=plastic
+[CS img]: https://img.shields.io/coveralls/matt-harvey/tabulo.svg?style=plastic
+[CC img]: https://img.shields.io/codeclimate/github/matt-harvey/tabulo.svg?style=plastic
+[DC img]: https://img.shields.io/badge/docs-v0.6.1-blue.svg?style=plastic
