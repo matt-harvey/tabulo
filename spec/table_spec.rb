@@ -286,9 +286,9 @@ describe Tabulo::Table do
       context "with unlimited wrapping" do
         it "respects newlines within header and cells" do
           table = Tabulo::Table.new(["Two\nlines", "\nInitial", "Final\n", "Multiple\nnew\nlines"]) do |t|
-            t.add_column(:itself, header: "Firstpart\nsecondpart", width: 7)
+            t.add_column(:itself, header: "Firstpart\nsecondpart", width: 7) { |s| s }
             t.add_column(:length)
-            t.add_column("Lines\nin\nheader", align_body: :right, &:itself)
+            t.add_column("Lines\nin\nheader", align_body: :right) { |s| s }
           end
 
           expect(table.to_s).to eq \
@@ -316,9 +316,9 @@ describe Tabulo::Table do
         it "accounts for newlines within header and cells" do
           table = Tabulo::Table.new(["Two\nlines", "\nInitial", "Final\n", "Multiple\nnew\nlines"],
             wrap_header_cells_to: 2, wrap_body_cells_to: 1) do |t|
-            t.add_column(:itself)
+            t.add_column(:itself) { |s| s }
             t.add_column(:length)
-            t.add_column("Lines\nin\nheader", align_body: :right, &:itself)
+            t.add_column("Lines\nin\nheader", align_body: :right) { |s| s }
           end
 
           expect(table.to_s).to eq \
@@ -332,15 +332,6 @@ describe Tabulo::Table do
                | Multiple    ~|           18 |     Multiple~|).gsub(/^ +/, "")
         end
       end
-    end
-  end
-
-  describe "#columns" do
-    it "returns an array of all the table's `Tabulo::Column`s" do
-      result = table.columns
-      expect(result).to be_a(Array)
-      expect(result.count).to eq(2)
-      expect(result.all? { |c| c.is_a?(Tabulo::Column) }).to be_truthy
     end
   end
 
@@ -442,7 +433,7 @@ describe Tabulo::Table do
       context "when provided" do
         let(:table) do
           Tabulo::Table.new(1..5) do |t|
-            t.add_column("N", &:itself)
+            t.add_column("N") { |s| s }
             t.add_column("x 2") do |n|
               n * 2
             end
@@ -468,20 +459,20 @@ describe Tabulo::Table do
       context "when not provided" do
         let(:table) do
           Tabulo::Table.new(1..5) do |t|
-            t.add_column(:itself)
+            t.add_column(:even?)
           end
         end
 
         specify "the first argument is called as a method on each source item to derive the cell value" do
           expect(table.to_s).to eq \
             %q(+--------------+
-               |    itself    |
+               |     even?    |
                +--------------+
-               |            1 |
-               |            2 |
-               |            3 |
-               |            4 |
-               |            5 |).gsub(/^ +/, "")
+               |     false    |
+               |     true     |
+               |     false    |
+               |     true     |
+               |     false    |).gsub(/^ +/, "")
         end
       end
     end
@@ -565,7 +556,9 @@ describe Tabulo::Table do
         )
 
         # Let's do a quick check to make sure that it will also expand the total table width if required.
-        small_table = Tabulo::Table.new(%w(hello goodbye), column_width: 3, columns: %i(itself))
+        small_table = Tabulo::Table.new(%w(hello goodbye), column_width: 3) do |t|
+          t.add_column(:itself) { |s| s }
+        end
         expect { small_table.shrinkwrap! }.to change(small_table, :to_s).from(
           %q(+-----+
              | its |
@@ -661,8 +654,12 @@ describe Tabulo::Table do
       context "when `max_table_width` is very small" do
         it "only reduces column widths to the extent that there is at least a character's width "\
           "available in each column for content, plus one character of padding on either side" do
-          table =
-            Tabulo::Table.new(%w(hi there), columns: %i(itself length)).shrinkwrap!(max_table_width: 3)
+          table = Tabulo::Table.new(%w(hi there)) do |t|
+            t.add_column(:itself) { |s| s }
+            t.add_column(:length)
+          end
+          table.shrinkwrap!(max_table_width: 3)
+
           expect(table.to_s).to eq \
             %q(+---+---+
                | i | l |
