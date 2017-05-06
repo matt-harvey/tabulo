@@ -40,12 +40,10 @@ module Tabulo
 
     # @return a Hash representation of the {Row}, with column labels acting
     #   as keys and the calculated cell values (before formatting) providing the values.
-    #
     # @example
     #   table = Tabulo::Table.new([1, 10], columns: %i(itself even?))
     #   row = table.first
     #   row.to_h  # => { :itself => 1, :even? => false }
-    #
     def to_h
       @table.columns.map(&:label).zip(to_a).to_h
     end

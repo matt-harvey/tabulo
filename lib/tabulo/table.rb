@@ -35,7 +35,6 @@ module Tabulo
     #   headers), if their content is longer than the column's fixed width. If passed <tt>nil</tt>, content will
     #   be wrapped for as many rows as required to accommodate it. If passed a Fixnum N (> 0), content will be
     #   wrapped up to N rows and then truncated thereafter.
-    #
     # @return [Table] a new Table
     def initialize(sources, columns: [], column_width: nil, header_frequency: :start,
       wrap_header_cells_to: nil, wrap_body_cells_to: nil)
@@ -60,7 +59,6 @@ module Tabulo
     #   extractor argument is not also provided, then the label argument should correspond to
     #   a method to be called on each item in the table sources to provide the content
     #   for this column.
-    #
     # @param [nil, #to_s] header (nil) Text to be displayed in the column header. If passed nil,
     #   the column's label will also be used as its header text.
     # @param [:left, :center, :right] align_header (:center) Specifies how the header text
@@ -83,7 +81,6 @@ module Tabulo
     #   that will be passed each of the Table sources to determine the value in each cell of this
     #   column. If this is not provided, then the column label will be treated as a method to be
     #   called on each source item to determine each cell's value.
-    #
     def add_column(label, header: nil, align_header: :center, align_body: nil,
       width: nil, formatter: :to_s.to_proc, &extractor)
 
@@ -140,7 +137,6 @@ module Tabulo
 
     # @return [String] an "ASCII" graphical representation of a horizontal
     #   dividing line suitable for printing at any point in the table.
-    #
     # @example Print a horizontal divider after every row:
     #   table.each do |row|
     #     puts row
@@ -172,7 +168,6 @@ module Tabulo
     #   in each column, together with border characters (1 on each side of the table and 1 between
     #   adjacent columns). I.e. there is a certain width below width the Table will refuse to
     #   shrink itself.
-    #
     # @return [Table] the Table itself
     def shrinkwrap!(max_table_width: nil)
       return self if columns.none?
