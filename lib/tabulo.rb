@@ -1,4 +1,5 @@
 require "tabulo/version"
+require "tabulo/exceptions"
 require "tabulo/table"
 require "tabulo/row"
 require "tabulo/column"

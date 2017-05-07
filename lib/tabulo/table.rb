@@ -25,11 +25,11 @@ module Tabulo
     TRUNCATION_INDICATOR = "~"
 
     # @!visibility private
-    attr_reader :columns
+    attr_reader :column_registry
 
     # @param [Enumerable] sources the underlying Enumerable from which the table will derive its data
-    # @param [Array[Symbol]] columns Specifies the initial columns.
-    #   Each element of the Array  will be used to create a column whose content is
+    # @param [Array[Symbol]] columns Specifies the initial columns. The Symbols provided must
+    #   be unique. Each element of the Array  will be used to create a column whose content is
     #   created by calling the corresponding method on each element of sources. Note
     #   the {#add_column} method is a much more flexible way to set up columns on the table.
     # @param [Fixnum, nil] column_width The default column width for columns in this
@@ -47,6 +47,7 @@ module Tabulo
     #   be wrapped for as many rows as required to accommodate it. If passed a Fixnum N (> 0), content will be
     #   wrapped up to N rows and then truncated thereafter.
     # @return [Table] a new Table
+    # @raise [InvalidColumnLabelError] if non-unique Symbols are provided to columns.
     def initialize(sources, columns: [], column_width: nil, header_frequency: :start,
       wrap_header_cells_to: nil, wrap_body_cells_to: nil)
 
@@ -57,7 +58,7 @@ module Tabulo
 
       @default_column_width = (column_width || DEFAULT_COLUMN_WIDTH)
 
-      @columns = []
+      @column_registry = { }
       columns.each { |item| add_column(item) }
 
       yield self if block_given?
@@ -92,24 +93,33 @@ module Tabulo
     #   that will be passed each of the Table sources to determine the value in each cell of this
     #   column. If this is not provided, then the column label will be treated as a method to be
     #   called on each source item to determine each cell's value.
+    # @raise [InvalidColumnLabelError] if label has already been used for another column in this
+    #   Table. (This is case-sensitive, but is insensitive to whether a String or Symbol is passed
+    #   to the label parameter.)
     def add_column(label, header: nil, align_header: :center, align_body: nil,
       width: nil, formatter: :to_s.to_proc, &extractor)
 
-      @columns << Column.new(
-        label: label.to_sym,
-        header: (header || label).to_s,
-        align_header: align_header,
-        align_body: align_body,
-        width: (width || @default_column_width),
-        formatter: formatter,
-        extractor: (extractor || label.to_proc)
-      )
+      column_label = label.to_sym
+
+      if column_registry.include?(column_label)
+        raise InvalidColumnLabelError, "Column label already used in this table."
+      end
+
+      @column_registry[column_label] =
+        Column.new(
+          header: (header || label).to_s,
+          align_header: align_header,
+          align_body: align_body,
+          width: (width || @default_column_width),
+          formatter: formatter,
+          extractor: (extractor || label.to_proc)
+        )
     end
 
     # @return [String] a graphical "ASCII" representation of the Table, suitable for
     #   display in a fixed-width font.
     def to_s
-      if @columns.any?
+      if column_registry.any?
         join_lines(map(&:to_s))
       else
         ""
@@ -142,7 +152,7 @@ module Tabulo
 
     # @return [String] an "ASCII" graphical representation of the Table column headers.
     def formatted_header
-      cells = @columns.map(&:header_subcells)
+      cells = column_registry.map { |label, column| column.header_subcells }
       format_row(cells, @wrap_header_cells_to)
     end
 
@@ -155,7 +165,9 @@ module Tabulo
     #   end
     #
     def horizontal_rule
-      inner = @columns.map { |column| surround(column.horizontal_rule, HORIZONTAL_RULE_CHARACTER) }
+      inner = column_registry.map do |label, column|
+        surround(column.horizontal_rule, HORIZONTAL_RULE_CHARACTER)
+      end
       surround_join(inner, CORNER_CHARACTER)
     end
 
@@ -181,36 +193,41 @@ module Tabulo
     #   shrink itself.
     # @return [Table] the Table itself
     def shrinkwrap!(max_table_width: nil)
-      return self if columns.none?
+      return self if column_registry.none?
 
       wrapped_width = -> (str) { str.split($/).map(&:length).max || 1 }
 
-      columns.each do |column|
+      column_registry.each do |label, column|
         column.width = wrapped_width.call(column.header)
       end
 
       @sources.each do |source|
-        columns.each do |column|
+        column_registry.each do |label, column|
           width = wrapped_width.call(column.formatted_cell_content(source))
           column.width = width if width > column.width
         end
       end
 
       if max_table_width
-        total_columns_width = columns.inject(0) { |sum, column| sum + column.width }
-        total_padding = columns.count * 2
-        total_borders = columns.count + 1
+        total_columns_width = column_registry.inject(0) do |sum, label_with_column|
+          _label, column = label_with_column
+          sum + column.width
+        end
+        total_padding = column_registry.count * 2
+        total_borders = column_registry.count + 1
         unadjusted_table_width = total_columns_width + total_padding + total_borders
 
         # Ensure max table width is at least wide enough to accommodate table borders and padding
         # and one character of content.
-        min_table_width = total_padding + total_borders + columns.count
+        min_table_width = total_padding + total_borders + column_registry.count
         max_table_width = min_table_width if min_table_width > max_table_width
 
         required_reduction = [unadjusted_table_width - max_table_width, 0].max
 
         required_reduction.times do
-          widest_column = columns.inject(columns.first) do |widest, column|
+          _first_label, first_column = column_registry.first
+          widest_column = column_registry.inject(first_column) do |widest, label_with_column|
+            _label, column = label_with_column
             column.width >= widest.width ? column : widest
           end
 
@@ -223,7 +240,7 @@ module Tabulo
 
     # @!visibility private
     def formatted_body_row(source, with_header: false)
-      cells = @columns.map { |column| column.body_subcells(source) }
+      cells = column_registry.map { |label, column| column.body_subcells(source) }
       inner = format_row(cells, @wrap_body_cells_to)
       if with_header
         join_lines([horizontal_rule, formatted_header, horizontal_rule, inner])
@@ -256,7 +273,7 @@ module Tabulo
       row_height = ([wrap_cells_to, cells.map(&:size).max].compact.min || 1)
 
       subrows = (0...row_height).map do |subrow_index|
-        subrow_components = cells.map.with_index do |cell, column_index|
+        subrow_components = cells.zip(column_registry.values).map do |cell, column|
           num_subcells = cell.size
           cell_truncated = (num_subcells > row_height)
           append_truncator = (cell_truncated && subrow_index + 1 == row_height)
@@ -268,8 +285,7 @@ module Tabulo
             if subrow_index < num_subcells
               cell[subrow_index]
             else
-              column_width = @columns[column_index].width
-              PADDING_CHARACTER * column_width
+              PADDING_CHARACTER * column.width
             end
 
           "#{lpad}#{inner}#{rpad}"

@@ -22,7 +22,7 @@ module Tabulo
     #     cell.class  # => Fixnum, => FalseClass
     #   end
     def each
-      @table.columns.each do |column|
+      @table.column_registry.each do |label, column|
         yield column.body_cell_value(@source)
       end
     end
@@ -31,7 +31,7 @@ module Tabulo
     #   any column headers that appear just above it in the {Table} (depending on where this Row is
     #   in the {Table} and how the {Table} was configured with respect to header frequency).
     def to_s
-      if @table.columns.any?
+      if @table.column_registry.any?
         @table.formatted_body_row(@source, with_header: @with_header)
       else
         ""
@@ -45,7 +45,7 @@ module Tabulo
     #   row = table.first
     #   row.to_h  # => { :itself => 1, :even? => false }
     def to_h
-      @table.columns.map(&:label).zip(to_a).to_h
+      @table.column_registry.map { |label, column| [label, column.body_cell_value(@source)] }.to_h
     end
   end
 end

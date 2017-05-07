@@ -3,7 +3,6 @@ require "spec_helper"
 describe Tabulo::Column do
   let(:column) do
     Tabulo::Column.new(
-      label: :times_ten,
       header: "X10",
       width: 10,
       align_header: :left,

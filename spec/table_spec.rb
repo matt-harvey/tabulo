@@ -38,7 +38,11 @@ describe Tabulo::Table do
              |            1 |          1.0 |
              |            2 |          2.0 |
              |            3 |          3.0 |).gsub(/^ +/, "")
+      end
 
+      it "raises Tabulo::InvalidColumnLabelError if symbols are not unique" do
+        expect { Tabulo::Table.new([1, 2, 3], columns: [:to_i, :to_i]) }.to \
+          raise_error(Tabulo::InvalidColumnLabelError)
       end
     end
 
@@ -337,7 +341,7 @@ describe Tabulo::Table do
 
   describe "#add_column" do
     it "adds to the table's columns" do
-      expect { table.add_column(:even?) }.to change { table.columns.count }.by(1)
+      expect { table.add_column(:even?) }.to change { table.column_registry.count }.by(1)
     end
 
     describe "`header` param" do
@@ -474,6 +478,20 @@ describe Tabulo::Table do
                |     true     |
                |     false    |).gsub(/^ +/, "")
         end
+      end
+    end
+
+    context "when the column label is not unique (even if one was passed a String and the other a Symbol)" do
+      it "raises Tabulo::InvalidColumnLabelError" do
+        table.add_column("abc") { |n| n * 3 }
+        expect { table.add_column(:abc) { |n| n * 4 } }.to raise_error(Tabulo::InvalidColumnLabelError)
+      end
+    end
+
+    context "when column label differs from that of an existing column only in regards to case" do
+      it "does not raise an exception" do
+        table.add_column("abc") { |n| n * 3 }
+        expect { table.add_column("Abc") { |n| n * 4 } }.not_to raise_error
       end
     end
   end

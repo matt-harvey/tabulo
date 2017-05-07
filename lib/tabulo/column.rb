@@ -4,12 +4,10 @@ module Tabulo
   class Column
 
     attr_accessor :width
-    attr_reader :header, :label
+    attr_reader :header
 
-    def initialize(label:, header:, width:, align_header:, align_body:,
-      formatter:, extractor:)
+    def initialize(header:, width:, align_header:, align_body:, formatter:, extractor:)
 
-      @label = label
       @header = header
       @width = width
       @align_header = align_header
