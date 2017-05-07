@@ -1,5 +1,9 @@
 # Changelog
 
+### v0.6.2
+
+* Explicitly support only Ruby >= 2.1.10.
+
 ### v0.6.1
 
 * Fix Table#shrinkwrap! handling of newlines within header cell content.
