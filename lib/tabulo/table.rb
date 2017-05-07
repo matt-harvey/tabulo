@@ -6,11 +6,22 @@ module Tabulo
   class Table
     include Enumerable
 
+    # @!visibility private
     DEFAULT_COLUMN_WIDTH = 12
+
+    # @!visibility private
     HORIZONTAL_RULE_CHARACTER = "-"
+
+    # @!visibility private
     VERTICAL_RULE_CHARACTER = "|"
+
+    # @!visibility private
     CORNER_CHARACTER = "+"
+
+    # @!visibility private
     PADDING_CHARACTER = " "
+
+    # @!visibility private
     TRUNCATION_INDICATOR = "~"
 
     # @!visibility private

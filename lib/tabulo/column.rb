@@ -6,7 +6,6 @@ module Tabulo
     attr_accessor :width
     attr_reader :header, :label
 
-    # @!visibility private
     def initialize(label:, header:, width:, align_header:, align_body:,
       formatter:, extractor:)
 
@@ -19,17 +18,14 @@ module Tabulo
       @extractor = extractor
     end
 
-    # @!visibility private
     def header_subcells
       infilled_subcells(@header, @align_header)
     end
 
-    # @!visibility private
     def horizontal_rule
       Table::HORIZONTAL_RULE_CHARACTER * width
     end
 
-    # @!visibility private
     def body_subcells(source)
       cell_datum = body_cell_value(source)
       formatted_content = @formatter.call(cell_datum)
@@ -37,19 +33,16 @@ module Tabulo
       infilled_subcells(formatted_content, real_alignment)
     end
 
-    # @!visibility private
     def formatted_cell_content(source)
       @formatter.call(body_cell_value(source))
     end
 
-    # @!visibility private
     def body_cell_value(source)
       @extractor.call(source)
     end
 
     private
 
-    # @!visibility private
     def infilled_subcells(str, real_alignment)
       str.split($/, -1).flat_map do |substr|
         num_subsubcells = [1, (substr.length.to_f / width).ceil].max
@@ -59,7 +52,6 @@ module Tabulo
       end
     end
 
-    # @!visibility private
     def align_cell_content(content, real_alignment)
       padding = [@width - content.length, 0].max
       left_padding, right_padding =
@@ -76,7 +68,6 @@ module Tabulo
       "#{' ' * left_padding}#{content}#{' ' * right_padding}"
     end
 
-    # @!visibility private
     def infer_alignment(cell_datum)
       case cell_datum
       when Numeric
