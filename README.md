@@ -226,7 +226,12 @@ table will not overflow your terminal horizontally.
 
 Note that shrinkwrapping necessarily involves traversing the entire collection up front as
 the maximum cell width needs to be calculated for each column. You may not want to do this
-if the collection is very large.
+if the collection is very large. Note also the effect of `shrinkwrap!` is to fix the column widths
+as appropriate to the formatted cell contents given the state of the underlying collection
+_at the point of shrinkwrapping_. If the underlying collection changes between that point, and when
+the table is printed, then the columns will _not_ be resized yet again on printing. This is a
+consequence of the table always being essentially a "live view" on the underlying collection:
+formatted contents are never cached within the table itself.
 
 <a name="overflow-handling"></a>
 #### Overflow handling
@@ -368,8 +373,9 @@ end.to_enum  # <-- make an Enumerator
 ```
 
 Note the use of `.find_each`: we can start printing the table without having to load the entire
-underlying collection. (The cost of supporting this behaviour is that Tabulo requires us to set
-column widths up front, rather than adapting to the width of the widest value.)
+underlying collection. (This is negated if we [shrinkwrap](#shrinkwrap) the table, however, since
+in that case the entire collection must be traversed up front in order for column widths to be
+calculated.)
 
 ## Development
 

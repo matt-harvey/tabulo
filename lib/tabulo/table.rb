@@ -180,6 +180,11 @@ module Tabulo
     # be traversed and all the column extractors and formatters to be applied in order
     # to calculate the required widths.
     #
+    # Note also that this method causes column widths to be fixed as appropriate to the
+    # formatted cell contents given the state of the source Enumerable at the point it
+    # is called. If the source Enumerable changes between that point, and the point when
+    # the Table is printed, then columns will *not* be resized yet again on printing.
+    #
     # @param [nil, Numeric] max_table_width (nil) If provided, stops the total table
     #   width (including padding and borders) from expanding beyond this number of characters.
     #   Width is deducted from columns if required to achieve this, with one character progressively
