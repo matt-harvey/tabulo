@@ -1,5 +1,9 @@
 # Changelog
 
+### v0.6.3
+
+* Throw an exception if column labels are not unique.
+
 ### v0.6.2
 
 * Explicitly support only Ruby >= 2.1.10.
