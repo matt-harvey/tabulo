@@ -22,7 +22,7 @@ module Tabulo
     #     cell.class  # => Fixnum, => FalseClass
     #   end
     def each
-      @table.column_registry.each do |label, column|
+      @table.column_registry.each do |_, column|
         yield column.body_cell_value(@source)
       end
     end

@@ -152,7 +152,7 @@ module Tabulo
 
     # @return [String] an "ASCII" graphical representation of the Table column headers.
     def formatted_header
-      cells = column_registry.map { |label, column| column.header_subcells }
+      cells = column_registry.map { |_, column| column.header_subcells }
       format_row(cells, @wrap_header_cells_to)
     end
 
@@ -165,7 +165,7 @@ module Tabulo
     #   end
     #
     def horizontal_rule
-      inner = column_registry.map do |label, column|
+      inner = column_registry.map do |_, column|
         surround(column.horizontal_rule, HORIZONTAL_RULE_CHARACTER)
       end
       surround_join(inner, CORNER_CHARACTER)
@@ -199,25 +199,21 @@ module Tabulo
     # @return [Table] the Table itself
     def shrinkwrap!(max_table_width: nil)
       return self if column_registry.none?
+      columns = column_registry.values
 
-      wrapped_width = -> (str) { str.split($/).map(&:length).max || 1 }
-
-      column_registry.each do |label, column|
-        column.width = wrapped_width.call(column.header)
+      columns.each do |column|
+        column.width = wrapped_width(column.header)
       end
 
       @sources.each do |source|
-        column_registry.each do |label, column|
-          width = wrapped_width.call(column.formatted_cell_content(source))
+        columns.each do |column|
+          width = wrapped_width(column.formatted_cell_content(source))
           column.width = width if width > column.width
         end
       end
 
       if max_table_width
-        total_columns_width = column_registry.inject(0) do |sum, label_with_column|
-          _label, column = label_with_column
-          sum + column.width
-        end
+        total_columns_width = columns.inject(0) { |sum, column| sum + column.width }
         total_padding = column_registry.count * 2
         total_borders = column_registry.count + 1
         unadjusted_table_width = total_columns_width + total_padding + total_borders
@@ -230,9 +226,7 @@ module Tabulo
         required_reduction = [unadjusted_table_width - max_table_width, 0].max
 
         required_reduction.times do
-          _first_label, first_column = column_registry.first
-          widest_column = column_registry.inject(first_column) do |widest, label_with_column|
-            _label, column = label_with_column
+          widest_column = columns.inject(columns.first) do |widest, column|
             column.width >= widest.width ? column : widest
           end
 
@@ -245,7 +239,7 @@ module Tabulo
 
     # @!visibility private
     def formatted_body_row(source, with_header: false)
-      cells = column_registry.map { |label, column| column.body_subcells(source) }
+      cells = column_registry.map { |_, column| column.body_subcells(source) }
       inner = format_row(cells, @wrap_body_cells_to)
       if with_header
         join_lines([horizontal_rule, formatted_header, horizontal_rule, inner])
@@ -315,6 +309,15 @@ module Tabulo
     # @!visibility private
     def join_lines(lines)
       lines.join($/)  # join strings with cross-platform newline
+    end
+
+    # @!visibility private
+    # @return [Fixnum] the length of the longest segment of str when split by newlines
+    def wrapped_width(str)
+      segments = str.split($/)
+      segments.inject(1) do |length, segment|
+        length > segment.length ? length : segment.length
+      end
     end
   end
 end
