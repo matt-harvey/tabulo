@@ -86,7 +86,7 @@ end
 Or equivalently:
 
 ```ruby
-table = Tabulo::Table.new([1, 2, 5], columns: %i(itself even? odd?))
+table = Tabulo::Table.new([1, 2, 5], columns: %i[itself even? odd?])
 ```
 
 ```
@@ -161,7 +161,7 @@ If you want to set the default column width for all columns of the table to some
 than 12, use the `column_width` option when initializing the table:
 
 ```ruby
-table = Tabulo::Table.new([1, 2], columns: %i(itself even?), column_width: 6)
+table = Tabulo::Table.new([1, 2], columns: %i[itself even?], column_width: 6)
 ```
 
 ```
@@ -183,7 +183,7 @@ itself, so that each column is just wide enough for its header and contents (plu
 of padding):
 
 ```ruby
-table = Tabulo::Table.new([1, 2], columns: %i(itself even?))
+table = Tabulo::Table.new([1, 2], columns: %i[itself even?])
 table.shrinkwrap!
 ```
 
@@ -199,14 +199,14 @@ table.shrinkwrap!
 The `shrinkwrap!` method returns the table itself, so you can "wrap-and-print" in one go:
 
 ```ruby
-puts Tabulo::Table.new([1, 2], columns: %i(itself even?)).shrinkwrap!
+puts Tabulo::Table.new([1, 2], columns: %i[itself even?]).shrinkwrap!
 ```
 
 <a name="max-table-width"></a>
 You can place an upper limit on the total width of the table when shrinkwrapping:
 
 ```ruby
-puts Tabulo::Table.new([1, 2], columns: %i(itself even?)).shrinkwrap!(max_table_width: 17)
+puts Tabulo::Table.new([1, 2], columns: %i[itself even?]).shrinkwrap!(max_table_width: 17)
 ```
 
 ```
@@ -242,7 +242,7 @@ required:
 ```ruby
 table = Tabulo::Table.new(
   ["hello", "abcdefghijklmnopqrstuvwxyz"],
-  columns: %i(itself length)
+  columns: %i[itself length]
 )
 ```
 
@@ -267,7 +267,7 @@ outputted cell content to show that truncation has occurred:
 table = Tabulo::Table.new(
   ["hello", "abcdefghijklmnopqrstuvwxyz"],
   wrap_body_cells_to: 1,
-  columns: %i(itself length)
+  columns: %i[itself length]
 )
 ```
 
@@ -325,7 +325,7 @@ at table that's taller than your terminal.
 E.g.:
 
 ```ruby
-table = Tabulo::Table.new(1..10, columns: %i(itself even?), header_frequency: 5)
+table = Tabulo::Table.new(1..10, columns: %i[itself even?], header_frequency: 5)
 ```
 
 ```
