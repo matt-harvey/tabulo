@@ -1,5 +1,10 @@
 # Changelog
 
+### v1.0.0
+
+* Decision to release stable version!
+* Minor implementation and documentation tweaks.
+
 ### v0.6.3
 
 * Throw an exception if column labels are not unique.
