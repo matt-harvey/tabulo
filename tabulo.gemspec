@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = ">= 2.1.10"
 
-  spec.add_development_dependency "bundler", "~> 1.15.1"
+  spec.add_development_dependency "bundler", "~> 1.16.0"
   spec.add_development_dependency "rake", "~> 11.0"
   spec.add_development_dependency "rspec", "~> 3.0"
   spec.add_development_dependency "simplecov"
