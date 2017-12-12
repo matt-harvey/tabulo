@@ -41,7 +41,7 @@ describe Tabulo::Row do
       :aggregate_failures do
 
       row.each_with_index do |cell, i|
-        expect(cell).to be_a(Fixnum)
+        expect(cell).to be_a(Integer)
 
         case i
         when 0

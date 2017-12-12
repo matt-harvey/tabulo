@@ -18,8 +18,7 @@ module Tabulo
     #   table = Tabulo::Table.new([1, 10], columns: %i(itself even?))
     #   row = table.first
     #   row.each do |cell|
-    #     cell        # => 1,      => false
-    #     cell.class  # => Fixnum, => FalseClass
+    #     puts cell        # => 1,       => false
     #   end
     def each
       @table.column_registry.each do |_, column|

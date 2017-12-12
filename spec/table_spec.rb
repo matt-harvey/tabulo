@@ -267,10 +267,10 @@ describe Tabulo::Table do
         end
       end
 
-      context "when passed a Fixnum" do
+      context "when passed an Integer" do
         let(:column_width) { 9 }
 
-        it "causes all column widths to default to the given Fixnum, unless overridden for "\
+        it "causes all column widths to default to the given Integer, unless overridden for "\
           "particular columns" do
           table.add_column(:even?, width: 5)
           expect(table.to_s).to eq \
@@ -429,7 +429,7 @@ describe Tabulo::Table do
              |            5 |           10 |        15.00 |).gsub(/^ +/, "")
         top_right_body_cell = table.first.to_a.last
         expect(top_right_body_cell).to eq(3)
-        expect(top_right_body_cell).to be_a(Fixnum)
+        expect(top_right_body_cell).to be_a(Integer)
       end
     end
 

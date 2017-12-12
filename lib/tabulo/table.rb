@@ -32,19 +32,19 @@ module Tabulo
     #   be unique. Each element of the Array  will be used to create a column whose content is
     #   created by calling the corresponding method on each element of sources. Note
     #   the {#add_column} method is a much more flexible way to set up columns on the table.
-    # @param [Fixnum, nil] column_width The default column width for columns in this
+    # @param [Integer, nil] column_width The default column width for columns in this
     #   table, not excluding padding. If nil, then DEFAULT_COLUMN_WIDTH will be used.
-    # @param [:start, nil, Fixnum] header_frequency Controls the display of column headers.
+    # @param [:start, nil, Integer] header_frequency Controls the display of column headers.
     #   If passed <tt>:start</tt>, headers will be shown at the top of the table only. If passed <tt>nil</tt>,
-    #   headers will not be shown. If passed a Fixnum N (> 0), headers will be shown at the top of the table,
+    #   headers will not be shown. If passed an Integer N (> 0), headers will be shown at the top of the table,
     #   then repeated every N rows.
-    # @param [nil, Fixnum] wrap_header_cells_to Controls wrapping behaviour for header
+    # @param [nil, Integer] wrap_header_cells_to Controls wrapping behaviour for header
     #   cells if the content thereof is longer than the column's fixed width. If passed <tt>nil</tt> (default),
-    #   content will be wrapped for as many rows as required to accommodate it. If passed a Fixnum N (> 0),
+    #   content will be wrapped for as many rows as required to accommodate it. If passed an Integer N (> 0),
     #   content will be wrapped up to N rows and then truncated thereafter.
-    # @param [nil, Fixnum] wrap_body_cells_to Controls wrapping behaviour for table cells (excluding
+    # @param [nil, Integer] wrap_body_cells_to Controls wrapping behaviour for table cells (excluding
     #   headers), if their content is longer than the column's fixed width. If passed <tt>nil</tt>, content will
-    #   be wrapped for as many rows as required to accommodate it. If passed a Fixnum N (> 0), content will be
+    #   be wrapped for as many rows as required to accommodate it. If passed an Integer N (> 0), content will be
     #   wrapped up to N rows and then truncated thereafter.
     # @return [Table] a new Table
     # @raise [InvalidColumnLabelError] if non-unique Symbols are provided to columns.
@@ -80,7 +80,7 @@ module Tabulo
     #   by the type of the cell value, with numbers aligned right, booleans center-aligned, and
     #   other values left-aligned. Note header text alignment is configured separately using the
     #   :align_header param.
-    # @param [Fixnum] width (nil) Specifies the width of the column, excluding padding. If
+    # @param [Integer] width (nil) Specifies the width of the column, excluding padding. If
     #   nil, then the column will take the width provided by the `column_width` param
     #   with which the Table was initialized.
     # @param [#to_proc] formatter (:to_s.to_proc) A lambda or other callable object that
@@ -141,7 +141,7 @@ module Tabulo
           case @header_frequency
           when :start
             index == 0
-          when Fixnum
+          when Integer
             index % @header_frequency == 0
           else
             @header_frequency
@@ -265,7 +265,7 @@ module Tabulo
     #   Each String includes the spaces, if any, on either side required for the
     #   "internal padding" of the cell to carry out the cell content alignment -- but
     #   does not include the single character of padding around each column.
-    # @param [Fixnum] wrap_cells_to the number of "lines" of wrapped content to allow
+    # @param [Integer] wrap_cells_to the number of "lines" of wrapped content to allow
     #   before truncating.
     # @return [String] the entire formatted row including all padding and borders.
     def format_row(cells, wrap_cells_to)
@@ -312,7 +312,7 @@ module Tabulo
     end
 
     # @!visibility private
-    # @return [Fixnum] the length of the longest segment of str when split by newlines
+    # @return [Integer] the length of the longest segment of str when split by newlines
     def wrapped_width(str)
       segments = str.split($/)
       segments.inject(1) do |length, segment|

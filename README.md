@@ -258,7 +258,7 @@ table = Tabulo::Table.new(
 
 Wrapping behaviour is configured for the table as a whole using the `wrap_header_cells_to` option
 for header cells and `wrap_body_cells_to` for body cells, both of which default to `nil`, meaning
-that cells are wrapped to as many rows as required. Passing a `Fixnum` limits wrapping to the given
+that cells are wrapped to as many rows as required. Passing an `Integer` limits wrapping to the given
 number of rows, with content truncated from that point on. The `~` character is appended to the
 outputted cell content to show that truncation has occurred:
 
@@ -317,7 +317,7 @@ the underlying value of that cell, not its formatted value.
 ### Repeating headers
 
 By default, headers are only shown once, at the top of the table (`header_frequency: :start`). If
-`header_frequency` is passed `nil`, headers are not shown at all; or, if passed a `Fixnum` N,
+`header_frequency` is passed `nil`, headers are not shown at all; or, if passed an `Integer` N,
 headers are shown at the top and then repeated every N rows. This can be handy when you're looking
 at table that's taller than your terminal.
 
