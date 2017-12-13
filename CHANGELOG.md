@@ -1,5 +1,10 @@
 # Changelog
 
+### v1.0.1
+
+* Fix deprecation warnings.
+* Update bundler version development dependency.
+
 ### v1.0.0
 
 * Decision to release stable version!
