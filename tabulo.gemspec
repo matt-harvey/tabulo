@@ -13,7 +13,6 @@ Gem::Specification.new do |spec|
   spec.description   = "Enumerable ASCII table"
   spec.homepage      = "https://matt-harvey.github.io/tabulo"
   spec.license       = "MIT"
-  spec.metadata      = { "source_code_uri" => "https://github.com/matt-harvey/tabulo" }
 
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|
     f.match(%r{^(test|spec|features)/})
@@ -23,6 +22,11 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.required_ruby_version = ">= 2.1.10"
+
+  spec.metadata = {
+    "source_code_uri" => "https://github.com/matt-harvey/tabulo",
+    "changelog_uri"   => "https://raw.githubusercontent.com/matt-harvey/tabulo/master/CHANGELOG.md"
+  }
 
   spec.add_development_dependency "bundler", "~> 1.16.0"
   spec.add_development_dependency "rake", "~> 11.0"
