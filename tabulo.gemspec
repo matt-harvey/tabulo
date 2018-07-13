@@ -13,6 +13,7 @@ Gem::Specification.new do |spec|
   spec.description   = "Enumerable ASCII table"
   spec.homepage      = "https://matt-harvey.github.io/tabulo"
   spec.license       = "MIT"
+  spec.metadata      = { "source_code_uri" => "https://github.com/matt-harvey/tabulo" }
 
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|
     f.match(%r{^(test|spec|features)/})
