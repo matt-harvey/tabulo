@@ -10,10 +10,10 @@ module Tabulo
     DEFAULT_COLUMN_WIDTH = 12
 
     # @!visibility private
-    HORIZONTAL_RULE_CHARACTER = "-"
+    VERTICAL_RULE_CHARACTER = "|"
 
     # @!visibility private
-    VERTICAL_RULE_CHARACTER = "|"
+    DEFAULT_HORIZONTAL_RULE_CHARACTER = "-"
 
     # @!visibility private
     CORNER_CHARACTER = "+"
@@ -46,17 +46,25 @@ module Tabulo
     #   headers), if their content is longer than the column's fixed width. If passed <tt>nil</tt>, content will
     #   be wrapped for as many rows as required to accommodate it. If passed an Integer N (> 0), content will be
     #   wrapped up to N rows and then truncated thereafter.
+    #   headers), if their content is longer than the column's fixed width. If passed <tt>nil</tt>, content will
+    #   be wrapped for as many rows as required to accommodate it. If passed an Integer N (> 0), content will be
+    #   wrapped up to N rows and then truncated thereafter.
+    # @param [nil, String] horizontal_rule_character Determines the character used to draw
+    #   horizontal lines where required in the table. If omitted or passed nil, defaults to
+    #   DEFAULT_HORIZONTAL_RULE_CHARACTER. If passed something other than nil or a single-character
+    #   String, raises InvalidHorizontalRuleCharacterError.
     # @return [Table] a new Table
     # @raise [InvalidColumnLabelError] if non-unique Symbols are provided to columns.
     def initialize(sources, columns: [], column_width: nil, header_frequency: :start,
-      wrap_header_cells_to: nil, wrap_body_cells_to: nil)
+      wrap_header_cells_to: nil, wrap_body_cells_to: nil, horizontal_rule_character: nil)
 
       @sources = sources
       @header_frequency = header_frequency
       @wrap_header_cells_to = wrap_header_cells_to
       @wrap_body_cells_to = wrap_body_cells_to
-
       @default_column_width = (column_width || DEFAULT_COLUMN_WIDTH)
+      validate_horizontal_rule_character(horizontal_rule_character)
+      @horizontal_rule_character = (horizontal_rule_character || DEFAULT_HORIZONTAL_RULE_CHARACTER)
 
       @column_registry = { }
       columns.each { |item| add_column(item) }
@@ -166,7 +174,7 @@ module Tabulo
     #
     def horizontal_rule
       inner = column_registry.map do |_, column|
-        surround(column.horizontal_rule, HORIZONTAL_RULE_CHARACTER)
+        @horizontal_rule_character * (column.width + 2)
       end
       surround_join(inner, CORNER_CHARACTER)
     end
@@ -309,6 +317,20 @@ module Tabulo
     # @!visibility private
     def join_lines(lines)
       lines.join($/)  # join strings with cross-platform newline
+    end
+
+    # @!visibility private
+    def validate_horizontal_rule_character(character)
+      case character
+      when nil
+        ; # do nothing
+      when String
+        if character.length != 1
+          raise InvalidHorizontalRuleCharacterError, "horizontal rule character is neither nil nor a single-character String"
+        end
+      else
+        raise InvalidHorizontalRuleCharacterError, "horizontal rule character is neither nil nor a single-character String"
+      end
     end
 
     # @!visibility private

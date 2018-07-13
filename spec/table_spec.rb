@@ -2,13 +2,14 @@ require "spec_helper"
 
 describe Tabulo::Table do
 
-  let!(:table) do
+  let(:table) do
     Tabulo::Table.new(
       source,
       column_width: column_width,
       header_frequency: header_frequency,
       wrap_header_cells_to: wrap_header_cells_to,
-      wrap_body_cells_to: wrap_body_cells_to
+      wrap_body_cells_to: wrap_body_cells_to,
+      horizontal_rule_character: horizontal_rule_character
     ) do |t|
       t.add_column("N") { |n| n }
       t.add_column("Doubled") { |n| n * 2 }
@@ -20,6 +21,7 @@ describe Tabulo::Table do
   let(:header_frequency) { :start }
   let(:wrap_header_cells_to) { nil }
   let(:wrap_body_cells_to) { nil }
+  let(:horizontal_rule_character) { nil }
 
   it "is an Enumerable" do
     expect(table).to be_a(Enumerable)
@@ -337,6 +339,72 @@ describe Tabulo::Table do
         end
       end
     end
+
+    describe "`horizontal_rule_character` params" do
+      context "when passed nil" do
+        let(:horizontal_rule_character) { nil }
+
+        it "determines the character used for all horizontal lines in the table (excluding corners), "\
+          "defaulting to '-'" do
+          expect(table.to_s).to eq \
+            %q(+--------------+--------------+
+               |       N      |    Doubled   |
+               +--------------+--------------+
+               |            1 |            2 |
+               |            2 |            4 |
+               |            3 |            6 |
+               |            4 |            8 |
+               |            5 |           10 |).gsub(/^ +/, "")
+        end
+      end
+
+      context "when passed a non-nil character" do
+        let(:horizontal_rule_character) { "!" }
+
+        it "causes the character used for all horizontal lines in the table (excluding corners), "\
+          "to be that character" do
+          expect(table.to_s).to eq \
+            %q(+!!!!!!!!!!!!!!+!!!!!!!!!!!!!!+
+               |       N      |    Doubled   |
+               +!!!!!!!!!!!!!!+!!!!!!!!!!!!!!+
+               |            1 |            2 |
+               |            2 |            4 |
+               |            3 |            6 |
+               |            4 |            8 |
+               |            5 |           10 |).gsub(/^ +/, "")
+        end
+      end
+
+      context "when passed something other than nil or a single-character String" do
+        subject do
+          Tabulo::Table.new(source, columns: [], horizontal_rule_character: horizontal_rule_character)
+        end
+
+        context "when passed an empty string" do
+          let(:horizontal_rule_character) { "" }
+
+          it "raises a Tabulo::InvalidHorizontalRuleCharacterError" do
+            expect { subject }.to raise_error(Tabulo::InvalidHorizontalRuleCharacterError)
+          end
+        end
+
+        context "when passed an string longer than one character" do
+          let(:horizontal_rule_character) { "!!" }
+
+          it "raises a Tabulo::InvalidHorizontalRuleCharacterError" do
+            expect { subject }.to raise_error(Tabulo::InvalidHorizontalRuleCharacterError)
+          end
+        end
+
+        context "when passed something other than nil or a String" do
+          let(:horizontal_rule_character) { 1 }
+
+          it "raises a Tabulo::InvalidHorizontalRuleCharacterError" do
+            expect { subject }.to raise_error(Tabulo::InvalidHorizontalRuleCharacterError)
+          end
+        end
+      end
+    end
   end
 
   describe "#add_column" do
@@ -519,7 +587,8 @@ describe Tabulo::Table do
   end
 
   describe "#horizontal_rule" do
-    it "returns a horizontal line made up of dashes, of an appropriate width for the table" do
+    it "returns a horizontal line made up of the horizontal rule character, and appropriately placed "\
+      "corner characters, of an appropriate width for the table" do
       expect(table.horizontal_rule).to eq("+--------------+--------------+")
     end
   end

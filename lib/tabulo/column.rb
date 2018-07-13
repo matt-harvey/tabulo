@@ -7,7 +7,6 @@ module Tabulo
     attr_reader :header
 
     def initialize(header:, width:, align_header:, align_body:, formatter:, extractor:)
-
       @header = header
       @width = width
       @align_header = align_header
@@ -18,10 +17,6 @@ module Tabulo
 
     def header_subcells
       infilled_subcells(@header, @align_header)
-    end
-
-    def horizontal_rule
-      Table::HORIZONTAL_RULE_CHARACTER * width
     end
 
     def body_subcells(source)
