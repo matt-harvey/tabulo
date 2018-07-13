@@ -6,4 +6,8 @@ module Tabulo
   # Error indidication that an attempt was made to use an invalid horizontal rule character
   # for the table.
   class InvalidHorizontalRuleCharacterError < StandardError; end
+
+  # Error indidication that an attempt was made to use an invalid vertical rule character
+  # for the table.
+  class InvalidVerticalRuleCharacterError < StandardError; end
 end
