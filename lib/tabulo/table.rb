@@ -6,13 +6,13 @@ module Tabulo
   class Table
     include Enumerable
 
-    # @!visibility private
+    # @!visibility public
     DEFAULT_COLUMN_WIDTH = 12
 
-    # @!visibility private
+    # @!visibility public
     DEFAULT_HORIZONTAL_RULE_CHARACTER = "-"
 
-    # @!visibility private
+    # @!visibility public
     DEFAULT_VERTICAL_RULE_CHARACTER = "|"
 
     # @!visibility private
@@ -33,7 +33,7 @@ module Tabulo
     #   created by calling the corresponding method on each element of sources. Note
     #   the {#add_column} method is a much more flexible way to set up columns on the table.
     # @param [Integer, nil] column_width The default column width for columns in this
-    #   table, not excluding padding. If nil, then DEFAULT_COLUMN_WIDTH will be used.
+    #   table, not excluding padding. If nil, then {DEFAULT_COLUMN_WIDTH} will be used.
     # @param [:start, nil, Integer] header_frequency Controls the display of column headers.
     #   If passed <tt>:start</tt>, headers will be shown at the top of the table only. If passed <tt>nil</tt>,
     #   headers will not be shown. If passed an Integer N (> 0), headers will be shown at the top of the table,
@@ -50,15 +50,17 @@ module Tabulo
     #   be wrapped for as many rows as required to accommodate it. If passed an Integer N (> 0), content will be
     #   wrapped up to N rows and then truncated thereafter.
     # @param [nil, String] horizontal_rule_character Determines the character used to draw
-    #   horizontal lines where required in the table. If omitted or passed nil, defaults to
-    #   DEFAULT_HORIZONTAL_RULE_CHARACTER. If passed something other than nil or a single-character
-    #   String, raises InvalidHorizontalRuleCharacterError.
+    #   horizontal lines where required in the table. If omitted or passed <tt>nil</tt>, defaults to
+    #   {DEFAULT_HORIZONTAL_RULE_CHARACTER}. If passed something other than <tt>nil</tt> or a single-character
+    #   String, raises {InvalidHorizontalRuleCharacterError}.
     # @param [nil, String] vertical_rule_character Determines the character used to draw
-    #   vertical lines where required in the table. If omitted or passed nil, defaults to
-    #   DEFAULT_VERTICAL_RULE_CHARACTER. If passed something other than nil or a single-character
-    #   String, raises InvalidVerticalRuleCharacterError.
+    #   vertical lines where required in the table. If omitted or passed <tt>nil</tt>, defaults to
+    #   {DEFAULT_VERTICAL_RULE_CHARACTER}. If passed something other than <tt>nil</tt> or a single-character
+    #   String, raises {InvalidVerticalRuleCharacterError}.
     # @return [Table] a new Table
     # @raise [InvalidColumnLabelError] if non-unique Symbols are provided to columns.
+    # @raise [InvalidHorizontalRuleCharacterError] if invalid argument passed to horizontal_rule_character.
+    # @raise [InvalidVerticalRuleCharacterError] if invalid argument passed to vertical_rule_character.
     def initialize(sources, columns: [], column_width: nil, header_frequency: :start,
       wrap_header_cells_to: nil, wrap_body_cells_to: nil, horizontal_rule_character: nil,
       vertical_rule_character: nil)
