@@ -1,7 +1,6 @@
 # Tabulo
 
 [![Gem Version][GV img]][Gem Version]
-[![Dependency Status][DS img]][Dependency Status]
 [![Coverage Status][CS img]][Coverage Status]
 [![Build Status][BS img]][Build Status]
 [![Documentation][DC img]][Documentation]
@@ -393,12 +392,10 @@ License](http://opensource.org/licenses/MIT).
 
 [Gem Version]: https://rubygems.org/gems/tabulo
 [Build Status]: https://travis-ci.org/matt-harvey/tabulo
-[Dependency Status]: https://gemnasium.com/matt-harvey/tabulo
 [Coverage Status]: https://coveralls.io/r/matt-harvey/tabulo
 [Documentation]: http://www.rubydoc.info/gems/tabulo/1.0.1
 
 [GV img]: https://img.shields.io/gem/v/tabulo.svg?style=plastic
 [BS img]: https://img.shields.io/travis/matt-harvey/tabulo.svg?style=plastic
-[DS img]: https://img.shields.io/gemnasium/matt-harvey/tabulo.svg?style=plastic
 [CS img]: https://img.shields.io/coveralls/matt-harvey/tabulo.svg?style=plastic
 [DC img]: https://img.shields.io/badge/docs-v1.0.1-blue.svg?style=plastic
