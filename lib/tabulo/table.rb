@@ -79,17 +79,14 @@ module Tabulo
       @wrap_body_cells_to = wrap_body_cells_to
       @default_column_width = (column_width || DEFAULT_COLUMN_WIDTH)
 
-      validate_horizontal_rule_character(horizontal_rule_character)
-      @horizontal_rule_character = (horizontal_rule_character || DEFAULT_HORIZONTAL_RULE_CHARACTER)
-
-      validate_vertical_rule_character(vertical_rule_character)
-      @vertical_rule_character = (vertical_rule_character || DEFAULT_VERTICAL_RULE_CHARACTER)
-
-      validate_intersection_character(intersection_character)
-      @intersection_character = (intersection_character || DEFAULT_INTERSECTION_CHARACTER)
-
-      validate_truncation_indicator(truncation_indicator)
-      @truncation_indicator = (truncation_indicator || DEFAULT_TRUNCATION_INDICATOR)
+      @horizontal_rule_character = validate_character(horizontal_rule_character,
+        DEFAULT_HORIZONTAL_RULE_CHARACTER, InvalidHorizontalRuleCharacterError, "horizontal rule character")
+      @vertical_rule_character = validate_character(vertical_rule_character,
+        DEFAULT_VERTICAL_RULE_CHARACTER, InvalidVerticalRuleCharacterError, "vertical rule character")
+      @intersection_character = validate_character(intersection_character,
+        DEFAULT_INTERSECTION_CHARACTER, InvalidIntersectionCharacterError, "intersection character")
+      @truncation_indicator = validate_character(truncation_indicator,
+        DEFAULT_TRUNCATION_INDICATOR, InvalidTruncationIndicatorError, "truncation indicator")
 
       @column_registry = { }
       columns.each { |item| add_column(item) }
@@ -345,59 +342,18 @@ module Tabulo
     end
 
     # @!visibility private
-    def validate_horizontal_rule_character(character)
-      case character
+    def validate_character(character, default, exception_class, message_fragment)
+      case (c = (character || default))
       when nil
         ; # do nothing
       when String
-        if character.length != 1
-          raise InvalidHorizontalRuleCharacterError, "horizontal rule character is neither nil nor a single-character String"
+        if c.length != 1
+          raise exception_class, "#{message_fragment} is neither nil nor a single-character String"
         end
       else
-        raise InvalidHorizontalRuleCharacterError, "horizontal rule character is neither nil nor a single-character String"
+        raise exception_class, "#{message_fragment} is neither nil nor a single-character String"
       end
-    end
-
-    # @!visibility private
-    def validate_vertical_rule_character(character)
-      case character
-      when nil
-        ; # do nothing
-      when String
-        if character.length != 1
-          raise InvalidVerticalRuleCharacterError, "vertical rule character is neither nil nor a single-character String"
-        end
-      else
-        raise InvalidVerticalRuleCharacterError, "vertical rule character is neither nil nor a single-character String"
-      end
-    end
-
-    # @!visibility private
-    def validate_intersection_character(character)
-      case character
-      when nil
-        ; # do nothing
-      when String
-        if character.length != 1
-          raise InvalidIntersectionCharacterError, "intersection character is neither nil nor a single-character String"
-        end
-      else
-        raise InvalidIntersectionCharacterError, "intersection character is neither nil nor a single-character String"
-      end
-    end
-
-    # @!visibility private
-    def validate_truncation_indicator(character)
-      case character
-      when nil
-        ; # do nothing
-      when String
-        if character.length != 1
-          raise InvalidTruncationIndicatorError, "truncation indicator is neither nil nor a single-character String"
-        end
-      else
-        raise InvalidTruncationIndicatorError, "truncation indicator is neither nil nor a single-character String"
-      end
+      c
     end
 
     # @!visibility private
