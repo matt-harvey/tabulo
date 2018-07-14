@@ -10,4 +10,8 @@ module Tabulo
   # Error indicating that an attempt was made to use an invalid vertical rule character
   # for the table.
   class InvalidVerticalRuleCharacterError < StandardError; end
+
+  # Error indicating that an attempt was made to use an invalid intersection character for
+  # the table.
+  class InvalidIntersectionCharacterError < StandardError; end
 end

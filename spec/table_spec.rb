@@ -10,7 +10,8 @@ describe Tabulo::Table do
       wrap_header_cells_to: wrap_header_cells_to,
       wrap_body_cells_to: wrap_body_cells_to,
       horizontal_rule_character: horizontal_rule_character,
-      vertical_rule_character: vertical_rule_character
+      vertical_rule_character: vertical_rule_character,
+      intersection_character: intersection_character
     ) do |t|
       t.add_column("N") { |n| n }
       t.add_column("Doubled") { |n| n * 2 }
@@ -24,6 +25,7 @@ describe Tabulo::Table do
   let(:wrap_body_cells_to) { nil }
   let(:horizontal_rule_character) { nil }
   let(:vertical_rule_character) { nil }
+  let(:intersection_character) { nil }
 
   it "is an Enumerable" do
     expect(table).to be_a(Enumerable)
@@ -469,6 +471,72 @@ describe Tabulo::Table do
 
           it "raises a Tabulo::InvalidVerticalRuleCharacterError" do
             expect { subject }.to raise_error(Tabulo::InvalidVerticalRuleCharacterError)
+          end
+        end
+      end
+    end
+
+    describe "`intersection_character` params" do
+      context "when passed nil" do
+        let(:intersection_character) { nil }
+
+        it "determines the character used for all intersections and corners in the table, "\
+          "defaulting to '+'" do
+          expect(table.to_s).to eq \
+            %q(+--------------+--------------+
+               |       N      |    Doubled   |
+               +--------------+--------------+
+               |            1 |            2 |
+               |            2 |            4 |
+               |            3 |            6 |
+               |            4 |            8 |
+               |            5 |           10 |).gsub(/^ +/, "")
+        end
+      end
+
+      context "when passed a non-nil character" do
+        let(:intersection_character) { "*" }
+
+        it "causes the character used for all intersections and corners in the table to be that "\
+          "character" do
+          expect(table.to_s).to eq \
+            %q(*--------------*--------------*
+               |       N      |    Doubled   |
+               *--------------*--------------*
+               |            1 |            2 |
+               |            2 |            4 |
+               |            3 |            6 |
+               |            4 |            8 |
+               |            5 |           10 |).gsub(/^ +/, "")
+        end
+      end
+
+      context "when passed something other than nil or a single-character String" do
+        subject do
+          Tabulo::Table.new(source, columns: [], intersection_character: intersection_character)
+        end
+
+        context "when passed an empty string" do
+          let(:intersection_character) { "" }
+
+          it "raises a Tabulo::InvalidIntersectionCharacterError" do
+            expect { subject }.to raise_error(Tabulo::InvalidIntersectionCharacterError)
+          end
+        end
+
+        context "when passed an string longer than one character" do
+          let(:intersection_character) { "!!" }
+
+          it "raises a Tabulo::InvalidIntersectionCharacterError" do
+            expect { subject }.to raise_error(Tabulo::InvalidIntersectionCharacterError)
+          end
+        end
+
+        context "when passed something other than nil or a String" do
+          let(:intersection_character) { 1 }
+
+          it "raises a Tabulo::InvalidIntersectionCharacterError" do
+            expect { subject }.to raise_error(Tabulo::InvalidIntersectionCharacterError)
           end
         end
       end

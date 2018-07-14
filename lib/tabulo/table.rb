@@ -16,7 +16,7 @@ module Tabulo
     DEFAULT_VERTICAL_RULE_CHARACTER = "|"
 
     # @!visibility private
-    CORNER_CHARACTER = "+"
+    DEFAULT_INTERSECTION_CHARACTER = "+"
 
     # @!visibility private
     PADDING_CHARACTER = " "
@@ -57,13 +57,17 @@ module Tabulo
     #   vertical lines where required in the table. If omitted or passed <tt>nil</tt>, defaults to
     #   {DEFAULT_VERTICAL_RULE_CHARACTER}. If passed something other than <tt>nil</tt> or a single-character
     #   String, raises {InvalidVerticalRuleCharacterError}.
+    # @param [nil, String] intersection_character Determines the character used to draw
+    #   line intersections and corners where required in the table. If omitted or passed <tt>nil</tt>,
+    #   defaults to {DEFAULT_INTERSECTION_CHARACTER}. If passed something other than <tt>nil</tt> or
+    #   a single-character String, raises {InvalidIntersectionCharacterError}.
     # @return [Table] a new Table
     # @raise [InvalidColumnLabelError] if non-unique Symbols are provided to columns.
     # @raise [InvalidHorizontalRuleCharacterError] if invalid argument passed to horizontal_rule_character.
     # @raise [InvalidVerticalRuleCharacterError] if invalid argument passed to vertical_rule_character.
     def initialize(sources, columns: [], column_width: nil, header_frequency: :start,
       wrap_header_cells_to: nil, wrap_body_cells_to: nil, horizontal_rule_character: nil,
-      vertical_rule_character: nil)
+      vertical_rule_character: nil, intersection_character: nil)
 
       @sources = sources
       @header_frequency = header_frequency
@@ -76,6 +80,9 @@ module Tabulo
 
       validate_vertical_rule_character(vertical_rule_character)
       @vertical_rule_character = (vertical_rule_character || DEFAULT_VERTICAL_RULE_CHARACTER)
+
+      validate_intersection_character(intersection_character)
+      @intersection_character = (intersection_character || DEFAULT_INTERSECTION_CHARACTER)
 
       @column_registry = { }
       columns.each { |item| add_column(item) }
@@ -187,7 +194,7 @@ module Tabulo
       inner = column_registry.map do |_, column|
         @horizontal_rule_character * (column.width + 2)
       end
-      surround_join(inner, CORNER_CHARACTER)
+      surround_join(inner, @intersection_character)
     end
 
     # Reset all the column widths so that each column is *just* wide enough to accommodate
@@ -358,6 +365,19 @@ module Tabulo
       end
     end
 
+    # @!visibility private
+    def validate_intersection_character(character)
+      case character
+      when nil
+        ; # do nothing
+      when String
+        if character.length != 1
+          raise InvalidIntersectionCharacterError, "intersection character is neither nil nor a single-character String"
+        end
+      else
+        raise InvalidIntersectionCharacterError, "intersection character is neither nil nor a single-character String"
+      end
+    end
 
     # @!visibility private
     # @return [Integer] the length of the longest segment of str when split by newlines
