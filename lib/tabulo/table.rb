@@ -10,6 +10,9 @@ module Tabulo
     DEFAULT_COLUMN_WIDTH = 12
 
     # @!visibility public
+    DEFAULT_COLUMN_PADDING = 1
+
+    # @!visibility public
     DEFAULT_HORIZONTAL_RULE_CHARACTER = "-"
 
     # @!visibility public
@@ -65,11 +68,13 @@ module Tabulo
     #   cell's content has been truncated. If omitted or passed <tt>nil</tt>,
     #   defaults to {DEFAULT_TRUNCATION_INDICATOR}. If passed something other than <tt>nil</tt> or
     #   a single-character String, raises {InvalidTruncationIndicatorError}.
+    # @param [nil, Integer] column_padding Determines the amount of blank space with which to pad either
+    #   of each column. Defaults to 1.
     # @return [Table] a new Table
     # @raise [InvalidColumnLabelError] if non-unique Symbols are provided to columns.
     # @raise [InvalidHorizontalRuleCharacterError] if invalid argument passed to horizontal_rule_character.
     # @raise [InvalidVerticalRuleCharacterError] if invalid argument passed to vertical_rule_character.
-    def initialize(sources, columns: [], column_width: nil, header_frequency: :start,
+    def initialize(sources, columns: [], column_width: nil, column_padding: nil, header_frequency: :start,
       wrap_header_cells_to: nil, wrap_body_cells_to: nil, horizontal_rule_character: nil,
       vertical_rule_character: nil, intersection_character: nil, truncation_indicator: nil)
 
@@ -78,6 +83,7 @@ module Tabulo
       @wrap_header_cells_to = wrap_header_cells_to
       @wrap_body_cells_to = wrap_body_cells_to
       @default_column_width = (column_width || DEFAULT_COLUMN_WIDTH)
+      @column_padding = (column_padding || DEFAULT_COLUMN_PADDING)
 
       @horizontal_rule_character = validate_character(horizontal_rule_character,
         DEFAULT_HORIZONTAL_RULE_CHARACTER, InvalidHorizontalRuleCharacterError, "horizontal rule character")
@@ -196,7 +202,7 @@ module Tabulo
     #
     def horizontal_rule
       inner = column_registry.map do |_, column|
-        @horizontal_rule_character * (column.width + 2)
+        @horizontal_rule_character * (column.width + @column_padding * 2)
       end
       surround_join(inner, @intersection_character)
     end
@@ -244,7 +250,7 @@ module Tabulo
 
       if max_table_width
         total_columns_width = columns.inject(0) { |sum, column| sum + column.width }
-        total_padding = column_registry.count * 2
+        total_padding = column_registry.count * @column_padding * 2
         total_borders = column_registry.count + 1
         unadjusted_table_width = total_columns_width + total_padding + total_borders
 
@@ -307,8 +313,13 @@ module Tabulo
           cell_truncated = (num_subcells > row_height)
           append_truncator = (cell_truncated && subrow_index + 1 == row_height)
 
-          lpad = PADDING_CHARACTER
-          rpad = (append_truncator ? @truncation_indicator : PADDING_CHARACTER)
+          lpad = PADDING_CHARACTER * @column_padding
+          rpad =
+            if append_truncator && @column_padding != 0
+              @truncation_indicator + PADDING_CHARACTER * (@column_padding - 1)
+            else
+              PADDING_CHARACTER * @column_padding
+            end
 
           inner =
             if subrow_index < num_subcells
