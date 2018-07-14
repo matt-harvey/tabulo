@@ -393,9 +393,9 @@ License](http://opensource.org/licenses/MIT).
 [Gem Version]: https://rubygems.org/gems/tabulo
 [Build Status]: https://travis-ci.org/matt-harvey/tabulo
 [Coverage Status]: https://coveralls.io/r/matt-harvey/tabulo
-[Documentation]: http://www.rubydoc.info/gems/tabulo/1.0.1
+[Documentation]: http://www.rubydoc.info/gems/tabulo/1.1.0
 
 [GV img]: https://img.shields.io/gem/v/tabulo.svg?style=plastic
 [BS img]: https://img.shields.io/travis/matt-harvey/tabulo.svg?style=plastic
 [CS img]: https://img.shields.io/coveralls/matt-harvey/tabulo.svg?style=plastic
-[DC img]: https://img.shields.io/badge/docs-v1.0.1-blue.svg?style=plastic
+[DC img]: https://img.shields.io/badge/docs-v1.1.0-blue.svg?style=plastic

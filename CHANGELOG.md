@@ -1,5 +1,9 @@
 # Changelog
 
+### v1.1.0
+
+* Allow customization of horizontal divider, vertical divider and intersection characters.
+
 ### v1.0.1
 
 * Fix deprecation warnings.
