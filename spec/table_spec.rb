@@ -11,7 +11,8 @@ describe Tabulo::Table do
       wrap_body_cells_to: wrap_body_cells_to,
       horizontal_rule_character: horizontal_rule_character,
       vertical_rule_character: vertical_rule_character,
-      intersection_character: intersection_character
+      intersection_character: intersection_character,
+      truncation_indicator: truncation_indicator
     ) do |t|
       t.add_column("N") { |n| n }
       t.add_column("Doubled") { |n| n * 2 }
@@ -26,6 +27,7 @@ describe Tabulo::Table do
   let(:horizontal_rule_character) { nil }
   let(:vertical_rule_character) { nil }
   let(:intersection_character) { nil }
+  let(:truncation_indicator) { nil }
 
   it "is an Enumerable" do
     expect(table).to be_a(Enumerable)
@@ -537,6 +539,79 @@ describe Tabulo::Table do
 
           it "raises a Tabulo::InvalidIntersectionCharacterError" do
             expect { subject }.to raise_error(Tabulo::InvalidIntersectionCharacterError)
+          end
+        end
+      end
+    end
+
+    describe "`truncation_indicator` params" do
+      let(:table) do
+        Tabulo::Table.new(
+          source,
+          wrap_header_cells_to: 1,
+          wrap_body_cells_to: 1,
+          truncation_indicator: truncation_indicator
+        ) do |t|
+          t.add_column("N", &:itself)
+          t.add_column("AAAAAAAAAAAAAAAAAAAA") { |n| n * 2 }
+        end
+      end
+      let(:source) { [400000000000000000, 400000000000000001] }
+
+      context "when passed nil" do
+        let(:truncation_indicator) { nil }
+
+        it "determines the character used to indicate that a cell's content has been truncated, "\
+          "defaulting to '~'" do
+          expect(table.to_s).to eq \
+            %q(+--------------+--------------+
+               |       N      | AAAAAAAAAAAA~|
+               +--------------+--------------+
+               | 400000000000~| 800000000000~|
+               | 400000000000~| 800000000000~|).gsub(/^ +/, "")
+        end
+      end
+
+      context "when passed a non-nil character" do
+        let(:truncation_indicator) { "*" }
+
+        it "causes the character used for indicating that a cell's content has been truncated, to be that"\
+          "character" do
+          expect(table.to_s).to eq \
+            %q(+--------------+--------------+
+               |       N      | AAAAAAAAAAAA*|
+               +--------------+--------------+
+               | 400000000000*| 800000000000*|
+               | 400000000000*| 800000000000*|).gsub(/^ +/, "")
+        end
+      end
+
+      context "when passed something other than nil or a single-character String" do
+        subject do
+          Tabulo::Table.new(source, columns: [], truncation_indicator: truncation_indicator)
+        end
+
+        context "when passed an empty string" do
+          let(:truncation_indicator) { "" }
+
+          it "raises a Tabulo::InvalidTruncationIndicatorError" do
+            expect { subject }.to raise_error(Tabulo::InvalidTruncationIndicatorError)
+          end
+        end
+
+        context "when passed an string longer than one character" do
+          let(:truncation_indicator) { "!!" }
+
+          it "raises a Tabulo::InvalidTruncationIndicatorError" do
+            expect { subject }.to raise_error(Tabulo::InvalidTruncationIndicatorError)
+          end
+        end
+
+        context "when passed something other than nil or a String" do
+          let(:truncation_indicator) { 1 }
+
+          it "raises a Tabulo::InvalidTruncationIndicatorError" do
+            expect { subject }.to raise_error(Tabulo::InvalidTruncationIndicatorError)
           end
         end
       end

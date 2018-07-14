@@ -15,14 +15,14 @@ module Tabulo
     # @!visibility public
     DEFAULT_VERTICAL_RULE_CHARACTER = "|"
 
-    # @!visibility private
+    # @!visibility public
     DEFAULT_INTERSECTION_CHARACTER = "+"
+
+    # @!visibility public
+    DEFAULT_TRUNCATION_INDICATOR = "~"
 
     # @!visibility private
     PADDING_CHARACTER = " "
-
-    # @!visibility private
-    TRUNCATION_INDICATOR = "~"
 
     # @!visibility private
     attr_reader :column_registry
@@ -61,13 +61,17 @@ module Tabulo
     #   line intersections and corners where required in the table. If omitted or passed <tt>nil</tt>,
     #   defaults to {DEFAULT_INTERSECTION_CHARACTER}. If passed something other than <tt>nil</tt> or
     #   a single-character String, raises {InvalidIntersectionCharacterError}.
+    # @param [nil, String] truncation_indicator Determines the character used to indicate that a
+    #   cell's content has been truncated. If omitted or passed <tt>nil</tt>,
+    #   defaults to {DEFAULT_TRUNCATION_INDICATOR}. If passed something other than <tt>nil</tt> or
+    #   a single-character String, raises {InvalidTruncationIndicatorError}.
     # @return [Table] a new Table
     # @raise [InvalidColumnLabelError] if non-unique Symbols are provided to columns.
     # @raise [InvalidHorizontalRuleCharacterError] if invalid argument passed to horizontal_rule_character.
     # @raise [InvalidVerticalRuleCharacterError] if invalid argument passed to vertical_rule_character.
     def initialize(sources, columns: [], column_width: nil, header_frequency: :start,
       wrap_header_cells_to: nil, wrap_body_cells_to: nil, horizontal_rule_character: nil,
-      vertical_rule_character: nil, intersection_character: nil)
+      vertical_rule_character: nil, intersection_character: nil, truncation_indicator: nil)
 
       @sources = sources
       @header_frequency = header_frequency
@@ -83,6 +87,9 @@ module Tabulo
 
       validate_intersection_character(intersection_character)
       @intersection_character = (intersection_character || DEFAULT_INTERSECTION_CHARACTER)
+
+      validate_truncation_indicator(truncation_indicator)
+      @truncation_indicator = (truncation_indicator || DEFAULT_TRUNCATION_INDICATOR)
 
       @column_registry = { }
       columns.each { |item| add_column(item) }
@@ -304,7 +311,7 @@ module Tabulo
           append_truncator = (cell_truncated && subrow_index + 1 == row_height)
 
           lpad = PADDING_CHARACTER
-          rpad = (append_truncator ? TRUNCATION_INDICATOR : PADDING_CHARACTER)
+          rpad = (append_truncator ? @truncation_indicator : PADDING_CHARACTER)
 
           inner =
             if subrow_index < num_subcells
@@ -376,6 +383,20 @@ module Tabulo
         end
       else
         raise InvalidIntersectionCharacterError, "intersection character is neither nil nor a single-character String"
+      end
+    end
+
+    # @!visibility private
+    def validate_truncation_indicator(character)
+      case character
+      when nil
+        ; # do nothing
+      when String
+        if character.length != 1
+          raise InvalidTruncationIndicatorError, "truncation indicator is neither nil nor a single-character String"
+        end
+      else
+        raise InvalidTruncationIndicatorError, "truncation indicator is neither nil nor a single-character String"
       end
     end
 
