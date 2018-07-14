@@ -33,7 +33,7 @@ module Tabulo
     #   created by calling the corresponding method on each element of sources. Note
     #   the {#add_column} method is a much more flexible way to set up columns on the table.
     # @param [Integer, nil] column_width The default column width for columns in this
-    #   table, not excluding padding. If nil, then {DEFAULT_COLUMN_WIDTH} will be used.
+    #   table, not excluding padding. If <tt>nil</tt>, then {DEFAULT_COLUMN_WIDTH} will be used.
     # @param [:start, nil, Integer] header_frequency Controls the display of column headers.
     #   If passed <tt>:start</tt>, headers will be shown at the top of the table only. If passed <tt>nil</tt>,
     #   headers will not be shown. If passed an Integer N (> 0), headers will be shown at the top of the table,
