@@ -552,7 +552,7 @@ describe Tabulo::Table do
           wrap_body_cells_to: 1,
           truncation_indicator: truncation_indicator
         ) do |t|
-          t.add_column("N", &:itself)
+          t.add_column("N") { |n| n }
           t.add_column("AAAAAAAAAAAAAAAAAAAA") { |n| n * 2 }
         end
       end
