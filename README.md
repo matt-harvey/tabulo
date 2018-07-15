@@ -172,6 +172,10 @@ table = Tabulo::Table.new([1, 2], columns: %i[itself even?], column_width: 6)
 
 Widths set for individual columns always override the default column width for the table.
 
+Note the single character of padding either side of each column is not counted in the column width.
+The amount of this padding can be configured for the table as a whole, using the `column_padding`
+option passed to `Table.new`.
+
 <a name="shrinkwrap"></a>
 #### Automating column widths
 
@@ -373,6 +377,15 @@ Note the use of `.find_each`: we can start printing the table without having to 
 underlying collection. (This is negated if we [shrinkwrap](#shrinkwrap) the table, however, since
 in that case the entire collection must be traversed up front in order for column widths to be
 calculated.)
+
+### Additional configuration options
+
+The characters used for horizontal dividers, vertical dividers and corners, which default to `-`,
+`|` and `+` respectively, can be configured using the using the `horizontal_rule_character`,
+`vertical_rule_character` and `intersection_character` options passed to `Table.new`.
+
+The character used to indicate truncation, which defaults to `~`, can be configured using the
+`truncation_indicator` option passed to `Table.new`.
 
 ## Development
 
