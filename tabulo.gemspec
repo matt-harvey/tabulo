@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = "Enumerable ASCII table"
   spec.description   = "Enumerable ASCII table"
-  spec.homepage      = "https://matt-harvey.github.io/tabulo"
+  spec.homepage      = "https://github.com/matt-harvey/tabulo"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|
