@@ -1,5 +1,9 @@
 # Changelog
 
+### v1.2.0
+
+* Allow customization of padding.
+
 ### v1.1.0
 
 * Allow customization of horizontal divider, vertical divider and intersection characters.
