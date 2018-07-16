@@ -1,6 +1,6 @@
 require "bundler/gem_tasks"
 require "rspec/core/rake_task"
-require 'rake-version'
+require "rake-version"
 
 RSpec::Core::RakeTask.new(:spec)
 
