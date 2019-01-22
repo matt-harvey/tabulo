@@ -25,6 +25,12 @@ end
 |      5000000 |     10000000 |
 ```
 
+While there are similar Ruby gems, such as [terminal-table](https://github.com/tj/terminal-table)
+and [tty-table](https://github.com/piotrmurach/tty-table), Tabulo differs from these in various
+ways.
+
+Tabulo has also been ported to Crystal (with some modifications): see [Tablo](https://github.com/hutou/tablo).
+
 ## Features
 
 * Set [fixed column widths](#fixed-column-widths), then either [wrap](#overflow-handling) or
@@ -39,6 +45,7 @@ end
 * A `Tabulo::Table` is an `Enumerable`, so you can [step through it](#enumerator) a row at a time,
   printing as you go, without waiting for the entire underlying collection to load.
 * Each `Tabulo::Row` is also an `Enumerable`, providing access to the underlying cell values.
+* Tabulate arbitrary `Enumberable`s: the underlying collection need not be an array.
 
 ## Installation
 
