@@ -436,6 +436,15 @@ The characters used for horizontal dividers, vertical dividers and corners, whic
 The character used to indicate truncation, which defaults to `~`, can be configured using the
 `truncation_indicator` option passed to `Table.new`.
 
+A bottom border can be added to the table when printing, as follows:
+
+```ruby
+puts table
+puts table.horizontal_rule
+```
+
+This will output a bottom border that's appropriately sized for the table.
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run
