@@ -29,9 +29,8 @@ end
 
 ## Features
 
-* A DRY interface that relieves the developer from maintaining a correspondence between an array
-  of column headers on the one hand, and an array of rows of cell values on the other; rather each column is
-  initialized as a whole, with a header together with a callable for generating cell values for that column on the fly.
+* A [DRY interface](#configuring-columns) that relieves the developer of maintaining a correspondence between an array
+  of column headers on the one hand, and an array of rows of cell values on the other
 * Set [fixed column widths](#fixed-column-widths), then either [wrap](#overflow-handling) or
   [truncate](#overflow-handling) the overflow.
 * Alternatively, [shrinkwrap](#shrinkwrap) the table so that each column is just wide enough for its contents.
@@ -43,8 +42,8 @@ end
 * Newlines within cell content are correctly handled.
 * A `Tabulo::Table` is an `Enumerable`, so you can [step through it](#enumerator) a row at a time,
   printing as you go, without waiting for the entire underlying collection to load.
-* Each `Tabulo::Row` is also an `Enumerable`, providing access to the underlying cell values.
-* Tabulate arbitrary `Enumerable`s: the underlying collection need not be an array.
+* Each `Tabulo::Row` is also an `Enumerable`, [providing access](#accessing-cell-values) to the underlying cell values.
+* Tabulate any `Enumerable`: the underlying collection need not be an array.
 
 Tabulo has also been ported to Crystal (with some modifications): see [Tablo](https://github.com/hutou/tablo).
 
