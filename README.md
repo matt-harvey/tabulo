@@ -29,8 +29,8 @@ end
 
 ## Features
 
-* A [DRY interface](#configuring-columns) that relieves the developer of maintaining a correspondence between an array
-  of column headers on the one hand, and an array of rows of cell values on the other
+* A [DRY interface](#configuring-columns): by being "column based", it is designed to spare the
+  developer the burden of syncing the ordering within the header row with that of the body rows.
 * Set [fixed column widths](#fixed-column-widths), then either [wrap](#overflow-handling) or
   [truncate](#overflow-handling) the overflow.
 * Alternatively, [shrinkwrap](#shrinkwrap) the table so that each column is just wide enough for its contents.
@@ -44,6 +44,7 @@ end
   printing as you go, without waiting for the entire underlying collection to load.
 * Each `Tabulo::Row` is also an `Enumerable`, [providing access](#accessing-cell-values) to the underlying cell values.
 * Tabulate any `Enumerable`: the underlying collection need not be an array.
+* [Customize](#additional-configuration-options) border and divider characters.
 
 Tabulo has also been ported to Crystal (with some modifications): see [Tablo](https://github.com/hutou/tablo).
 
