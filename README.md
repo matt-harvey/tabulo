@@ -59,6 +59,7 @@ Tabulo has also been ported to Crystal (with some modifications): see [Tablo](ht
      * [Cell alignment](#cell-alignment)
      * [Column width, wrapping and truncation](#column-width-wrapping-and-truncation)
         * [Configuring fixed widths](#configuring-fixed-widths)
+        * [Configuring padding](#configuring-padding)
         * [Automating column widths](#automating-column-widths)
         * [Overflow handling](#overflow-handling)
      * [Formatting cell values](#formatting-cell-values)
@@ -202,7 +203,10 @@ table = Tabulo::Table.new([1, 2], columns: %i[itself even?], column_width: 6)
 
 Widths set for individual columns always override the default column width for the table.
 
-Note the single character of padding either side of each column is not counted in the column width.
+<a name="configuring-padding"></a>
+#### Configuring padding
+
+The single character of padding either side of each column is not counted in the column width.
 The amount of this padding can be configured for the table as a whole, using the `column_padding`
 option passed to `Table.new`.
 
