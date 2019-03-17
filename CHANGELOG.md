@@ -1,5 +1,11 @@
 # Changelog
 
+### v1.2.1
+
+* Improve documentation in README.
+* Update Travis config.
+* Change homepage in Gemspec
+
 ### v1.2.0
 
 * Allow customization of padding.
