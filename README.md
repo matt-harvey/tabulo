@@ -9,9 +9,9 @@
 Tabulo is a Ruby library for generating ASCII tables.
 
 ```ruby
-underyling_collection = [1, 2, 50000000] # need not be an array
+underyling_enumerable = [1, 2, 50000000] # need not be an array
 
-table = Tabulo::Table.new(underlying_collection) do |t|
+table = Tabulo::Table.new(underlying_enumerable) do |t|
   t.add_column("N", &:itself)
   t.add_column("Doubled") { |n| n * 2 }
 end
@@ -29,9 +29,9 @@ end
 
 ## Features
 
-* A DRY functional interface&mdash;no need to maintain a correspondence between an array of column headers on
-  the one hand, and an array of rows of cell values on the other; rather each column is initialized as a whole,
-  with a header together with a callable for generating cell values for that column on the fly.
+* A DRY interface that relieves the developer from maintaining a correspondence between an array
+  of column headers on the one hand, and an array of rows of cell values on the other; rather each column is
+  initialized as a whole, with a header together with a callable for generating cell values for that column on the fly.
 * Set [fixed column widths](#fixed-column-widths), then either [wrap](#overflow-handling) or
   [truncate](#overflow-handling) the overflow.
 * Alternatively, [shrinkwrap](#shrinkwrap) the table so that each column is just wide enough for its contents.
