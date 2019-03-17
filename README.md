@@ -48,6 +48,28 @@ end
 
 Tabulo has also been ported to Crystal (with some modifications): see [Tablo](https://github.com/hutou/tablo).
 
+## Table of Contents
+
+  * [Overview](#overview)
+  * [Features](#features)
+  * [Table of Contents](#table-of-contents)
+  * [Installation](#installation)
+  * [Detailed usage](#detailed-usage)
+     * [Requiring the gem](#requiring-the-gem)
+     * [Configuring columns](#configuring-columns)
+     * [Cell alignment](#cell-alignment)
+     * [Column width, wrapping and truncation](#column-width-wrapping-and-truncation)
+        * [Configuring fixed widths](#configuring-fixed-widths)
+        * [Automating column widths](#automating-column-widths)
+        * [Overflow handling](#overflow-handling)
+     * [Formatting cell values](#formatting-cell-values)
+     * [Repeating headers](#repeating-headers)
+     * [Using a Table Enumerator](#using-a-table-enumerator)
+     * [Additional configuration options](#additional-configuration-options)
+  * [Development](#development)
+  * [Contributing](#contributing)
+  * [License](#license)
+
 ## Installation
 
 Add this line to your application's Gemfile:
