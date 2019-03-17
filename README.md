@@ -427,6 +427,25 @@ table.each do |row|
 end
 ```
 
+The first argument to `add_column`, considered as a `Symbol`, always provides the key
+for the purpose of accessing the `Hash` form of a `Tabulo::Row`. This key serves as
+a sort of "logical label" for the column; and it need not be the same as the column
+header. If we want the header to be different to the label, we can achieve this
+using the `header` option to `add_column`:
+
+```ruby
+table = Tabulo::Table.new(1..5) do |t|
+  t.add_column("Number") { |n| n }
+  t.add_column(:doubled, header: "Number X 2") { |n| n * 2 }
+end
+
+table.each do |row|
+  cells = row.to_h
+  puts cells[:Number]  # 1...2...3...4...5
+  puts cells[:doubled] # 2...4...6...8...10
+end
+```
+
 ### Additional configuration options
 
 The characters used for horizontal dividers, vertical dividers and corners, which default to `-`,
