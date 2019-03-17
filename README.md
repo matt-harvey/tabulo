@@ -6,10 +6,12 @@
 
 ## Overview
 
-Tabulo generates ASCII tables.
+Tabulo is a Ruby library for generating ASCII tables.
 
 ```ruby
-table = Tabulo::Table.new([1, 2, 50000000]) do |t|
+underyling_collection = [1, 2, 50000000] # need not be an array
+
+table = Tabulo::Table.new(underlying_collection) do |t|
   t.add_column("N", &:itself)
   t.add_column("Doubled") { |n| n * 2 }
 end
@@ -25,14 +27,11 @@ end
 |      5000000 |     10000000 |
 ```
 
-While there are similar Ruby gems, such as [terminal-table](https://github.com/tj/terminal-table)
-and [tty-table](https://github.com/piotrmurach/tty-table), Tabulo differs from these in various
-ways.
-
-Tabulo has also been ported to Crystal (with some modifications): see [Tablo](https://github.com/hutou/tablo).
-
 ## Features
 
+* A DRY functional interface&mdash;no need to maintain a correspondence between an array of column headers on
+  the one hand, and an array of rows of cell values on the other; rather each column is initialized as a whole,
+  with a header together with a callable for generating cell values for that column on the fly.
 * Set [fixed column widths](#fixed-column-widths), then either [wrap](#overflow-handling) or
   [truncate](#overflow-handling) the overflow.
 * Alternatively, [shrinkwrap](#shrinkwrap) the table so that each column is just wide enough for its contents.
@@ -45,7 +44,9 @@ Tabulo has also been ported to Crystal (with some modifications): see [Tablo](ht
 * A `Tabulo::Table` is an `Enumerable`, so you can [step through it](#enumerator) a row at a time,
   printing as you go, without waiting for the entire underlying collection to load.
 * Each `Tabulo::Row` is also an `Enumerable`, providing access to the underlying cell values.
-* Tabulate arbitrary `Enumberable`s: the underlying collection need not be an array.
+* Tabulate arbitrary `Enumerable`s: the underlying collection need not be an array.
+
+Tabulo has also been ported to Crystal (with some modifications): see [Tablo](https://github.com/hutou/tablo).
 
 ## Installation
 
