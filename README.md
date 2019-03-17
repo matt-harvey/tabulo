@@ -12,7 +12,7 @@ Tabulo is a Ruby library for generating ASCII tables.
 underyling_enumerable = [1, 2, 50000000] # need not be an array
 
 table = Tabulo::Table.new(underlying_enumerable) do |t|
-  t.add_column("N", &:itself)
+  t.add_column("N") { |n| n }
   t.add_column("Doubled") { |n| n * 2 }
 end
 ```
@@ -65,6 +65,7 @@ Tabulo has also been ported to Crystal (with some modifications): see [Tablo](ht
      * [Formatting cell values](#formatting-cell-values)
      * [Repeating headers](#repeating-headers)
      * [Using a Table Enumerator](#using-a-table-enumerator)
+     * [Accessing cell values)(#accessing-cell-values)
      * [Additional configuration options](#additional-configuration-options)
   * [Development](#development)
   * [Contributing](#contributing)
@@ -407,6 +408,21 @@ Note the use of `.find_each`: we can start printing the table without having to 
 underlying collection. (This is negated if we [shrinkwrap](#shrinkwrap) the table, however, since
 in that case the entire collection must be traversed up front in order for column widths to be
 calculated.)
+
+<a name="accessing-cell-values"></a>
+### Accessing cell values
+Each `Tabulo::Table` is an `Enumerable` of which each element is a `Tabulo::Row`. Each `Tabulo::Row`
+is itself an `Enumerable` comprising the underlying the values of each cell. A `Tabulo::Row` can
+also be converted to a `Hash` for keyed access. For example:
+
+```ruby
+table = Tabulo::Table.new(1..5, columns: %i[itself even? odd?])
+
+table.each do |row|
+  row.each { |cell| puts cell } # 1...2...3...4...5
+  puts row.to_h[:even?]         # false...true...false...true...false
+end
+```
 
 ### Additional configuration options
 
