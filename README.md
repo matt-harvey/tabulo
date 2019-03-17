@@ -486,7 +486,7 @@ table = Tabulo::Table.new(1..3, columns: %i[itself even?])
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/matt-harvey/tabulo.
+Issues and pull requests are welcome on GitHub at https://github.com/matt-harvey/tabulo.
 
 To start working on Tabulo, `git clone` and `cd` into your fork of the repo, then run `bin/setup` to
 install dependencies.
