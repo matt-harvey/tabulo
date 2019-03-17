@@ -237,7 +237,9 @@ module Tabulo
       return self if column_registry.none?
       columns = column_registry.values
 
-      columns.each { |column| column.width = wrapped_width(column.header) }
+      columns.each do |column|
+        column.width = wrapped_width(column.header)
+      end
 
       @sources.each do |source|
         columns.each do |column|
@@ -247,7 +249,7 @@ module Tabulo
       end
 
       if max_table_width
-        total_columns_width = columns.sum(&:width)
+        total_columns_width = columns.inject(0) { |sum, column| sum + column.width }
         total_padding = column_registry.count * @column_padding * 2
         total_borders = column_registry.count + 1
         unadjusted_table_width = total_columns_width + total_padding + total_borders
