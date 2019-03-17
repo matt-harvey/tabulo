@@ -465,6 +465,25 @@ puts table.horizontal_rule
 
 This will output a bottom border that's appropriately sized for the table.
 
+This mechanism can also be used to output a horizontal divider after each row:
+
+```ruby
+table = Tabulo::Table.new(1..3, columns: %i[itself even?])
+```
+
+```
+> table.each { |row| puts row ; puts table.horizontal_rule }                                                                                                          
++--------------+--------------+
+|    itself    |     even?    |
++--------------+--------------+
+|            1 |     false    |
++--------------+--------------+
+|            2 |     true     |
++--------------+--------------+
+|            3 |     false    |
++--------------+--------------+
+```
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/matt-harvey/tabulo.
