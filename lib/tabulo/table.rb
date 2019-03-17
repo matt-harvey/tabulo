@@ -237,9 +237,7 @@ module Tabulo
       return self if column_registry.none?
       columns = column_registry.values
 
-      columns.each do |column|
-        column.width = wrapped_width(column.header)
-      end
+      columns.each { |column| column.width = wrapped_width(column.header) }
 
       @sources.each do |source|
         columns.each do |column|
