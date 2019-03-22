@@ -49,7 +49,7 @@ end
 
 Tabulo has also been ported to Crystal (with some modifications): see [Tablo](https://github.com/hutou/tablo).
 
-## Table of Contents
+## Contents
 
   * [Overview](#overview)
   * [Features](#features)
