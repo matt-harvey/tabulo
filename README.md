@@ -3,6 +3,7 @@
 [![Gem Version][GV img]][Gem Version]
 [![Coverage Status][CS img]][Coverage Status]
 [![Build Status][BS img]][Build Status]
+[![Code Climate][CC img]][Code Climate]
 
 ## Overview
 
@@ -503,7 +504,9 @@ License](http://opensource.org/licenses/MIT).
 [Gem Version]: https://rubygems.org/gems/tabulo
 [Build Status]: https://travis-ci.org/matt-harvey/tabulo
 [Coverage Status]: https://coveralls.io/r/matt-harvey/tabulo
+[Code Climate]: https://codeclimate.com/github/matt-harvey/tabulo
 
-[GV img]: https://img.shields.io/gem/v/tabulo.svg?style=plastic
-[BS img]: https://img.shields.io/travis/matt-harvey/tabulo.svg?style=plastic
-[CS img]: https://img.shields.io/coveralls/matt-harvey/tabulo.svg?style=plastic
+[GV img]: https://img.shields.io/gem/v/tabulo.svg
+[BS img]: https://img.shields.io/travis/matt-harvey/tabulo.svg
+[CS img]: https://img.shields.io/coveralls/matt-harvey/tabulo.svg
+[CC img]: https://codeclimate.com/github/matt-harvey/tabulo/badges/gpa.svg
