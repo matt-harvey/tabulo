@@ -31,7 +31,7 @@ end
 
 * A [DRY interface](#configuring-columns): by being "column based", it is designed to spare the
   developer the burden of syncing the ordering within the header row with that of the body rows.
-* Set [fixed column widths](#fixed-column-widths), then either [wrap](#overflow-handling) or
+* Lets you set [fixed column widths](#fixed-column-widths), then either [wrap](#overflow-handling) or
   [truncate](#overflow-handling) the overflow.
 * Alternatively, [shrinkwrap](#shrinkwrap) the table so that each column is just wide enough for its contents.
 * Put an upper limit on total table width when shrinkwrapping, to
@@ -334,7 +334,7 @@ end
 ```
 
 ```
-puts table
+> puts table
 +--------------+--------------+
 |       N      |  Reciprocal  |
 +--------------+--------------+
