@@ -35,8 +35,8 @@ end
   developer the burden of syncing the ordering within the header row with that of the body rows.
 * Lets you set [fixed column widths](#fixed-column-widths), then either [wrap](#overflow-handling) or
   [truncate](#overflow-handling) the overflow.
-* Alternatively, [shrinkwrap](#shrinkwrap) the table so that each column is just wide enough for its contents.
-* Put an upper limit on total table width when shrinkwrapping, to
+* Alternatively, [pack](#pack) the table so that each column is just wide enough for its contents.
+* Put an upper limit on total table width when "packing", to
   [stop it overflowing your terminal horizontally](#max-table-width).
 * Alignment of cell content is [configurable](#cell-alignment), but has helpful content-based defaults
   (numbers right, strings left).
@@ -213,7 +213,7 @@ The single character of padding either side of each column is not counted in the
 The amount of this padding can be configured for the table as a whole, using the `column_padding`
 option passed to `Table.new`.
 
-<a name="shrinkwrap"></a>
+<a name="pack"></a>
 #### Automating column widths
 
 Instead of setting column widths "manually", you can tell the table to sort out the widths
@@ -222,7 +222,7 @@ of padding):
 
 ```ruby
 table = Tabulo::Table.new([1, 2], columns: %i[itself even?])
-table.shrinkwrap!
+table.pack
 ```
 
 ```
@@ -234,17 +234,17 @@ table.shrinkwrap!
 |      2 |  true |
 ```
 
-The `shrinkwrap!` method returns the table itself, so you can "wrap-and-print" in one go:
+The `pack` method returns the table itself, so you can "pack-and-print" in one go:
 
 ```ruby
-puts Tabulo::Table.new([1, 2], columns: %i[itself even?]).shrinkwrap!
+puts Tabulo::Table.new([1, 2], columns: %i[itself even?]).pack
 ```
 
 <a name="max-table-width"></a>
-You can place an upper limit on the total width of the table when shrinkwrapping:
+You can manually place an upper limit on the total width of the table when packing:
 
 ```ruby
-puts Tabulo::Table.new([1, 2], columns: %i[itself even?]).shrinkwrap!(max_table_width: 17)
+puts Tabulo::Table.new([1, 2], columns: %i[itself even?]).pack(max_table_width: 17)
 ```
 
 ```
@@ -256,24 +256,23 @@ puts Tabulo::Table.new([1, 2], columns: %i[itself even?]).shrinkwrap!(max_table_
 |     2 |  true |
 ```
 
-Usually, you want the table width to be capped at the width of your terminal. By passing `:auto` to
-`max_table_width`, you can do this automatically:
+Or if you simply call `pack` with no parameters (or if you explicitly call
+`pack(max_table_width: :auto)`), the table width will automatically be capped at the
+width of your terminal.
 
-```ruby
-puts Tabulo::Table.new([1, 2], columns: %i[itself even?]).shrinkwrap!(max_table_width: :auto)
-```
+If you want the table width not to be capped at all, call `pack(max_table_width: nil)`.
 
-If the table cannot be fit within `max_table_width`, column widths are reduced as required, with
-wrapping or truncation then occuring as necessary (see [Overflow handling](#overflow-handling)).
-Under the hood, a character of width is deducted column by column&mdash;the widest column being
-targetted each time&mdash;until the table will fit. This is very useful when you want to ensure the
-table will not overflow your terminal horizontally.
+If the table cannot be fit within the width of the terminal, or the specified maximum width,
+then column widths are reduced as required, with wrapping or truncation then occuring as
+necessary (see [Overflow handling](#overflow-handling)). Under the hood, a character of width
+is deducted column by column&mdash;the widest column being targetted each time&mdash;until
+the table will fit.
 
-Note that shrinkwrapping necessarily involves traversing the entire collection up front as
+Note that `pack`ing the table necessarily involves traversing the entire collection up front as
 the maximum cell width needs to be calculated for each column. You may not want to do this
-if the collection is very large. Note also the effect of `shrinkwrap!` is to fix the column widths
+if the collection is very large. Note also the effect of `pack` is to fix the column widths
 as appropriate to the formatted cell contents given the state of the underlying collection
-_at the point of shrinkwrapping_. If the underlying collection changes between that point, and when
+_at the point of packing_. If the underlying collection changes between that point, and when
 the table is printed, then the columns will _not_ be resized yet again on printing. This is a
 consequence of the table always being essentially a "live view" on the underlying collection:
 formatted contents are never cached within the table itself.
@@ -418,7 +417,7 @@ end.to_enum  # <-- make an Enumerator
 ```
 
 Note the use of `.find_each`: we can start printing the table without having to load the entire
-underlying collection. (This is negated if we [shrinkwrap](#shrinkwrap) the table, however, since
+underlying collection. (This is negated if we [pack](#pack) the table, however, since
 in that case the entire collection must be traversed up front in order for column widths to be
 calculated.)
 
