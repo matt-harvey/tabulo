@@ -1185,6 +1185,22 @@ describe Tabulo::Table do
                | e |   |).gsub(/^ +/, "")
         end
       end
+
+      context "when `max_table_width` is passed :auto" do
+        it "caps the table width at the screen width, as returned by TTY::Screen.width" do
+          allow(TTY::Screen).to receive(:width).and_return(13)
+          table = Tabulo::Table.new(1..3, columns: [:to_i, :to_f])
+          table.shrinkwrap!(max_table_width: :auto)
+          expect(table.to_s).to eq \
+            %q(+-----+-----+
+               | to_ | to_ |
+               |  i  |  f  |
+               +-----+-----+
+               |   1 | 1.0 |
+               |   2 | 2.0 |
+               |   3 | 3.0 |).gsub(/^ +/, "")
+        end
+      end
     end
   end
 

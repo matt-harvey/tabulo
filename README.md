@@ -256,6 +256,13 @@ puts Tabulo::Table.new([1, 2], columns: %i[itself even?]).shrinkwrap!(max_table_
 |     2 |  true |
 ```
 
+Usually, you want the table width to be capped at the width of your terminal. By passing `:auto` to
+`max_table_width`, you can do this automatically:
+
+```ruby
+puts Tabulo::Table.new([1, 2], columns: %i[itself even?]).shrinkwrap!(max_table_width: :auto)
+```
+
 If the table cannot be fit within `max_table_width`, column widths are reduced as required, with
 wrapping or truncation then occuring as necessary (see [Overflow handling](#overflow-handling)).
 Under the hood, a character of width is deducted column by column&mdash;the widest column being

@@ -1,3 +1,5 @@
+require "tty-screen"
+
 module Tabulo
 
   # Represents a table primarily intended for "pretty-printing" in a fixed-width font.
@@ -223,15 +225,17 @@ module Tabulo
     #
     # @param [nil, Numeric] max_table_width (nil) If provided, stops the total table
     #   width (including padding and borders) from expanding beyond this number of characters.
+    #   If passed <tt>:auto</tt>, the table width will automatically be capped at the current
+    #   terminal width.
     #   Width is deducted from columns if required to achieve this, with one character progressively
     #   deducted from the width of the widest column until the target is reached. When the
     #   table is printed, wrapping or truncation will then occur in these columns as required
-    #   (depending on how they were configured). Note that regardless of the value passed to
-    #   max_table_width, the table will always be left wide enough to accommodate at least
-    #   1 character's width of content, 1 character of left padding and 1 character of right padding
-    #   in each column, together with border characters (1 on each side of the table and 1 between
-    #   adjacent columns). I.e. there is a certain width below width the Table will refuse to
-    #   shrink itself.
+    #   (depending on how they were configured).
+    #   Note that regardless of the value passed to max_table_width, the table will always be left wide
+    #   enough to accommodate at least 1 character's width of content, 1 character of left padding and
+    #   1 character of right padding in each column, together with border characters (1 on each side
+    #   of the table and 1 between adjacent columns). I.e. there is a certain width below width the
+    #   Table will refuse to shrink itself.
     # @return [Table] the Table itself
     def shrinkwrap!(max_table_width: nil)
       return self if column_registry.none?
@@ -247,6 +251,7 @@ module Tabulo
       end
 
       if max_table_width
+        max_table_width = TTY::Screen.width if max_table_width == :auto
         total_columns_width = columns.inject(0) { |sum, column| sum + column.width }
         total_padding = column_registry.count * @column_padding * 2
         total_borders = column_registry.count + 1
