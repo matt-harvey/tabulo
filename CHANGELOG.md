@@ -1,5 +1,9 @@
 # Changelog
 
+### v1.2.2
+
+* Improve documentation.
+
 ### v1.2.1
 
 * Improve documentation in README.
