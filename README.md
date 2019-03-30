@@ -69,6 +69,7 @@ Tabulo has also been ported to Crystal (with some modifications): see [Tablo](ht
      * [Repeating headers](#repeating-headers)
      * [Using a Table Enumerator](#using-a-table-enumerator)
      * [Accessing cell values](#accessing-cell-values)
+     * [Accessing the underlying enumerable](#accessing-sources)
      * [Additional configuration options](#additional-configuration-options)
   * [Development](#development)
   * [Contributing](#contributing)
@@ -455,6 +456,34 @@ table.each do |row|
 end
 ```
 
+<a name="accessing-sources"></a>
+### Accessing the underlying enumerable
+
+The underlying enumerable for a table can be retrieved by calling the `sources` getter:
+
+```ruby
+table = Tabulo::Table.new([1, 2, 5], columns: %i[itself even? odd?])
+```
+
+```
+> table.sources
+=> [1, 2, 5]
+```
+
+There is also a corresponding setter, meaning you can reuse the same table to tabulate
+a different data set, without having to reconfigure the columns and other
+other options from scratch:
+
+```ruby
+table.sources = [50, 60]
+```
+
+```
+> table.sources
+=> [50, 60]
+```
+
+<a name="additional-configuration-options"></a>
 ### Additional configuration options
 
 The characters used for horizontal dividers, vertical dividers and corners, which default to `-`,

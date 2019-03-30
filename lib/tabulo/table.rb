@@ -32,6 +32,8 @@ module Tabulo
     # @!visibility private
     attr_reader :column_registry
 
+    attr_accessor :sources
+
     # @param [Enumerable] sources the underlying Enumerable from which the table will derive its data
     # @param [Array[Symbol]] columns Specifies the initial columns. The Symbols provided must
     #   be unique. Each element of the Array  will be used to create a column whose content is
