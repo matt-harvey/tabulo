@@ -3,8 +3,7 @@ module Tabulo
   class Row
     include Enumerable
 
-    # @return the element of the {Table}'s underlying enumerable to which this {Row}
-    # corresponds
+    # @return the element of the {Table}'s underlying enumerable to which this {Row} corresponds
     attr_reader :source
 
     # @!visibility private

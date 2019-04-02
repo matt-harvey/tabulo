@@ -118,7 +118,7 @@ end
 Or equivalently:
 
 ```ruby
-table = Tabulo::Table.new([1, 2, 5], columns: %i[itself even? odd?])
+table = Tabulo::Table.new([1, 2, 5], :itself, :even?, :odd?)
 ```
 
 ```
@@ -193,7 +193,7 @@ If you want to set the default column width for all columns of the table to some
 than 12, use the `column_width` option when initializing the table:
 
 ```ruby
-table = Tabulo::Table.new([1, 2], columns: %i[itself even?], column_width: 6)
+table = Tabulo::Table.new([1, 2], :itself, :even?, column_width: 6)
 ```
 
 ```
@@ -222,7 +222,7 @@ itself, so that each column is just wide enough for its header and contents (plu
 of padding):
 
 ```ruby
-table = Tabulo::Table.new([1, 2], columns: %i[itself even?])
+table = Tabulo::Table.new([1, 2], :itself, :even?)
 table.pack
 ```
 
@@ -238,14 +238,14 @@ table.pack
 The `pack` method returns the table itself, so you can "pack-and-print" in one go:
 
 ```ruby
-puts Tabulo::Table.new([1, 2], columns: %i[itself even?]).pack
+puts Tabulo::Table.new([1, 2], :itself, :even?).pack
 ```
 
 <a name="max-table-width"></a>
 You can manually place an upper limit on the total width of the table when packing:
 
 ```ruby
-puts Tabulo::Table.new([1, 2], columns: %i[itself even?]).pack(max_table_width: 17)
+puts Tabulo::Table.new([1, 2], :itself, :even?).pack(max_table_width: 17)
 ```
 
 ```
@@ -287,7 +287,7 @@ required:
 ```ruby
 table = Tabulo::Table.new(
   ["hello", "abcdefghijklmnopqrstuvwxyz"],
-  columns: %i[itself length]
+  :itself, :length
 )
 ```
 
@@ -311,8 +311,8 @@ outputted cell content to show that truncation has occurred:
 ```ruby
 table = Tabulo::Table.new(
   ["hello", "abcdefghijklmnopqrstuvwxyz"],
-  wrap_body_cells_to: 1,
-  columns: %i[itself length]
+  :itself, :length,
+  wrap_body_cells_to: 1
 )
 ```
 
@@ -370,7 +370,7 @@ at table that's taller than your terminal.
 E.g.:
 
 ```ruby
-table = Tabulo::Table.new(1..10, columns: %i[itself even?], header_frequency: 5)
+table = Tabulo::Table.new(1..10, :itself, :even?, header_frequency: 5)
 ```
 
 ```
@@ -429,7 +429,7 @@ is itself an `Enumerable` comprising the underlying the values of each cell. A `
 also be converted to a `Hash` for keyed access. For example:
 
 ```ruby
-table = Tabulo::Table.new(1..5, columns: %i[itself even? odd?])
+table = Tabulo::Table.new(1..5, :itself, :even?, :odd?)
 
 table.each do |row|
   row.each { |cell| puts cell } # 1...2...3...4...5
@@ -462,7 +462,7 @@ end
 The underlying enumerable for a table can be retrieved by calling the `sources` getter:
 
 ```ruby
-table = Tabulo::Table.new([1, 2, 5], columns: %i[itself even? odd?])
+table = Tabulo::Table.new([1, 2, 5], :itself, :even?, :odd?)
 ```
 
 ```
@@ -471,8 +471,7 @@ table = Tabulo::Table.new([1, 2, 5], columns: %i[itself even? odd?])
 ```
 
 There is also a corresponding setter, meaning you can reuse the same table to tabulate
-a different data set, without having to reconfigure the columns and other
-other options from scratch:
+a different data set, without having to reconfigure the columns and other options from scratch:
 
 ```ruby
 table.sources = [50, 60]
@@ -484,7 +483,7 @@ table.sources = [50, 60]
 ```
 
 In addition, the element of the underlying enumerable corresponding to a particular
-row can be accessed by calling the `source` method on the row:
+row can be accessed by calling the `source` method on that row:
 
 ```ruby
 table.each do |row|
@@ -515,7 +514,7 @@ This will output a bottom border that's appropriately sized for the table.
 This mechanism can also be used to output a horizontal divider after each row:
 
 ```ruby
-table = Tabulo::Table.new(1..3, columns: %i[itself even?])
+table = Tabulo::Table.new(1..3, :itself, :even?)
 ```
 
 ```

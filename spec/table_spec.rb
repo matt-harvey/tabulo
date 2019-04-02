@@ -39,6 +39,23 @@ describe Tabulo::Table do
   end
 
   describe "#initialize / #to_s" do
+    describe "`cols` param" do
+      it "accepts symbols corresponding to methods on the source objects" do
+        expect(Tabulo::Table.new([1, 2, 3], :to_i, :to_f).to_s).to eq \
+          %q(+--------------+--------------+
+             |     to_i     |     to_f     |
+             +--------------+--------------+
+             |            1 |          1.0 |
+             |            2 |          2.0 |
+             |            3 |          3.0 |).gsub(/^ +/, "")
+      end
+
+      it "raises Tabulo::InvalidColumnLabelError if symbols are not unique" do
+        expect { Tabulo::Table.new([1, 2, 3], columns: [:to_i, :to_i]) }.to \
+          raise_error(Tabulo::InvalidColumnLabelError)
+      end
+    end
+
     describe "`columns` param" do
       it "accepts symbols corresponding to methods on the source objects" do
         expect(Tabulo::Table.new([1, 2, 3], columns: [:to_i, :to_f]).to_s).to eq \
@@ -440,7 +457,7 @@ describe Tabulo::Table do
 
       context "when passed something other than nil or a single-character String" do
         subject do
-          Tabulo::Table.new(source, columns: [], horizontal_rule_character: horizontal_rule_character)
+          Tabulo::Table.new(source, horizontal_rule_character: horizontal_rule_character)
         end
 
         context "when passed an empty string" do
@@ -506,7 +523,7 @@ describe Tabulo::Table do
 
       context "when passed something other than nil or a single-character String" do
         subject do
-          Tabulo::Table.new(source, columns: [], vertical_rule_character: vertical_rule_character)
+          Tabulo::Table.new(source, vertical_rule_character: vertical_rule_character)
         end
 
         context "when passed an empty string" do
@@ -572,7 +589,7 @@ describe Tabulo::Table do
 
       context "when passed something other than nil or a single-character String" do
         subject do
-          Tabulo::Table.new(source, columns: [], intersection_character: intersection_character)
+          Tabulo::Table.new(source, intersection_character: intersection_character)
         end
 
         context "when passed an empty string" do
@@ -645,7 +662,7 @@ describe Tabulo::Table do
 
       context "when passed something other than nil or a single-character String" do
         subject do
-          Tabulo::Table.new(source, columns: [], truncation_indicator: truncation_indicator)
+          Tabulo::Table.new(source, truncation_indicator: truncation_indicator)
         end
 
         context "when passed an empty string" do
@@ -1189,7 +1206,7 @@ describe Tabulo::Table do
       context "when `max_table_width` is passed :auto" do
         it "caps the table width at the screen width, as returned by TTY::Screen.width" do
           allow(TTY::Screen).to receive(:width).and_return(13)
-          table = Tabulo::Table.new(1..3, columns: [:to_i, :to_f])
+          table = Tabulo::Table.new(1..3, :to_i, :to_f)
           table.pack(max_table_width: :auto)
           expect(table.to_s).to eq \
             %q(+-----+-----+
@@ -1484,7 +1501,7 @@ describe Tabulo::Table do
       context "when `max_table_width` is passed :auto" do
         it "caps the table width at the screen width, as returned by TTY::Screen.width" do
           allow(TTY::Screen).to receive(:width).and_return(13)
-          table = Tabulo::Table.new(1..3, columns: [:to_i, :to_f])
+          table = Tabulo::Table.new(1..3, :to_i, :to_f)
           table.shrinkwrap!(max_table_width: :auto)
           expect(table.to_s).to eq \
             %q(+-----+-----+
