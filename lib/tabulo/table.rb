@@ -257,25 +257,7 @@ module Tabulo
 
       if max_table_width
         max_table_width = TTY::Screen.width if max_table_width == :auto
-        total_columns_width = columns.inject(0) { |sum, column| sum + column.width }
-        total_padding = column_registry.count * @column_padding * 2
-        total_borders = column_registry.count + 1
-        unadjusted_table_width = total_columns_width + total_padding + total_borders
-
-        # Ensure max table width is at least wide enough to accommodate table borders and padding
-        # and one character of content.
-        min_table_width = total_padding + total_borders + column_registry.count
-        max_table_width = min_table_width if min_table_width > max_table_width
-
-        required_reduction = [unadjusted_table_width - max_table_width, 0].max
-
-        required_reduction.times do
-          widest_column = columns.inject(columns.first) do |widest, column|
-            column.width >= widest.width ? column : widest
-          end
-
-          widest_column.width -= 1
-        end
+        shrink_to(max_table_width)
       end
 
       self
@@ -327,6 +309,29 @@ module Tabulo
     end
 
     private
+
+    # @!visibility private
+    def shrink_to(max_table_width)
+      columns = column_registry.values
+      total_columns_width = columns.inject(0) { |sum, column| sum + column.width }
+      total_padding = column_registry.count * @column_padding * 2
+      total_borders = column_registry.count + 1
+      unadjusted_table_width = total_columns_width + total_padding + total_borders
+
+      # Ensure max table width is at least wide enough to accommodate table borders and padding
+      # and one character of content.
+      min_table_width = total_padding + total_borders + column_registry.count
+      max_table_width = min_table_width if min_table_width > max_table_width
+      required_reduction = [unadjusted_table_width - max_table_width, 0].max
+
+      required_reduction.times do
+        widest_column = columns.inject(columns.first) do |widest, column|
+          column.width >= widest.width ? column : widest
+        end
+
+        widest_column.width -= 1
+      end
+    end
 
     # @!visibility private
     def body_row(source, with_header: false)
