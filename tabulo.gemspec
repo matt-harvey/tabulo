@@ -9,8 +9,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Matthew Harvey"]
   spec.email         = ["software@matthewharvey.net"]
 
-  spec.summary       = "Enumerable ASCII table"
-  spec.description   = "Enumerable ASCII table"
+  spec.summary       = "Enumerable ASCII terminal table"
+  spec.description   = "Enumerable ASCII terminal table"
   spec.homepage      = "https://github.com/matt-harvey/tabulo"
   spec.license       = "MIT"
 
