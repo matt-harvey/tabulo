@@ -32,6 +32,7 @@ module Tabulo
     # @!visibility private
     attr_reader :column_registry
 
+    # @return [Enumerable] the underlying enumerable from which the table derives its data
     attr_accessor :sources
 
     # @param [Enumerable] sources the underlying Enumerable from which the table will derive its data
@@ -74,7 +75,7 @@ module Tabulo
     #   a single-character String, raises {InvalidTruncationIndicatorError}.
     # @param [nil, Integer] column_padding Determines the amount of blank space with which to pad either
     #   of each column. Defaults to 1.
-    # @return [Table] a new Table
+    # @return [Table] a new {Table}
     # @raise [InvalidColumnLabelError] if non-unique Symbols are provided to columns.
     # @raise [InvalidHorizontalRuleCharacterError] if invalid argument passed to horizontal_rule_character.
     # @raise [InvalidVerticalRuleCharacterError] if invalid argument passed to vertical_rule_character.

@@ -483,6 +483,16 @@ table.sources = [50, 60]
 => [50, 60]
 ```
 
+In addition, the element of the underlying enumerable corresponding to a particular
+row can be accessed by calling the `source` method on the row:
+
+```ruby
+table.each do |row|
+  puts row.source # 50...60...
+end
+
+```
+
 <a name="additional-configuration-options"></a>
 ### Additional configuration options
 
