@@ -1,5 +1,6 @@
-require "tabulo/version"
+require "tabulo/deprecation"
 require "tabulo/exceptions"
 require "tabulo/table"
+require "tabulo/version"
 require "tabulo/row"
 require "tabulo/column"
