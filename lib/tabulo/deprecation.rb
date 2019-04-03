@@ -2,6 +2,7 @@ module Tabulo
 
   # @!visibility private
   def self.warn_deprecated(deprecated, replacement, stack_level = 1)
-    warn "#{Kernel.caller[stack_level]}: [DEPRECATION] #{deprecated} is deprecated. Please use #{replacement} instead."
+    kaller = Kernel.caller[stack_level]
+    Kernel.warn "#{kaller}: [DEPRECATION] #{deprecated} is deprecated. Please use #{replacement} instead."
   end
 end

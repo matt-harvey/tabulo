@@ -51,8 +51,14 @@ describe Tabulo::Table do
       end
 
       it "raises Tabulo::InvalidColumnLabelError if symbols are not unique" do
-        expect { Tabulo::Table.new([1, 2, 3], columns: [:to_i, :to_i]) }.to \
+        expect { Tabulo::Table.new([1, 2, 3], :to_i, :to_i) }.to \
           raise_error(Tabulo::InvalidColumnLabelError)
+      end
+
+      it "does not issue a deprecation warning" do
+        expect(Tabulo).not_to receive(:warn_deprecated)
+
+        Tabulo::Table.new([1, 2, 3], :to_i, :to_s)
       end
     end
 
@@ -70,6 +76,13 @@ describe Tabulo::Table do
       it "raises Tabulo::InvalidColumnLabelError if symbols are not unique" do
         expect { Tabulo::Table.new([1, 2, 3], columns: [:to_i, :to_i]) }.to \
           raise_error(Tabulo::InvalidColumnLabelError)
+      end
+
+      it "issues a deprecation warning" do
+        expect(Tabulo).to receive(:warn_deprecated).
+          with("`columns' option to Tabulo::Table#initialize", "the variable length parameter `cols'", 2)
+
+        Tabulo::Table.new([1, 2, 3], columns: [:to_i, :to_s])
       end
     end
 
@@ -941,6 +954,12 @@ describe Tabulo::Table do
       expect(table.pack(max_table_width: [nil, 64, 47].sample)).to eq(table)
     end
 
+    it "does not issue a deprecation warning" do
+      expect(Tabulo).not_to receive(:warn_deprecated)
+
+      table.pack
+    end
+
     context "when `max_table_width` is nil" do
       it "expands or contracts the column widths of the table as necessary so that they just "\
         "accommodate their header and formatted body contents without wrapping (assuming "\
@@ -1234,6 +1253,12 @@ describe Tabulo::Table do
 
     it "returns the Table itself" do
       expect(table.shrinkwrap!(max_table_width: [nil, 64, 47].sample)).to eq(table)
+    end
+
+    it "issues deprecation warning" do
+      expect(Tabulo).to receive(:warn_deprecated).with("`Tabulo::Table#shrinkwrap!'", "`#pack'")
+
+      table.shrinkwrap!
     end
 
     context "when `max_table_width` is not provided" do
