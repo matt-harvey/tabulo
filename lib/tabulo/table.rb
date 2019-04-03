@@ -84,6 +84,10 @@ module Tabulo
       wrap_header_cells_to: nil, wrap_body_cells_to: nil, horizontal_rule_character: nil,
       vertical_rule_character: nil, intersection_character: nil, truncation_indicator: nil)
 
+      if columns.any?
+        warn "[DEPRECATION] `columns` option to Tabulo::Table#initialize is deprecated. Please use the variable length parameter `cols` instead."
+      end
+
       @sources = sources
       @header_frequency = header_frequency
       @wrap_header_cells_to = wrap_header_cells_to
@@ -294,6 +298,7 @@ module Tabulo
     #   Table will refuse to shrink itself.
     # @return [Table] the Table itself
     def shrinkwrap!(max_table_width: nil)
+      warn "[DEPRECATION] `Tabulo::Table#shrinkwrap!` is deprecated. Please use `#pack` instead."
       pack(max_table_width: max_table_width)
     end
 
