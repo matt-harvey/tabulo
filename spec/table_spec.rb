@@ -2,6 +2,10 @@ require "spec_helper"
 
 describe Tabulo::Table do
 
+  around(:all) do |group|
+    Tabulo::Deprecation.without_warnings { group.run }
+  end
+
   let(:table) do
     Tabulo::Table.new(
       source,
@@ -56,7 +60,7 @@ describe Tabulo::Table do
       end
 
       it "does not issue a deprecation warning" do
-        expect(Tabulo).not_to receive(:warn_deprecated)
+        expect(Tabulo::Deprecation).not_to receive(:warn)
 
         Tabulo::Table.new([1, 2, 3], :to_i, :to_s)
       end
@@ -79,7 +83,7 @@ describe Tabulo::Table do
       end
 
       it "issues a deprecation warning" do
-        expect(Tabulo).to receive(:warn_deprecated).
+        expect(Tabulo::Deprecation).to receive(:warn).
           with("`columns' option to Tabulo::Table#initialize", "the variable length parameter `cols'", 2)
 
         Tabulo::Table.new([1, 2, 3], columns: [:to_i, :to_s])
@@ -955,7 +959,7 @@ describe Tabulo::Table do
     end
 
     it "does not issue a deprecation warning" do
-      expect(Tabulo).not_to receive(:warn_deprecated)
+      expect(Tabulo::Deprecation).not_to receive(:warn)
 
       table.pack
     end
@@ -1256,7 +1260,7 @@ describe Tabulo::Table do
     end
 
     it "issues deprecation warning" do
-      expect(Tabulo).to receive(:warn_deprecated).with("`Tabulo::Table#shrinkwrap!'", "`#pack'")
+      expect(Tabulo::Deprecation).to receive(:warn).with("`Tabulo::Table#shrinkwrap!'", "`#pack'")
 
       table.shrinkwrap!
     end

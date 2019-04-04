@@ -85,7 +85,7 @@ module Tabulo
       vertical_rule_character: nil, intersection_character: nil, truncation_indicator: nil)
 
       if columns.any?
-        Tabulo.warn_deprecated("`columns' option to Tabulo::Table#initialize",
+        Deprecation.warn("`columns' option to Tabulo::Table#initialize",
                                "the variable length parameter `cols'", 2)
       end
 
@@ -299,7 +299,7 @@ module Tabulo
     #   Table will refuse to shrink itself.
     # @return [Table] the Table itself
     def shrinkwrap!(max_table_width: nil)
-      Tabulo.warn_deprecated("`Tabulo::Table#shrinkwrap!'", "`#pack'")
+      Deprecation.warn("`Tabulo::Table#shrinkwrap!'", "`#pack'")
       pack(max_table_width: max_table_width)
     end
 
