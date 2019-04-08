@@ -70,7 +70,6 @@ Tabulo has also been ported to Crystal (with some modifications): see [Tablo](ht
      * [Using a Table Enumerator](#using-a-table-enumerator)
      * [Accessing cell values](#accessing-cell-values)
      * [Additional configuration options](#additional-configuration-options)
-  * [Development](#development)
   * [Contributing](#contributing)
   * [License](#license)
 
