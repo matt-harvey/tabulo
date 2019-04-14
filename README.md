@@ -10,8 +10,21 @@
 
 Tabulo is a Ruby library for generating ASCII tables.
 
+*Quick API*:
+
+```
+> puts Tabulo::Table.new(User.all, :id, :first_name, :last_name)
++--------------+--------------+--------------+
+|      id      |  first_name  |   last_name  |
++--------------+--------------+--------------+
+|            1 | John         | Citizen      |
+|            2 | Jane         | Doe          |
+```
+
+*Full API*:
+
 ```ruby
-underyling_enumerable = [1, 2, 50000000] # need not be an array
+underyling_enumerable = [1, 2, 50000000]
 
 table = Tabulo::Table.new(underlying_enumerable) do |t|
   t.add_column("N") { |n| n }
@@ -31,13 +44,10 @@ end
 
 ## Features
 
-* A [DRY interface](#configuring-columns): by being "column based", it is designed to spare the
-  developer the burden of syncing the ordering within the header row with that of the body rows.
 * Lets you set [fixed column widths](#fixed-column-widths), then either [wrap](#overflow-handling) or
   [truncate](#overflow-handling) the overflow.
-* Alternatively, [pack](#pack) the table so that each column is just wide enough for its contents.
-* Put an upper limit on total table width when "packing", to
-  [stop it overflowing your terminal horizontally](#max-table-width).
+* Alternatively, ["pack"](#pack) the table so that each column is automatically just wide enough for its
+  contents, but [without overflowing the terminal horizontally](#max-table-width).
 * Alignment of cell content is [configurable](#cell-alignment), but has helpful content-based defaults
   (numbers right, strings left).
 * Headers are [repeatable](#repeating-headers).
@@ -47,6 +57,8 @@ end
 * Each `Tabulo::Row` is also an `Enumerable`, [providing access](#accessing-cell-values) to the underlying cell values.
 * Tabulate any `Enumerable`: the underlying collection need not be an array.
 * [Customize](#additional-configuration-options) border and divider characters.
+* Use a [DRY interface](#configuring-columns): by being "column based", it is designed to spare the
+  developer the burden of syncing the ordering within the header row with that of the body rows.
 
 Tabulo has also been ported to Crystal (with some modifications): see [Tablo](https://github.com/hutou/tablo).
 
@@ -115,7 +127,7 @@ table = Tabulo::Table.new([1, 2, 5]) do |t|
 end
 ```
 
-Or equivalently:
+Or equivalently, using the "quick API":
 
 ```ruby
 table = Tabulo::Table.new([1, 2, 5], :itself, :even?, :odd?)
