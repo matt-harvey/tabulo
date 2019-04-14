@@ -10,7 +10,7 @@
 
 Tabulo is a Ruby library for generating ASCII tables.
 
-*Quick API*:
+*Quick API:*
 
 ```
 > puts Tabulo::Table.new(User.all, :id, :first_name, :last_name)
@@ -21,7 +21,7 @@ Tabulo is a Ruby library for generating ASCII tables.
 |            2 | Jane         | Doe          |
 ```
 
-*Full API*:
+*Full API:*
 
 ```ruby
 underyling_enumerable = [1, 2, 50000000]
@@ -565,7 +565,7 @@ For example, suppose we have called `User.all` from the Rails console, and want 
 a table showing the email, first name, last name and ID of each user,
 with column headings. Also, we want the ID column to be right-aligned, because it's a number.
 
-In `terminal_table`, we could achieve this as follows:
+In `terminal-table`, we could achieve this as follows:
 
 ```ruby
 rows = User.all.map { |u| [u.email, u.first_name, u.last_name, u.id] }
@@ -583,7 +583,7 @@ tables, but for tables that have many columns, or that are constructed
 dynamically based on user input or other runtime factors determining the columns
 to be included, this can be a hassle and a source of brittleness.
 
-`tty-table` has a somewhat different API to `terminal_table`. It offers both a
+`tty-table` has a somewhat different API to `terminal-table`. It offers both a
 "row-based" and a "column-based" method of initializing a table. We won't cover
 the row-based method here, but it is similar to `terminal-table`'s in that it
 burdens the developer with syncing the column ordering across multiple code
@@ -602,7 +602,7 @@ table = TTY::Table.new [
 puts table
 ```
 
-While this isn't too bad, it does mean that the underlying collection (`users`) has to
+While this doesn't seem too bad, it does mean that the underlying collection (`users`) has to
 be traversed multiple times, once for each column, which is inefficient, particularly
 if the underlying collection is large. In addition, it's not clear how to pass separate
 formatting information for each column when initializing in this way. (Perhaps there is a way to do
