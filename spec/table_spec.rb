@@ -708,7 +708,7 @@ describe Tabulo::Table do
       end
     end
 
-    describe "column_padding param" do
+    describe "`column_padding` param" do
       context "by default" do
         it "determines the amount of padding on either side of each column to be 1" do
           expect(table.to_s).to eq \
@@ -753,6 +753,100 @@ describe Tabulo::Table do
                |           4|           8|
                |           5|          10|).gsub(/^ +/, "")
         end
+      end
+    end
+
+    describe "`align_header` param" do
+      let(:table) do
+        Tabulo::Table.new(
+          source,
+          column_width: column_width,
+          header_frequency: header_frequency,
+          wrap_header_cells_to: wrap_header_cells_to,
+          wrap_body_cells_to: wrap_body_cells_to,
+          horizontal_rule_character: horizontal_rule_character,
+          vertical_rule_character: vertical_rule_character,
+          intersection_character: intersection_character,
+          truncation_indicator: truncation_indicator,
+          column_padding: column_padding,
+          align_header: :left
+        ) do |t|
+          t.add_column("N") { |n| n }
+          t.add_column("Doubled") { |n| n * 2 }
+        end
+      end
+
+      it "sets the default header alignment for columns in the table" do
+        expect(table.to_s).to eq \
+          %q(+--------------+--------------+
+             | N            | Doubled      |
+             +--------------+--------------+
+             |            1 |            2 |
+             |            2 |            4 |
+             |            3 |            6 |
+             |            4 |            8 |
+             |            5 |           10 |).gsub(/^ +/, "")
+      end
+
+      it "sets a default header alignment that can be overriden via #add_column" do
+        table.add_column(:even?, header: "Even?", align_header: :right)
+
+        expect(table.to_s).to eq \
+          %q(+--------------+--------------+--------------+
+             | N            | Doubled      |        Even? |
+             +--------------+--------------+--------------+
+             |            1 |            2 |     false    |
+             |            2 |            4 |     true     |
+             |            3 |            6 |     false    |
+             |            4 |            8 |     true     |
+             |            5 |           10 |     false    |).gsub(/^ +/, "")
+      end
+    end
+
+    describe "`align_body` param" do
+      let(:table) do
+        Tabulo::Table.new(
+          source,
+          column_width: column_width,
+          header_frequency: header_frequency,
+          wrap_header_cells_to: wrap_header_cells_to,
+          wrap_body_cells_to: wrap_body_cells_to,
+          horizontal_rule_character: horizontal_rule_character,
+          vertical_rule_character: vertical_rule_character,
+          intersection_character: intersection_character,
+          truncation_indicator: truncation_indicator,
+          column_padding: column_padding,
+          align_body: :left
+        ) do |t|
+          t.add_column("N") { |n| n }
+          t.add_column("Doubled") { |n| n * 2 }
+        end
+      end
+
+      it "sets the default body cell alignment for columns in the table" do
+        expect(table.to_s).to eq \
+          %q(+--------------+--------------+
+             |       N      |    Doubled   |
+             +--------------+--------------+
+             | 1            | 2            |
+             | 2            | 4            |
+             | 3            | 6            |
+             | 4            | 8            |
+             | 5            | 10           |).gsub(/^ +/, "")
+      end
+
+      it "sets a default body cell alignment that can be overriden via #add_column" do
+        table.add_column(:even?, header: "Even?", align_body: :right)
+
+        expect(table.to_s).to eq \
+          %q(+--------------+--------------+--------------+
+             |       N      |    Doubled   |     Even?    |
+             +--------------+--------------+--------------+
+             | 1            | 2            |        false |
+             | 2            | 4            |         true |
+             | 3            | 6            |        false |
+             | 4            | 8            |         true |
+             | 5            | 10           |        false |).gsub(/^ +/, "")
       end
     end
   end

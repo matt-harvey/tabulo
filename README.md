@@ -170,11 +170,20 @@ end
 
 By default, column header text is center-aligned, while the content of each body cell is aligned
 according to its data type. Numbers are right-aligned, text is left-aligned, and booleans (`false`
-and `true`) are center-aligned. This can be customized by passing `:center`, `:left` or `:right` to
-the `align_header` or `align_body` options of `add_column`, e.g.:
+and `true`) are center-aligned.
+
+This default behaviour can be set at the table level, by passing `:center`, `:left` or `:right`
+to the `align_header` or `align_body` options when initializing the table:
 
 ```ruby
-table.add_column("Doubled", align_header: :left, align_body: :left) { |n| n * 2 }
+table = Tabulo::Table.new([1, 2], :itself, :even?, align_header: :left, align_body: :right)
+```
+
+The table-level alignment settings can be overridden for individual columns by
+passing using similarly-named options passed to `add_column`, e.g.:
+
+```ruby
+table.add_column("Doubled", align_header: :right, align_body: :left) { |n| n * 2 }
 ```
 
 ### Column width, wrapping and truncation
