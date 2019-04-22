@@ -180,7 +180,7 @@ table = Tabulo::Table.new([1, 2], :itself, :even?, align_header: :left, align_bo
 ```
 
 The table-level alignment settings can be overridden for individual columns by
-passing using similarly-named options passed to `add_column`, e.g.:
+passing similarly-named options passed to `add_column`, e.g.:
 
 ```ruby
 table.add_column("Doubled", align_header: :right, align_body: :left) { |n| n * 2 }
@@ -278,7 +278,7 @@ puts Tabulo::Table.new([1, 2], :itself, :even?).pack(max_table_width: 17)
 |     2 |  true |
 ```
 
-Or if you simply call `pack` with no parameters (or if you explicitly call
+Or if you simply call `pack` with no arguments (or if you explicitly call
 `pack(max_table_width: :auto)`), the table width will automatically be capped at the
 width of your terminal.
 
