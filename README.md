@@ -652,13 +652,13 @@ The gem is available as open source under the terms of the [MIT
 License](http://opensource.org/licenses/MIT).
 
 [Gem Version]: https://rubygems.org/gems/tabulo
-[Documentation]: http://www.rubydoc.info/gems/tabulo/1.2.2
+[Documentation]: http://www.rubydoc.info/gems/tabulo/1.3.0
 [Build Status]: https://travis-ci.org/matt-harvey/tabulo
 [Coverage Status]: https://coveralls.io/r/matt-harvey/tabulo
 [Code Climate]: https://codeclimate.com/github/matt-harvey/tabulo
 
 [GV img]: https://img.shields.io/gem/v/tabulo.svg
-[DC img]: https://img.shields.io/badge/documentation-v1.2.2-blue.svg
+[DC img]: https://img.shields.io/badge/documentation-v1.3.0-blue.svg
 [BS img]: https://img.shields.io/travis/matt-harvey/tabulo.svg
 [CS img]: https://img.shields.io/coveralls/matt-harvey/tabulo.svg
 [CC img]: https://codeclimate.com/github/matt-harvey/tabulo/badges/gpa.svg

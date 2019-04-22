@@ -1,5 +1,16 @@
 # Changelog
 
+### v1.3.0
+
+* More ergonomic Table initializer, allowing you to specify columns directly as varargs rather
+  than as an array passed to `columns:` option (the latter is now deprecated)
+* New `#pack` method to autosize table, capping total table width at width of terminal
+  by default (replaces `#shrinkwrap!` method, now deprecated)
+* Ability to set table-level defaults for column header and body cell alignments
+* Accessor methods for `source` attribute, representing the underlying collection
+  being tabulated, facilitating reuse of the same table to tabulate different collections
+* Documentation improvements
+
 ### v1.2.2
 
 * Improve documentation.
