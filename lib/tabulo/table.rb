@@ -1,3 +1,5 @@
+require "tty-screen"
+
 module Tabulo
 
   # Represents a table primarily intended for "pretty-printing" in a fixed-width font.
@@ -30,11 +32,15 @@ module Tabulo
     # @!visibility private
     attr_reader :column_registry
 
+    # @return [Enumerable] the underlying enumerable from which the table derives its data
+    attr_accessor :sources
+
     # @param [Enumerable] sources the underlying Enumerable from which the table will derive its data
-    # @param [Array[Symbol]] columns Specifies the initial columns. The Symbols provided must
+    # @param [Array[Symbol]] cols Specifies the initial columns. The Symbols provided must
     #   be unique. Each element of the Array  will be used to create a column whose content is
     #   created by calling the corresponding method on each element of sources. Note
     #   the {#add_column} method is a much more flexible way to set up columns on the table.
+    # @param [Array[Symbol]] columns <b>DEPRECATED</b> Use {cols} instead.
     # @param [Integer, nil] column_width The default column width for columns in this
     #   table, not excluding padding. If <tt>nil</tt>, then {DEFAULT_COLUMN_WIDTH} will be used.
     # @param [:start, nil, Integer] header_frequency Controls the display of column headers.
@@ -70,13 +76,27 @@ module Tabulo
     #   a single-character String, raises {InvalidTruncationIndicatorError}.
     # @param [nil, Integer] column_padding Determines the amount of blank space with which to pad either
     #   of each column. Defaults to 1.
-    # @return [Table] a new Table
+    # @param [:left, :right, :center] align_header (:center) Determines the alignment of header text
+    #   for columns in this Table. Can be overridden for individual columns using the
+    #   <tt>align_header</tt> option passed to {#add_column}
+    # @param [:left, :right, :center, :auto] align_body (:auto) Determines the alignment of body cell
+    #   (i.e. non-header) content within columns in this Table. Can be overridden for individual columns
+    #   using the <tt>align_body</tt> option passed to {#add_column}. If passed <tt>:auto</tt>,
+    #   alignment is determined by cell content, with numbers aligned right, booleans
+    #   center-aligned, and other values left-aligned.
+    # @return [Table] a new {Table}
     # @raise [InvalidColumnLabelError] if non-unique Symbols are provided to columns.
     # @raise [InvalidHorizontalRuleCharacterError] if invalid argument passed to horizontal_rule_character.
     # @raise [InvalidVerticalRuleCharacterError] if invalid argument passed to vertical_rule_character.
-    def initialize(sources, columns: [], column_width: nil, column_padding: nil, header_frequency: :start,
+    def initialize(sources, *cols, columns: [], column_width: nil, column_padding: nil, header_frequency: :start,
       wrap_header_cells_to: nil, wrap_body_cells_to: nil, horizontal_rule_character: nil,
-      vertical_rule_character: nil, intersection_character: nil, truncation_indicator: nil)
+      vertical_rule_character: nil, intersection_character: nil, truncation_indicator: nil,
+      align_header: :center, align_body: :auto)
+
+      if columns.any?
+        Deprecation.warn("`columns' option to Tabulo::Table#initialize",
+                               "the variable length parameter `cols'", 2)
+      end
 
       @sources = sources
       @header_frequency = header_frequency
@@ -84,6 +104,8 @@ module Tabulo
       @wrap_body_cells_to = wrap_body_cells_to
       @default_column_width = (column_width || DEFAULT_COLUMN_WIDTH)
       @column_padding = (column_padding || DEFAULT_COLUMN_PADDING)
+      @align_header = align_header
+      @align_body = align_body
 
       @horizontal_rule_character = validate_character(horizontal_rule_character,
         DEFAULT_HORIZONTAL_RULE_CHARACTER, InvalidHorizontalRuleCharacterError, "horizontal rule character")
@@ -95,6 +117,7 @@ module Tabulo
         DEFAULT_TRUNCATION_INDICATOR, InvalidTruncationIndicatorError, "truncation indicator")
 
       @column_registry = { }
+      cols.each { |item| add_column(item) }
       columns.each { |item| add_column(item) }
 
       yield self if block_given?
@@ -109,13 +132,18 @@ module Tabulo
     #   for this column.
     # @param [nil, #to_s] header (nil) Text to be displayed in the column header. If passed nil,
     #   the column's label will also be used as its header text.
-    # @param [:left, :center, :right] align_header (:center) Specifies how the header text
-    #   should be aligned.
-    # @param [:left, :center, :right, nil] align_body (nil) Specifies how the cell body contents
-    #   should be aligned. Possible If <tt>nil</tt> is passed, then the alignment is determined
-    #   by the type of the cell value, with numbers aligned right, booleans center-aligned, and
-    #   other values left-aligned. Note header text alignment is configured separately using the
-    #   :align_header param.
+    # @param [:left, :center, :right, nil] align_header (nil) Specifies how the header text
+    #   should be aligned. If <tt>nil</tt> is passed, then the alignment is determined
+    #   by the Table-level setting passed to the <tt>align_header</tt> (which itself defaults
+    #   to <tt>:center</tt>). Otherwise, this option determines the alignment of the header
+    #   content for this column.
+    # @param [:left, :center, :right, :auto, nil] align_body (nil) Specifies how the cell body contents
+    #   should be aligned. If <tt>nil</tt> is passed, then the alignment is determined
+    #   by the Table-level setting passed to the <tt>align_body</tt> option on Table initialization
+    #   (which itself defaults to <tt>:auto</tt>). Otherwise this option determines the alignment of
+    #   this column. If <tt>:auto</tt> is passed, the alignment is determined by the type of the cell
+    #   value, with numbers aligned right, booleans center-aligned, and other values left-aligned.
+    #   Note header text alignment is configured separately using the :align_header param.
     # @param [Integer] width (nil) Specifies the width of the column, excluding padding. If
     #   nil, then the column will take the width provided by the `column_width` param
     #   with which the Table was initialized.
@@ -132,7 +160,7 @@ module Tabulo
     # @raise [InvalidColumnLabelError] if label has already been used for another column in this
     #   Table. (This is case-sensitive, but is insensitive to whether a String or Symbol is passed
     #   to the label parameter.)
-    def add_column(label, header: nil, align_header: :center, align_body: nil,
+    def add_column(label, header: nil, align_header: nil, align_body: nil,
       width: nil, formatter: :to_s.to_proc, &extractor)
 
       column_label = label.to_sym
@@ -144,8 +172,8 @@ module Tabulo
       @column_registry[column_label] =
         Column.new(
           header: (header || label).to_s,
-          align_header: align_header,
-          align_body: align_body,
+          align_header: align_header || @align_header,
+          align_body: align_body || @align_body,
           width: (width || @default_column_width),
           formatter: formatter,
           extractor: (extractor || label.to_proc)
@@ -221,19 +249,21 @@ module Tabulo
     # is called. If the source Enumerable changes between that point, and the point when
     # the Table is printed, then columns will *not* be resized yet again on printing.
     #
-    # @param [nil, Numeric] max_table_width (nil) If provided, stops the total table
-    #   width (including padding and borders) from expanding beyond this number of characters.
+    # @param [nil, Numeric] max_table_width (:auto) With no args, or if passed <tt>:auto</tt>,
+    #   stops the total table width (including padding and borders) from expanding beyond the
+    #   bounds of the terminal screen.
+    #   If passed <tt>nil</tt>, the table width will not be capped.
     #   Width is deducted from columns if required to achieve this, with one character progressively
     #   deducted from the width of the widest column until the target is reached. When the
     #   table is printed, wrapping or truncation will then occur in these columns as required
-    #   (depending on how they were configured). Note that regardless of the value passed to
-    #   max_table_width, the table will always be left wide enough to accommodate at least
-    #   1 character's width of content, 1 character of left padding and 1 character of right padding
-    #   in each column, together with border characters (1 on each side of the table and 1 between
-    #   adjacent columns). I.e. there is a certain width below width the Table will refuse to
-    #   shrink itself.
+    #   (depending on how they were configured).
+    #   Note that regardless of the value passed to max_table_width, the table will always be left wide
+    #   enough to accommodate at least 1 character's width of content, 1 character of left padding and
+    #   1 character of right padding in each column, together with border characters (1 on each side
+    #   of the table and 1 between adjacent columns). I.e. there is a certain width below width the
+    #   Table will refuse to shrink itself.
     # @return [Table] the Table itself
-    def shrinkwrap!(max_table_width: nil)
+    def pack(max_table_width: :auto)
       return self if column_registry.none?
       columns = column_registry.values
 
@@ -247,28 +277,46 @@ module Tabulo
       end
 
       if max_table_width
-        total_columns_width = columns.inject(0) { |sum, column| sum + column.width }
-        total_padding = column_registry.count * @column_padding * 2
-        total_borders = column_registry.count + 1
-        unadjusted_table_width = total_columns_width + total_padding + total_borders
-
-        # Ensure max table width is at least wide enough to accommodate table borders and padding
-        # and one character of content.
-        min_table_width = total_padding + total_borders + column_registry.count
-        max_table_width = min_table_width if min_table_width > max_table_width
-
-        required_reduction = [unadjusted_table_width - max_table_width, 0].max
-
-        required_reduction.times do
-          widest_column = columns.inject(columns.first) do |widest, column|
-            column.width >= widest.width ? column : widest
-          end
-
-          widest_column.width -= 1
-        end
+        max_table_width = TTY::Screen.width if max_table_width == :auto
+        shrink_to(max_table_width)
       end
 
       self
+    end
+
+    # @deprecated Use {#pack} instead.
+    #
+    # Reset all the column widths so that each column is *just* wide enough to accommodate
+    # its header text as well as the formatted content of each its cells for the entire
+    # collection, together with a single character of padding on either side of the column,
+    # without any wrapping.
+    #
+    # Note that calling this method will cause the entire source Enumerable to
+    # be traversed and all the column extractors and formatters to be applied in order
+    # to calculate the required widths.
+    #
+    # Note also that this method causes column widths to be fixed as appropriate to the
+    # formatted cell contents given the state of the source Enumerable at the point it
+    # is called. If the source Enumerable changes between that point, and the point when
+    # the Table is printed, then columns will *not* be resized yet again on printing.
+    #
+    # @param [nil, Numeric] max_table_width (nil) If provided, stops the total table
+    #   width (including padding and borders) from expanding beyond this number of characters.
+    #   If passed <tt>:auto</tt>, the table width will automatically be capped at the current
+    #   terminal width.
+    #   Width is deducted from columns if required to achieve this, with one character progressively
+    #   deducted from the width of the widest column until the target is reached. When the
+    #   table is printed, wrapping or truncation will then occur in these columns as required
+    #   (depending on how they were configured).
+    #   Note that regardless of the value passed to max_table_width, the table will always be left wide
+    #   enough to accommodate at least 1 character's width of content, 1 character of left padding and
+    #   1 character of right padding in each column, together with border characters (1 on each side
+    #   of the table and 1 between adjacent columns). I.e. there is a certain width below width the
+    #   Table will refuse to shrink itself.
+    # @return [Table] the Table itself
+    def shrinkwrap!(max_table_width: nil)
+      Deprecation.warn("`Tabulo::Table#shrinkwrap!'", "`#pack'")
+      pack(max_table_width: max_table_width)
     end
 
     # @!visibility private
@@ -283,6 +331,29 @@ module Tabulo
     end
 
     private
+
+    # @!visibility private
+    def shrink_to(max_table_width)
+      columns = column_registry.values
+      total_columns_width = columns.inject(0) { |sum, column| sum + column.width }
+      total_padding = column_registry.count * @column_padding * 2
+      total_borders = column_registry.count + 1
+      unadjusted_table_width = total_columns_width + total_padding + total_borders
+
+      # Ensure max table width is at least wide enough to accommodate table borders and padding
+      # and one character of content.
+      min_table_width = total_padding + total_borders + column_registry.count
+      max_table_width = min_table_width if min_table_width > max_table_width
+      required_reduction = [unadjusted_table_width - max_table_width, 0].max
+
+      required_reduction.times do
+        widest_column = columns.inject(columns.first) do |widest, column|
+          column.width >= widest.width ? column : widest
+        end
+
+        widest_column.width -= 1
+      end
+    end
 
     # @!visibility private
     def body_row(source, with_header: false)

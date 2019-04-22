@@ -22,7 +22,7 @@ module Tabulo
     def body_subcells(source)
       cell_datum = body_cell_value(source)
       formatted_content = @formatter.call(cell_datum)
-      real_alignment = (@align_body || infer_alignment(cell_datum))
+      real_alignment = (@align_body == :auto ? infer_alignment(cell_datum) : @align_body)
       infilled_subcells(formatted_content, real_alignment)
     end
 

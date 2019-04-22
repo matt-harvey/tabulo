@@ -9,8 +9,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Matthew Harvey"]
   spec.email         = ["software@matthewharvey.net"]
 
-  spec.summary       = "Enumerable ASCII table"
-  spec.description   = "Enumerable ASCII table"
+  spec.summary       = "Enumerable ASCII terminal table"
+  spec.description   = "Enumerable ASCII terminal table"
   spec.homepage      = "https://github.com/matt-harvey/tabulo"
   spec.license       = "MIT"
 
@@ -27,6 +27,8 @@ Gem::Specification.new do |spec|
     "source_code_uri" => "https://github.com/matt-harvey/tabulo",
     "changelog_uri"   => "https://raw.githubusercontent.com/matt-harvey/tabulo/master/CHANGELOG.md"
   }
+
+  spec.add_runtime_dependency "tty-screen", "0.6.5"
 
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "rake", "~> 11.0"

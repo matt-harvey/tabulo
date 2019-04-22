@@ -2,6 +2,10 @@ require "spec_helper"
 
 describe Tabulo::Table do
 
+  around(:all) do |group|
+    Tabulo::Deprecation.without_warnings { group.run }
+  end
+
   let(:table) do
     Tabulo::Table.new(
       source,
@@ -39,6 +43,29 @@ describe Tabulo::Table do
   end
 
   describe "#initialize / #to_s" do
+    describe "`cols` param" do
+      it "accepts symbols corresponding to methods on the source objects" do
+        expect(Tabulo::Table.new([1, 2, 3], :to_i, :to_f).to_s).to eq \
+          %q(+--------------+--------------+
+             |     to_i     |     to_f     |
+             +--------------+--------------+
+             |            1 |          1.0 |
+             |            2 |          2.0 |
+             |            3 |          3.0 |).gsub(/^ +/, "")
+      end
+
+      it "raises Tabulo::InvalidColumnLabelError if symbols are not unique" do
+        expect { Tabulo::Table.new([1, 2, 3], :to_i, :to_i) }.to \
+          raise_error(Tabulo::InvalidColumnLabelError)
+      end
+
+      it "does not issue a deprecation warning" do
+        expect(Tabulo::Deprecation).not_to receive(:warn)
+
+        Tabulo::Table.new([1, 2, 3], :to_i, :to_s)
+      end
+    end
+
     describe "`columns` param" do
       it "accepts symbols corresponding to methods on the source objects" do
         expect(Tabulo::Table.new([1, 2, 3], columns: [:to_i, :to_f]).to_s).to eq \
@@ -53,6 +80,13 @@ describe Tabulo::Table do
       it "raises Tabulo::InvalidColumnLabelError if symbols are not unique" do
         expect { Tabulo::Table.new([1, 2, 3], columns: [:to_i, :to_i]) }.to \
           raise_error(Tabulo::InvalidColumnLabelError)
+      end
+
+      it "issues a deprecation warning" do
+        expect(Tabulo::Deprecation).to receive(:warn).
+          with("`columns' option to Tabulo::Table#initialize", "the variable length parameter `cols'", 2)
+
+        Tabulo::Table.new([1, 2, 3], columns: [:to_i, :to_s])
       end
     end
 
@@ -440,7 +474,7 @@ describe Tabulo::Table do
 
       context "when passed something other than nil or a single-character String" do
         subject do
-          Tabulo::Table.new(source, columns: [], horizontal_rule_character: horizontal_rule_character)
+          Tabulo::Table.new(source, horizontal_rule_character: horizontal_rule_character)
         end
 
         context "when passed an empty string" do
@@ -506,7 +540,7 @@ describe Tabulo::Table do
 
       context "when passed something other than nil or a single-character String" do
         subject do
-          Tabulo::Table.new(source, columns: [], vertical_rule_character: vertical_rule_character)
+          Tabulo::Table.new(source, vertical_rule_character: vertical_rule_character)
         end
 
         context "when passed an empty string" do
@@ -572,7 +606,7 @@ describe Tabulo::Table do
 
       context "when passed something other than nil or a single-character String" do
         subject do
-          Tabulo::Table.new(source, columns: [], intersection_character: intersection_character)
+          Tabulo::Table.new(source, intersection_character: intersection_character)
         end
 
         context "when passed an empty string" do
@@ -645,7 +679,7 @@ describe Tabulo::Table do
 
       context "when passed something other than nil or a single-character String" do
         subject do
-          Tabulo::Table.new(source, columns: [], truncation_indicator: truncation_indicator)
+          Tabulo::Table.new(source, truncation_indicator: truncation_indicator)
         end
 
         context "when passed an empty string" do
@@ -674,7 +708,7 @@ describe Tabulo::Table do
       end
     end
 
-    describe "column_padding param" do
+    describe "`column_padding` param" do
       context "by default" do
         it "determines the amount of padding on either side of each column to be 1" do
           expect(table.to_s).to eq \
@@ -719,6 +753,100 @@ describe Tabulo::Table do
                |           4|           8|
                |           5|          10|).gsub(/^ +/, "")
         end
+      end
+    end
+
+    describe "`align_header` param" do
+      let(:table) do
+        Tabulo::Table.new(
+          source,
+          column_width: column_width,
+          header_frequency: header_frequency,
+          wrap_header_cells_to: wrap_header_cells_to,
+          wrap_body_cells_to: wrap_body_cells_to,
+          horizontal_rule_character: horizontal_rule_character,
+          vertical_rule_character: vertical_rule_character,
+          intersection_character: intersection_character,
+          truncation_indicator: truncation_indicator,
+          column_padding: column_padding,
+          align_header: :left
+        ) do |t|
+          t.add_column("N") { |n| n }
+          t.add_column("Doubled") { |n| n * 2 }
+        end
+      end
+
+      it "sets the default header alignment for columns in the table" do
+        expect(table.to_s).to eq \
+          %q(+--------------+--------------+
+             | N            | Doubled      |
+             +--------------+--------------+
+             |            1 |            2 |
+             |            2 |            4 |
+             |            3 |            6 |
+             |            4 |            8 |
+             |            5 |           10 |).gsub(/^ +/, "")
+      end
+
+      it "sets a default header alignment that can be overriden via #add_column" do
+        table.add_column(:even?, header: "Even?", align_header: :right)
+
+        expect(table.to_s).to eq \
+          %q(+--------------+--------------+--------------+
+             | N            | Doubled      |        Even? |
+             +--------------+--------------+--------------+
+             |            1 |            2 |     false    |
+             |            2 |            4 |     true     |
+             |            3 |            6 |     false    |
+             |            4 |            8 |     true     |
+             |            5 |           10 |     false    |).gsub(/^ +/, "")
+      end
+    end
+
+    describe "`align_body` param" do
+      let(:table) do
+        Tabulo::Table.new(
+          source,
+          column_width: column_width,
+          header_frequency: header_frequency,
+          wrap_header_cells_to: wrap_header_cells_to,
+          wrap_body_cells_to: wrap_body_cells_to,
+          horizontal_rule_character: horizontal_rule_character,
+          vertical_rule_character: vertical_rule_character,
+          intersection_character: intersection_character,
+          truncation_indicator: truncation_indicator,
+          column_padding: column_padding,
+          align_body: :left
+        ) do |t|
+          t.add_column("N") { |n| n }
+          t.add_column("Doubled") { |n| n * 2 }
+        end
+      end
+
+      it "sets the default body cell alignment for columns in the table" do
+        expect(table.to_s).to eq \
+          %q(+--------------+--------------+
+             |       N      |    Doubled   |
+             +--------------+--------------+
+             | 1            | 2            |
+             | 2            | 4            |
+             | 3            | 6            |
+             | 4            | 8            |
+             | 5            | 10           |).gsub(/^ +/, "")
+      end
+
+      it "sets a default body cell alignment that can be overriden via #add_column" do
+        table.add_column(:even?, header: "Even?", align_body: :right)
+
+        expect(table.to_s).to eq \
+          %q(+--------------+--------------+--------------+
+             |       N      |    Doubled   |     Even?    |
+             +--------------+--------------+--------------+
+             | 1            | 2            |        false |
+             | 2            | 4            |         true |
+             | 3            | 6            |        false |
+             | 4            | 8            |         true |
+             | 5            | 10           |        false |).gsub(/^ +/, "")
       end
     end
   end
@@ -909,6 +1037,307 @@ describe Tabulo::Table do
     end
   end
 
+  describe "#pack" do
+    let(:column_width) { 8 }
+
+    before(:each) do
+      table.add_column(:to_s)
+      table.add_column("Is it\neven?") { |n| n.even? }
+      table.add_column("dec", formatter: -> (n) { "%.#{n}f" % n }) { |n| n }
+      table.add_column("word\nyep", width: 5) { |n| "w" * n * 2 }
+      table.add_column("cool") { |n| "two\nlines" if n == 3 }
+    end
+
+    it "returns the Table itself" do
+      expect(table.pack(max_table_width: [nil, 64, 47].sample)).to eq(table)
+    end
+
+    it "does not issue a deprecation warning" do
+      expect(Tabulo::Deprecation).not_to receive(:warn)
+
+      table.pack
+    end
+
+    context "when `max_table_width` is nil" do
+      it "expands or contracts the column widths of the table as necessary so that they just "\
+        "accommodate their header and formatted body contents without wrapping (assuming "\
+        "source data is constant), except insofar as is required to honour newlines within "\
+        "the cell content", :aggregate_failures do
+
+        # Check that it adjusts column widths by shrinking
+        expect { table.pack }.to change(table, :to_s).from(
+          %q(+----------+----------+----------+----------+----------+-------+----------+
+             |     N    |  Doubled |   to_s   |   Is it  |    dec   |  word |   cool   |
+             |          |          |          |   even?  |          |  yep  |          |
+             +----------+----------+----------+----------+----------+-------+----------+
+             |        1 |        2 | 1        |   false  |      1.0 | ww    |          |
+             |        2 |        4 | 2        |   true   |     2.00 | wwww  |          |
+             |        3 |        6 | 3        |   false  |    3.000 | wwwww | two      |
+             |          |          |          |          |          | w     | lines    |
+             |        4 |        8 | 4        |   true   |   4.0000 | wwwww |          |
+             |          |          |          |          |          | www   |          |
+             |        5 |       10 | 5        |   false  |  5.00000 | wwwww |          |
+             |          |          |          |          |          | wwwww |          |).gsub(/^ +/, "")
+
+        ).to(
+          %q(+---+---------+------+-------+---------+------------+-------+
+             | N | Doubled | to_s | Is it |   dec   |    word    |  cool |
+             |   |         |      | even? |         |     yep    |       |
+             +---+---------+------+-------+---------+------------+-------+
+             | 1 |       2 | 1    | false |     1.0 | ww         |       |
+             | 2 |       4 | 2    |  true |    2.00 | wwww       |       |
+             | 3 |       6 | 3    | false |   3.000 | wwwwww     | two   |
+             |   |         |      |       |         |            | lines |
+             | 4 |       8 | 4    |  true |  4.0000 | wwwwwwww   |       |
+             | 5 |      10 | 5    | false | 5.00000 | wwwwwwwwww |       |).gsub(/^ +/, "")
+        )
+
+        # Let's do a quick check to make sure that it will also expand the total table width if required.
+        small_table = Tabulo::Table.new(%w(hello goodbye), column_width: 3) do |t|
+          t.add_column(:itself) { |s| s }
+        end
+        expect { small_table.pack }.to change(small_table, :to_s).from(
+          %q(+-----+
+             | its |
+             | elf |
+             +-----+
+             | hel |
+             | lo  |
+             | goo |
+             | dby |
+             | e   |).gsub(/^ +/, "")
+        ).to(
+          %q(+---------+
+             |  itself |
+             +---------+
+             | hello   |
+             | goodbye |).gsub(/^ +/, "")
+        )
+      end
+    end
+
+    context "when `max_table_width` is nil" do
+      context "when column_padding is > 1" do
+        let(:column_padding) { 2 }
+
+        it "expands or contracts the column widths of the table as necessary so that they just "\
+          "accommodate their header and formatted body contents without wrapping (assuming "\
+          "source data is constant), inclusive of additional padding, except insofar as is "\
+          "required to honour newlines within the cell content" do
+
+          # Check that it adjusts column widths by shrinking
+          expect { table.pack }.to change(table, :to_s).to(
+            %q(+-----+-----------+--------+---------+-----------+--------------+---------+
+               |  N  |  Doubled  |  to_s  |  Is it  |    dec    |     word     |   cool  |
+               |     |           |        |  even?  |           |      yep     |         |
+               +-----+-----------+--------+---------+-----------+--------------+---------+
+               |  1  |        2  |  1     |  false  |      1.0  |  ww          |         |
+               |  2  |        4  |  2     |   true  |     2.00  |  wwww        |         |
+               |  3  |        6  |  3     |  false  |    3.000  |  wwwwww      |  two    |
+               |     |           |        |         |           |              |  lines  |
+               |  4  |        8  |  4     |   true  |   4.0000  |  wwwwwwww    |         |
+               |  5  |       10  |  5     |  false  |  5.00000  |  wwwwwwwwww  |         |).gsub(/^ +/, "")
+          )
+        end
+      end
+    end
+
+    context "when `max_table_width` is passed an integer (assuming source data is constant)" do
+      context "when `max_table_width` is wider than the existing table width" do
+        it "amends the column widths of the table so that they just accommodate their header and "\
+          "formatted body contents without wrapping (assuming source data is constant), except "\
+          "insofar as is required to honour newlines within the cell content " do
+
+          expect { table.pack(max_table_width: 64) }.to change(table, :to_s).from(
+            %q(+----------+----------+----------+----------+----------+-------+----------+
+               |     N    |  Doubled |   to_s   |   Is it  |    dec   |  word |   cool   |
+               |          |          |          |   even?  |          |  yep  |          |
+               +----------+----------+----------+----------+----------+-------+----------+
+               |        1 |        2 | 1        |   false  |      1.0 | ww    |          |
+               |        2 |        4 | 2        |   true   |     2.00 | wwww  |          |
+               |        3 |        6 | 3        |   false  |    3.000 | wwwww | two      |
+               |          |          |          |          |          | w     | lines    |
+               |        4 |        8 | 4        |   true   |   4.0000 | wwwww |          |
+               |          |          |          |          |          | www   |          |
+               |        5 |       10 | 5        |   false  |  5.00000 | wwwww |          |
+               |          |          |          |          |          | wwwww |          |).gsub(/^ +/, "")
+
+          ).to(
+            %q(+---+---------+------+-------+---------+------------+-------+
+               | N | Doubled | to_s | Is it |   dec   |    word    |  cool |
+               |   |         |      | even? |         |     yep    |       |
+               +---+---------+------+-------+---------+------------+-------+
+               | 1 |       2 | 1    | false |     1.0 | ww         |       |
+               | 2 |       4 | 2    |  true |    2.00 | wwww       |       |
+               | 3 |       6 | 3    | false |   3.000 | wwwwww     | two   |
+               |   |         |      |       |         |            | lines |
+               | 4 |       8 | 4    |  true |  4.0000 | wwwwwwww   |       |
+               | 5 |      10 | 5    | false | 5.00000 | wwwwwwwwww |       |).gsub(/^ +/, "")
+
+          )
+        end
+      end
+
+      context "when `max_table_width` is too narrow to accommodate the packed columns" do
+        it "amends the column widths of the table so that they just accommodate their header and "\
+          "formatted body contents (assuming source data is constant) (except insofar as it required "\
+          "to honour newlines within existing cell content), except that width is progressively "\
+          "removed from the widest column until the table fits the passed width" do
+
+          expect { table.pack(max_table_width: 55) }.to change(table, :to_s).from(
+            %q(+----------+----------+----------+----------+----------+-------+----------+
+               |     N    |  Doubled |   to_s   |   Is it  |    dec   |  word |   cool   |
+               |          |          |          |   even?  |          |  yep  |          |
+               +----------+----------+----------+----------+----------+-------+----------+
+               |        1 |        2 | 1        |   false  |      1.0 | ww    |          |
+               |        2 |        4 | 2        |   true   |     2.00 | wwww  |          |
+               |        3 |        6 | 3        |   false  |    3.000 | wwwww | two      |
+               |          |          |          |          |          | w     | lines    |
+               |        4 |        8 | 4        |   true   |   4.0000 | wwwww |          |
+               |          |          |          |          |          | www   |          |
+               |        5 |       10 | 5        |   false  |  5.00000 | wwwww |          |
+               |          |          |          |          |          | wwwww |          |).gsub(/^ +/, "")
+          ).to(
+            %q(+---+--------+------+-------+--------+--------+-------+
+               | N | Double | to_s | Is it |   dec  |  word  |  cool |
+               |   |    d   |      | even? |        |   yep  |       |
+               +---+--------+------+-------+--------+--------+-------+
+               | 1 |      2 | 1    | false |    1.0 | ww     |       |
+               | 2 |      4 | 2    |  true |   2.00 | wwww   |       |
+               | 3 |      6 | 3    | false |  3.000 | wwwwww | two   |
+               |   |        |      |       |        |        | lines |
+               | 4 |      8 | 4    |  true | 4.0000 | wwwwww |       |
+               |   |        |      |       |        | ww     |       |
+               | 5 |     10 | 5    | false | 5.0000 | wwwwww |       |
+               |   |        |      |       |      0 | wwww   |       |).gsub(/^ +/, "")
+          )
+        end
+
+        context "when column_padding is > 1" do
+          let(:column_padding) { 2 }
+
+          it "amends the column widths of the table so that they just accommodate their header and "\
+            "formatted body contents (assuming source data is constant) (except insofar as it required "\
+            "to honour newlines within existing cell content), including additional padding, except "\
+            "that width is progressively removed from the widest column until the table fits the "\
+            "passed width" do
+
+            expect { table.pack(max_table_width: 69) }.to change(table, :to_s).from(
+              %q(+------------+------------+------------+------------+------------+---------+------------+
+                 |      N     |   Doubled  |    to_s    |    Is it   |     dec    |   word  |    cool    |
+                 |            |            |            |    even?   |            |   yep   |            |
+                 +------------+------------+------------+------------+------------+---------+------------+
+                 |         1  |         2  |  1         |    false   |       1.0  |  ww     |            |
+                 |         2  |         4  |  2         |    true    |      2.00  |  wwww   |            |
+                 |         3  |         6  |  3         |    false   |     3.000  |  wwwww  |  two       |
+                 |            |            |            |            |            |  w      |  lines     |
+                 |         4  |         8  |  4         |    true    |    4.0000  |  wwwww  |            |
+                 |            |            |            |            |            |  www    |            |
+                 |         5  |        10  |  5         |    false   |   5.00000  |  wwwww  |            |
+                 |            |            |            |            |            |  wwwww  |            |).gsub(/^ +/, "")
+            ).to(
+              %q(+-----+----------+--------+---------+----------+----------+---------+
+                 |  N  |  Double  |  to_s  |  Is it  |    dec   |   word   |   cool  |
+                 |     |     d    |        |  even?  |          |    yep   |         |
+                 +-----+----------+--------+---------+----------+----------+---------+
+                 |  1  |       2  |  1     |  false  |     1.0  |  ww      |         |
+                 |  2  |       4  |  2     |   true  |    2.00  |  wwww    |         |
+                 |  3  |       6  |  3     |  false  |   3.000  |  wwwwww  |  two    |
+                 |     |          |        |         |          |          |  lines  |
+                 |  4  |       8  |  4     |   true  |  4.0000  |  wwwwww  |         |
+                 |     |          |        |         |          |  ww      |         |
+                 |  5  |      10  |  5     |  false  |  5.0000  |  wwwwww  |         |
+                 |     |          |        |         |       0  |  wwww    |         |).gsub(/^ +/, "")
+            )
+          end
+        end
+
+        context "when column_padding is 0" do
+          let(:column_padding) { 0 }
+
+          it "amends the column widths of the table so that they just accommodate their header and "\
+            "formatted body contents (assuming source data is constant) (except insofar as it required "\
+            "to honour newlines within existing cell content), with no padding, except "\
+            "that width is progressively removed from the widest column until the table fits the "\
+            "passed width" do
+
+            expect { table.pack(max_table_width: 41) }.to change(table, :to_s).from(
+              %q(+--------+--------+--------+--------+--------+-----+--------+
+                 |    N   | Doubled|  to_s  |  Is it |   dec  | word|  cool  |
+                 |        |        |        |  even? |        | yep |        |
+                 +--------+--------+--------+--------+--------+-----+--------+
+                 |       1|       2|1       |  false |     1.0|ww   |        |
+                 |       2|       4|2       |  true  |    2.00|wwww |        |
+                 |       3|       6|3       |  false |   3.000|wwwww|two     |
+                 |        |        |        |        |        |w    |lines   |
+                 |       4|       8|4       |  true  |  4.0000|wwwww|        |
+                 |        |        |        |        |        |www  |        |
+                 |       5|      10|5       |  false | 5.00000|wwwww|        |
+                 |        |        |        |        |        |wwwww|        |).gsub(/^ +/, "")
+            ).to(
+              %q(+-+------+----+-----+------+------+-----+
+                 |N|Double|to_s|Is it|  dec | word | cool|
+                 | |   d  |    |even?|      |  yep |     |
+                 +-+------+----+-----+------+------+-----+
+                 |1|     2|1   |false|   1.0|ww    |     |
+                 |2|     4|2   | true|  2.00|wwww  |     |
+                 |3|     6|3   |false| 3.000|wwwwww|two  |
+                 | |      |    |     |      |      |lines|
+                 |4|     8|4   | true|4.0000|wwwwww|     |
+                 | |      |    |     |      |ww    |     |
+                 |5|    10|5   |false|5.0000|wwwwww|     |
+                 | |      |    |     |     0|wwww  |     |).gsub(/^ +/, "")
+            )
+          end
+        end
+      end
+
+      context "when `max_table_width` is very small" do
+        it "only reduces column widths to the extent that there is at least a character's width "\
+          "available in each column for content, plus one character of padding on either side" do
+          table = Tabulo::Table.new(%w(hi there)) do |t|
+            t.add_column(:itself) { |s| s }
+            t.add_column(:length)
+          end
+          table.pack(max_table_width: 3)
+
+          expect(table.to_s).to eq \
+            %q(+---+---+
+               | i | l |
+               | t | e |
+               | s | n |
+               | e | g |
+               | l | t |
+               | f | h |
+               +---+---+
+               | h | 2 |
+               | i |   |
+               | t | 5 |
+               | h |   |
+               | e |   |
+               | r |   |
+               | e |   |).gsub(/^ +/, "")
+        end
+      end
+
+      context "when `max_table_width` is passed :auto" do
+        it "caps the table width at the screen width, as returned by TTY::Screen.width" do
+          allow(TTY::Screen).to receive(:width).and_return(13)
+          table = Tabulo::Table.new(1..3, :to_i, :to_f)
+          table.pack(max_table_width: :auto)
+          expect(table.to_s).to eq \
+            %q(+-----+-----+
+               | to_ | to_ |
+               |  i  |  f  |
+               +-----+-----+
+               |   1 | 1.0 |
+               |   2 | 2.0 |
+               |   3 | 3.0 |).gsub(/^ +/, "")
+        end
+      end
+    end
+  end
+
   describe "#shrinkwrap" do
     let(:column_width) { 8 }
 
@@ -922,6 +1351,12 @@ describe Tabulo::Table do
 
     it "returns the Table itself" do
       expect(table.shrinkwrap!(max_table_width: [nil, 64, 47].sample)).to eq(table)
+    end
+
+    it "issues deprecation warning" do
+      expect(Tabulo::Deprecation).to receive(:warn).with("`Tabulo::Table#shrinkwrap!'", "`#pack'")
+
+      table.shrinkwrap!
     end
 
     context "when `max_table_width` is not provided" do
@@ -1183,6 +1618,22 @@ describe Tabulo::Table do
                | e |   |
                | r |   |
                | e |   |).gsub(/^ +/, "")
+        end
+      end
+
+      context "when `max_table_width` is passed :auto" do
+        it "caps the table width at the screen width, as returned by TTY::Screen.width" do
+          allow(TTY::Screen).to receive(:width).and_return(13)
+          table = Tabulo::Table.new(1..3, :to_i, :to_f)
+          table.shrinkwrap!(max_table_width: :auto)
+          expect(table.to_s).to eq \
+            %q(+-----+-----+
+               | to_ | to_ |
+               |  i  |  f  |
+               +-----+-----+
+               |   1 | 1.0 |
+               |   2 | 2.0 |
+               |   3 | 3.0 |).gsub(/^ +/, "")
         end
       end
     end
