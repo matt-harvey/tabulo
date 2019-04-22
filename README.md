@@ -560,15 +560,15 @@ There are other terminal table generators for Ruby. Popular among these are:
 * [terminal-table](https://github.com/tj/terminal-table)
 * [table\_print](https://github.com/arches/table_print)
 
-*DISCLAIMER: My comments regarding these other libraries are based only on my own,
-possibly-flawed, reading of the documentation for, and experimentation with, these libraries at the
-time of my writing this. Their APIs, features or documentation may well change between when I write this, and
-when you read it&mdash;possibly in ways that address the issues I describe here!*
+*DISCLAIMER: My comments regarding these other libraries are based only on my own, possibly flawed
+reading of the documentation for, and experimentation with, these libraries at the time of my
+writing this. Their APIs, features or documentation may well change between when I write this, and
+when you read it. Please consult the libraries' own documentation for yourself, rather than relying
+on these comments.*
 
-These are excellent libraries, and each has its strengths. However, I personally found that for the
-common use case of printing a table on the basis of some underlying collection (such as an
-ActiveRecord query result), using these libraries in practice was more cumbersome than it needed to
-be.
+While these libraries have their strengths, I personally found that for the common use case of
+printing a table on the basis of some underlying enumerable collection (such as an ActiveRecord
+query result), using these libraries felt more cumbersome than it needed to be.
 
 For example, suppose we have called `User.all` from the Rails console, and want to print
 a table showing the email, first name, last name and ID of each user,
@@ -586,17 +586,17 @@ puts table
 
 The problem here is that there is no single source of knowledge about which columns
 appear, and in which order. If we want to add another column to the left of "email",
-we need to amend the rows map, and the headings map, and the index passed to `align_column`.
+we need to amend the rows array, and the headings array, and the index passed to `align_column`.
 We bear the burden of keeping these three in sync. This is not be a big deal for small one-off
 tables, but for tables that have many columns, or that are constructed
 dynamically based on user input or other runtime factors determining the columns
 to be included, this can be a hassle and a source of brittleness.
 
 `tty-table` has a somewhat different API to `terminal-table`. It offers both a
-"row-based" and a "column-based" method of initializing a table. We won't cover
-the row-based method here, but it is similar to `terminal-table`'s in that it
-burdens the developer with syncing the column ordering across multiple code
-locations. The "column-based" API for `tty-table`, on the other hand, looks like this:
+"row-based" and a "column-based" method of initializing a table. The row-based method
+is similar to `terminal-table`'s in that it burdens the developer with syncing the
+column ordering across multiple code locations. The "column-based" API for `tty-table`, on
+the other hand, seems to avoid this problem. One way of using it is like this:
 
 ```ruby
 users = User.all
