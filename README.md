@@ -180,7 +180,7 @@ table = Tabulo::Table.new([1, 2], :itself, :even?, align_header: :left, align_bo
 ```
 
 The table-level alignment settings can be overridden for individual columns by
-passing similarly-named options passed to `add_column`, e.g.:
+passing similarly-named options to `add_column`, e.g.:
 
 ```ruby
 table.add_column("Doubled", align_header: :right, align_body: :left) { |n| n * 2 }
