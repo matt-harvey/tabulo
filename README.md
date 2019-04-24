@@ -6,10 +6,10 @@
 [![Build Status][BS img]][Build Status]
 [![Code Climate][CC img]][Code Climate]
 
-Tabulo is an ASCII terminal table generator for Ruby.
+Tabulo is an ASCII table generator for Ruby.
 
-It offers a DRY, "column-centric" interface, and is designed so that even large, unwieldly data sets can
-be tabulated readably with a minimum of fuss.
+It offers a DRY, "column-centric" interface, and is designed to make it very easy it produce highly
+readable tables, even from large and unwieldy data sets and streams.
 
 ## Overview
 
@@ -47,21 +47,23 @@ end
 
 ## Features
 
-* Lets you set [fixed column widths](#fixed-column-widths), then either [wrap](#overflow-handling) or
-  [truncate](#overflow-handling) the overflow.
-* Alternatively, ["pack"](#pack) the table so that each column is automatically just wide enough for its
-  contents, but [without overflowing the terminal horizontally](#max-table-width).
-* Alignment of cell content is [configurable](#cell-alignment), but has helpful content-based defaults
-  (numbers right, strings left).
-* Headers are [repeatable](#repeating-headers).
-* Newlines within cell content are correctly handled.
-* A `Tabulo::Table` is an `Enumerable`, so you can [step through it](#enumerator) a row at a time,
-  printing as you go, without waiting for the entire underlying collection to load.
-* Each `Tabulo::Row` is also an `Enumerable`, [providing access](#accessing-cell-values) to the underlying cell values.
+* Lets you set [fixed column widths](#fixed-column-widths), then either [wrap](#overflow-handling)
+  or [truncate](#overflow-handling) the overflow.
+* Alternatively, ["pack"](#pack) the table so that each column is automatically just wide enough for
+  its contents, but [without overflowing the terminal horizontally](#max-table-width).
+* Alignment of cell content is [configurable](#cell-alignment), but has helpful content-based
+  defaults (numbers right, strings left).
 * Tabulate any `Enumerable`: the underlying collection need not be an array.
+* Since a `Tabulo::Table` is itself also an `Enumerable`, you can [step through it](#enumerator) a
+  row at a time, printing as you go, without waiting for the entire underlying collection to load.
+  In other words, you get a [streaming interface](#enumerator) for free.
+* Each `Tabulo::Row` is also an `Enumerable`, [providing access](#accessing-cell-values) to the
+  underlying cell values.
+* The header row can be [repeated](#repeating-headers) at arbitrary intervals.
+* Newlines within cell content are correctly handled.
 * [Customize](#additional-configuration-options) border and divider characters.
-* Use a [DRY interface](#configuring-columns): by being "column based", it is designed to spare the
-  developer the burden of syncing the ordering within the header row with that of the body rows.
+* Use a [DRY initialization interface](#configuring-columns): by being "column based", it is
+  designed to spare the developer the burden of syncing the ordering within the header row with that of the body rows.
 
 Tabulo has also been ported to Crystal (with some modifications): see [Tablo](https://github.com/hutou/tablo).
 
@@ -559,8 +561,8 @@ table = Tabulo::Table.new(1..3, :itself, :even?)
 
 There are other terminal table generators for Ruby. Popular among these are:
 
-* [tty-table](https://github.com/piotrmurach/tty-table)
 * [terminal-table](https://github.com/tj/terminal-table)
+* [tty-table](https://github.com/piotrmurach/tty-table)
 * [table\_print](https://github.com/arches/table_print)
 
 *DISCLAIMER: My comments regarding these other libraries are based only on my own, possibly flawed
