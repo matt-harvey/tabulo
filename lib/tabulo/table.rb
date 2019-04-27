@@ -319,19 +319,12 @@ module Tabulo
     # @raise [InvalidHorizontalRuleCharacterError] if invalid argument passed to horizontal_rule_character.
     # @raise [InvalidVerticalRuleCharacterError] if invalid argument passed to vertical_rule_character.
     def transpose(opts = {})
-      default_opts = {
-        column_width: @default_column_width,
-        column_padding: @column_padding,
-        header_frequency: @header_frequency,
-        wrap_header_cells_to: @wrap_header_cells_to,
-        wrap_body_cells_to: @wrap_body_cells_to,
-        horizontal_rule_character: @horizontal_rule_character,
-        vertical_rule_character: @vertical_rule_character,
-        intersection_character: @intersection_character,
-        truncation_indicator: @truncation_indicator,
-        align_header: @align_header,
-        align_body: @align_body,
-      }
+      default_opts = { column_width: @default_column_width, column_padding: @column_padding,
+        header_frequency: @header_frequency, wrap_header_cells_to: @wrap_header_cells_to,
+        wrap_body_cells_to: @wrap_body_cells_to, horizontal_rule_character: @horizontal_rule_character,
+        vertical_rule_character: @vertical_rule_character, intersection_character: @intersection_character,
+        truncation_indicator: @truncation_indicator, align_header: @align_header, align_body: @align_body }
+
       initializer_opts = default_opts.merge(Util.slice_hash(opts, *default_opts.keys))
       default_extra_opts = { field_names_width: nil, field_names_header: "",
         field_names_body_alignment: :right, field_names_header_alignment: :right, headers: :to_s.to_proc }
@@ -343,16 +336,11 @@ module Tabulo
       Table.new(fields, **initializer_opts) do |t|
 
         # Left hand column of new table, containing field names
-        initial_column_width =
-          if extra_opts[:field_names_width].nil?
-            fields.map { |field| field.header.length }.max
-          else
-            extra_opts[:field_names_width]
-          end
+        width_opt = extra_opts[:field_names_width]
+        field_names_width = (width_opt.nil? ? fields.map { |f| f.header.length }.max : width_opt)
 
-        t.add_column(:dummy, header: extra_opts[:field_names_header], width: initial_column_width,
-          align_header: extra_opts[:field_names_header_alignment], align_body: extra_opts[:field_names_body_alignment],
-          &:header)
+        t.add_column(:dummy, header: extra_opts[:field_names_header], width: field_names_width, align_header:
+          extra_opts[:field_names_header_alignment], align_body: extra_opts[:field_names_body_alignment], &:header)
 
         # Add a column to the new table for each of the original table's sources
         sources.each_with_index do |source, i|
