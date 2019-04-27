@@ -542,9 +542,10 @@ puts table.transpose
 |  odd? |     true     |     false    |     true     |
 ```
 
-The `transpose` method accepts various options for controlling the layout and content of the new
-table. For details, see the documentation. (TODO Link to documentation for #transpose, once available at
-rubydoc site.)
+By default, a header row is added to the new table, showing the string value of the element
+represented in that column. This can be configured, however, along with other aspects of
+`transpose`'s behaviour. For details, see the documentation. (TODO Link to
+documentation for #transpose, once available at rubydoc site.)
 
 <a name="additional-configuration-options"></a>
 ### Additional configuration options
