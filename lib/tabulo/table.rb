@@ -290,7 +290,14 @@ module Tabulo
     # elements of the current Table's <tt>sources</tt>, with the header of that column being the String
     # value of that element.
     #
-    # FIXME Add an example.
+    # @example
+    #   puts Tabulo::Table.new(-1..1, :even?, :odd?, :abs).transpose
+    #     # => +-------+--------------+--------------+--------------+
+    #     #    |       |      -1      |       0      |       1      |
+    #     #    +-------+--------------+--------------+--------------+
+    #     #    | even? |     false    |     true     |     false    |
+    #     #    |  odd? |     true     |     false    |     true     |
+    #     #    |   abs |            1 |            0 |            1 |
     #
     # @param [Hash] opts Options for configuring the new, transposed {Table}.
     #   These are the same as the keyword params for the {#initialize} method for {Table}, other
@@ -300,17 +307,17 @@ module Tabulo
     #   values from the original {Table} (with the exception of settings for the left-most column,
     #   containing the field names, which are determined as described below). In addition, the
     #   following options also apply to {#transpose}:
-    # @param opts [nil, Integer] :field_names_width Determines the width of the left-most column of the
+    # @option opts [nil, Integer] :field_names_width Determines the width of the left-most column of the
     #   new Table, which contains the names of "fields" (corresponding to the original Table's
     #   column headings). If this is not provided, then by default this column will be made just
     #   wide enough to accommodate its contents.
-    # @param opts [String] :field_names_header ("") By default the left-most column will have a
+    # @option opts [String] :field_names_header ("") By default the left-most column will have a
     #   blank header; but this can be overridden by passing a String to this option.
-    # @param opts [:left, :center, :right] :field_names_header_alignment (:right) Specifies how the
+    # @option opts [:left, :center, :right] :field_names_header_alignment (:right) Specifies how the
     #   header text of the left-most column (if it has header text) should be aligned.
-    # @param opts [:left, :center, :right] :field_names_body_alignment (:right) Specifies how the
+    # @option opts [:left, :center, :right] :field_names_body_alignment (:right) Specifies how the
     #   body text of the left-most column should be aligned.
-    # @param opts [#to_proc] :headers (:to_s.to_proc) A lambda or other callable object that
+    # @option opts [#to_proc] :headers (:to_s.to_proc) A lambda or other callable object that
     #   will be passed in turn each of the elements of the current Table's <tt>sources</tt>
     #   Enumerable, to determine the text to be displayed in the header of each column of the
     #   new Table (other than the left-most column's header, which is determined as described

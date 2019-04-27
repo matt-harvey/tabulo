@@ -530,16 +530,18 @@ initialize an ordinary table, specifying fields as columns, and then call `trans
 a new table in which the rows and columns are swapped:
 
 ```ruby
-table = Tabulo::Table.new(1..3, :even?, :odd?)
-puts table.transpose
+> puts Tabulo::Table.new(-1..1, :even?, :odd?, :zero?, :pred, :succ, :abs).transpose
 ```
-
 ```
 +-------+--------------+--------------+--------------+
-|       |       1      |       2      |       3      |
+|       |      -1      |       0      |       1      |
 +-------+--------------+--------------+--------------+
 | even? |     false    |     true     |     false    |
 |  odd? |     true     |     false    |     true     |
+| zero? |     false    |     true     |     false    |
+|  pred |           -2 |           -1 |            0 |
+|  succ |            0 |            1 |            2 |
+|   abs |            1 |            0 |            1 |
 ```
 
 By default, a header row is added to the new table, showing the string value of the element
