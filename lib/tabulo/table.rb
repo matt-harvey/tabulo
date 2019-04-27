@@ -332,10 +332,10 @@ module Tabulo
         align_header: @align_header,
         align_body: @align_body,
       }
-      initializer_opts = default_opts.merge(opts.slice(*default_opts.keys))
+      initializer_opts = default_opts.merge(Util.slice_hash(opts, *default_opts.keys))
       default_extra_opts = { field_names_width: nil, field_names_header: "",
         field_names_body_alignment: :right, field_names_header_alignment: :right, headers: :to_s.to_proc }
-      extra_opts = default_extra_opts.merge(opts.slice(*default_extra_opts.keys))
+      extra_opts = default_extra_opts.merge(Util.slice_hash(opts, *default_extra_opts.keys))
 
       # The underlying enumerable for the new table, is the columns of the original table.
       fields = column_registry.values

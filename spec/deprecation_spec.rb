@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe Tabulo::Deprecation do
 
-  describe 'without_warnings' do
+  describe "without_warnings" do
     it "disables deprecation warnings within the passed block" do
       expect(Kernel).not_to receive(:warn)
 
