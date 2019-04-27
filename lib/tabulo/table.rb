@@ -332,7 +332,7 @@ module Tabulo
       }
       initializer_opts = default_opts.merge(opts.slice(*default_opts.keys))
       default_extra_opts = { field_names_width: nil, field_names_header: "",
-        field_names_body_alignment: nil, field_names_header_alignment: nil }
+        field_names_body_alignment: :left, field_names_header_alignment: :left }
       extra_opts = default_extra_opts.merge(opts.slice(*default_extra_opts.keys))
 
       # The underlying enumerable for the new table, is the columns of the original table.
@@ -348,7 +348,9 @@ module Tabulo
             extra_opts[:field_names_width]
           end
 
-        t.add_column(:dummy, header: extra_opts[:field_names_header], width: initial_column_width, &:header)
+        t.add_column(:dummy, header: extra_opts[:field_names_header], width: initial_column_width,
+          align_header: extra_opts[:field_names_header_alignment], align_body: extra_opts[:field_names_body_alignment],
+          &:header)
 
         # Add a column to the new table for each of the original table's sources
         sources.each_with_index do |source, i|

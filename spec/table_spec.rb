@@ -1341,6 +1341,7 @@ describe Tabulo::Table do
   # FIXME Test various options
   describe "#transpose" do
     let(:source) { 1..3 }
+    let(:intersection_character) { "*" }
 
     it "returns another table" do
       result = table.transpose
@@ -1348,13 +1349,28 @@ describe Tabulo::Table do
       expect(result).to be_a(Tabulo::Table)
     end
 
-    it "returns a table that's transposed relative to the original one" do
+    it "returns a table that's transposed relative to the original one, with config options overridably "\
+      "inherited from the original table, other than for the left-most column's width and alignment, which are "\
+      "determined automatically, and default to left-aligned, respectively" do
       expect(table.transpose(column_width: 3).to_s).to eq \
-        %q(+---------+-----+-----+-----+
+        %q(*---------*-----*-----*-----*
            |         |  1  |  2  |  3  |
-           +---------+-----+-----+-----+
+           *---------*-----*-----*-----*
            | N       |   1 |   2 |   3 |
            | Doubled |   2 |   4 |   6 |).gsub(/^ +/, "")
+    end
+
+    it "accepts options for determining the header, width and alignment of the left-most column of the "\
+      "transposed table" do
+      expect(table.transpose(column_width: 3, field_names_width: 20, field_names_header: "FIELDS",
+        field_names_header_alignment: :right, field_names_body_alignment: :right).to_s).to eq \
+        %q(*----------------------*-----*-----*-----*
+           |               FIELDS |  1  |  2  |  3  |
+           *----------------------*-----*-----*-----*
+           |                    N |   1 |   2 |   3 |
+           |              Doubled |   2 |   4 |   6 |).gsub(/^ +/, "")
+
+
     end
   end
 
