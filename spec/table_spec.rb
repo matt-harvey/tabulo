@@ -1356,21 +1356,38 @@ describe Tabulo::Table do
         %q(*---------*-----*-----*-----*
            |         |  1  |  2  |  3  |
            *---------*-----*-----*-----*
-           | N       |   1 |   2 |   3 |
+           |       N |   1 |   2 |   3 |
            | Doubled |   2 |   4 |   6 |).gsub(/^ +/, "")
     end
 
     it "accepts options for determining the header, width and alignment of the left-most column of the "\
       "transposed table" do
       expect(table.transpose(column_width: 3, field_names_width: 20, field_names_header: "FIELDS",
-        field_names_header_alignment: :right, field_names_body_alignment: :right).to_s).to eq \
+        field_names_header_alignment: :center, field_names_body_alignment: :left).to_s).to eq \
+        %q(*----------------------*-----*-----*-----*
+           |        FIELDS        |  1  |  2  |  3  |
+           *----------------------*-----*-----*-----*
+           | N                    |   1 |   2 |   3 |
+           | Doubled              |   2 |   4 |   6 |).gsub(/^ +/, "")
+    end
+
+    it "right-aligns the left-hand column of the new table by default" do
+      expect(table.transpose(column_width: 3, field_names_width: 20, field_names_header: "FIELDS").to_s).to eq \
         %q(*----------------------*-----*-----*-----*
            |               FIELDS |  1  |  2  |  3  |
            *----------------------*-----*-----*-----*
            |                    N |   1 |   2 |   3 |
            |              Doubled |   2 |   4 |   6 |).gsub(/^ +/, "")
+    end
 
-
+    it "accepts a :headers option, allowing the caller to customize the column headers, "\
+      "(other than the left-most column)" do
+      expect(table.transpose(column_width: 3, headers: -> (n) { n * 2 }).to_s).to eq \
+        %q(*---------*-----*-----*-----*
+           |         |  2  |  4  |  6  |
+           *---------*-----*-----*-----*
+           |       N |   1 |   2 |   3 |
+           | Doubled |   2 |   4 |   6 |).gsub(/^ +/, "")
     end
   end
 

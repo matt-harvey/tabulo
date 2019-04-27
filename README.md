@@ -61,6 +61,7 @@ end
   underlying cell values.
 * The header row can be [repeated](#repeating-headers) at arbitrary intervals.
 * Newlines within cell content are correctly handled.
+* Easily [transpose](#transposition) the table, so that rows are swapped with columns.
 * [Customize](#additional-configuration-options) border and divider characters.
 * Use a [DRY initialization interface](#configuring-columns): by being "column based", it is
   designed to spare the developer the burden of syncing the ordering within the header row with that of the body rows.
@@ -87,6 +88,7 @@ Tabulo has also been ported to Crystal (with some modifications): see [Tablo](ht
      * [Using a Table Enumerator](#using-a-table-enumerator)
      * [Accessing cell values](#accessing-cell-values)
      * [Accessing the underlying enumerable](#accessing-sources)
+     * [Transposing rows and columns](#transposition)
      * [Additional configuration options](#additional-configuration-options)
   * [Motivation](#motivation)
   * [Contributing](#contributing)
@@ -515,8 +517,34 @@ row can be accessed by calling the `source` method on that row:
 table.each do |row|
   puts row.source # 50...60...
 end
+```
+
+<a name="transposition"></a>
+### Transposing rows and columns
+
+By default, Tabulo generates a table in which each row corresponds to a _record_, i.e. an element of
+the underlying enumerable, and each column to a _field_. However, there are times when one instead
+wants each row to represent a field, and each column a record. This is generally the case when there
+are a small number or records but a large number of fields. To produce such a table, we can first
+initialize an ordinary table, specifying fields as columns, and then call `transpose`, which returns
+a new table in which the rows and columns are swapped:
+
+```ruby
+table = Tabulo::Table.new(1..3, :even?, :odd?)
+puts table.transpose
+```
 
 ```
++-------+--------------+--------------+--------------+
+|       |       1      |       2      |       3      |
++-------+--------------+--------------+--------------+
+| even? |     false    |     true     |     false    |
+|  odd? |     true     |     false    |     true     |
+```
+
+The `transpose` method accepts various options for controlling the layout and content of the new
+table. For details, see the documentation. (TODO Link to documentation for #transpose, once available at
+rubydoc site.)
 
 <a name="additional-configuration-options"></a>
 ### Additional configuration options

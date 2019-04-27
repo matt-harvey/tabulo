@@ -287,8 +287,8 @@ module Tabulo
     # Creates a new {Table} from the current Table, transposed, that is rotated 90 degrees,
     # relative to the current Table, so that the header names of the current Table form the
     # content of left-most column of the new Table, and each column thereafter corresponds to one of the
-    # elements of the current Table's `sources`, with the header of that column being the String value
-    # of that element.
+    # elements of the current Table's <tt>sources</tt>, with the header of that column being the String
+    # value of that element.
     #
     # FIXME Add an example.
     #
@@ -306,13 +306,15 @@ module Tabulo
     #   wide enough to accommodate its contents.
     # @param opts [String] :field_names_header ("") By default the left-most column will have a
     #   blank header; but this can be overridden by passing a String to this option.
-    # @param opts [:left, :center, :right] :field_names_header_alignment (:left) Specifies how the
+    # @param opts [:left, :center, :right] :field_names_header_alignment (:right) Specifies how the
     #   header text of the left-most column (if it has header text) should be aligned.
-    # @param opts [:left, :center, :right] :field_names_body_alignment (:left) Specifies how the
+    # @param opts [:left, :center, :right] :field_names_body_alignment (:right) Specifies how the
     #   body text of the left-most column should be aligned.
-    #
-    # FIXME Add an option to facilitate customization of the new Table's headers.
-    #
+    # @param opts [#to_proc] :headers (:to_s.to_proc) A lambda or other callable object that
+    #   will be passed in turn each of the elements of the current Table's <tt>sources</tt>
+    #   Enumerable, to determine the text to be displayed in the header of each column of the
+    #   new Table (other than the left-most column's header, which is determined as described
+    #   above).
     # @return [Table] a new {Table}
     # @raise [InvalidHorizontalRuleCharacterError] if invalid argument passed to horizontal_rule_character.
     # @raise [InvalidVerticalRuleCharacterError] if invalid argument passed to vertical_rule_character.
@@ -332,7 +334,7 @@ module Tabulo
       }
       initializer_opts = default_opts.merge(opts.slice(*default_opts.keys))
       default_extra_opts = { field_names_width: nil, field_names_header: "",
-        field_names_body_alignment: :left, field_names_header_alignment: :left }
+        field_names_body_alignment: :right, field_names_header_alignment: :right, headers: :to_s.to_proc }
       extra_opts = default_extra_opts.merge(opts.slice(*default_extra_opts.keys))
 
       # The underlying enumerable for the new table, is the columns of the original table.
@@ -360,10 +362,7 @@ module Tabulo
           # if the column labels could actually just be numbers.
           label = i.to_s
 
-          # The string value of the original source forms the header for this column
-          header = source.respond_to?(:to_s) ? source.to_s : ""
-
-          t.add_column(label, header: header) do |original_column|
+          t.add_column(label, header: extra_opts[:headers].call(source)) do |original_column|
             original_column.body_cell_value(source)
           end
         end
