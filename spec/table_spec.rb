@@ -1338,6 +1338,25 @@ describe Tabulo::Table do
     end
   end
 
+  # FIXME Test various options once added.
+  describe "#transpose" do
+    it "returns another table" do
+      result = table.transpose
+      expect(result).not_to be(table)
+      expect(result).to be_a(Tabulo::Table)
+    end
+
+    it "returns a table that's transposed relative to the original one" do
+      transposed_table = table.transpose.pack
+      expect(transposed_table.to_s).to eq \
+        %q(+---------+---+---+---+---+----+
+           |         | 1 | 2 | 3 | 4 |  5 |
+           +---------+---+---+---+---+----+
+           | N       | 1 | 2 | 3 | 4 |  5 |
+           | Doubled | 2 | 4 | 6 | 8 | 10 |).gsub(/^ +/, "")
+    end
+  end
+
   describe "#shrinkwrap" do
     let(:column_width) { 8 }
 

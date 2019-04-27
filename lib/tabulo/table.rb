@@ -284,6 +284,39 @@ module Tabulo
       self
     end
 
+    # FIXME Document.
+    # FIXME Add some options to facilitate customization of new headers etc..
+    # Could be more or less the same as the options for initializing a new table,
+    # plus options to control alignment etc. of columns generated for the new table.
+    def transpose
+
+      # The underlying enumerable for the new table, is the columns of the original table.
+      new_table = Table.new(column_registry.values) do |t|
+
+        # Left hand column of new table, containing field names
+        t.add_column(:dummy, header: "", &:header)
+
+        # Add a column to the new table for each of the original table's sources
+        sources.each_with_index do |source, i|
+
+          # The string value of the index of the original source forms the label of the new column.
+          # FIXME I don't like this. These will be converted into symbols. It would be better
+          # if the column labels could actually just be numbers.
+          label = i.to_s
+
+          # The string value of the original source forms the header for this column
+          header = source.respond_to?(:to_s) ? source.to_s : ""
+
+          t.add_column(label, header: header) do |original_column|
+            original_column.body_cell_value(source)
+          end
+        end
+      end
+
+      yield new_table if block_given?
+      new_table
+    end
+
     # @deprecated Use {#pack} instead.
     #
     # Reset all the column widths so that each column is *just* wide enough to accommodate
