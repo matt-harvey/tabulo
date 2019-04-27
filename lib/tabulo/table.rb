@@ -284,17 +284,71 @@ module Tabulo
       self
     end
 
-    # FIXME Document.
-    # FIXME Add some options to facilitate customization of new headers etc..
-    # Could be more or less the same as the options for initializing a new table,
-    # plus options to control alignment etc. of columns generated for the new table.
-    def transpose
+    # Creates a new {Table} from the current Table, transposed, that is rotated 90 degrees,
+    # relative to the current Table, so that the header names of the current Table form the
+    # content of left-most column of the new Table, and each column thereafter corresponds to one of the
+    # elements of the current Table's `sources`, with the header of that column being the String value
+    # of that element.
+    #
+    # FIXME Add an example.
+    #
+    # @param [Hash] opts Options for configuring the new, transposed {Table}.
+    #   These are the same as the keyword params for the {#initialize} method for {Table}, other
+    #   than the `columns` param, which does not apply here. These are applied in the same way as
+    #   documented for {#initialize}, when creating the new, transposed Table. Any options not
+    #   specified explicitly in the call to {#transpose} will inherit their
+    #   values from the original {Table} (with the exception of settings for the left-most column,
+    #   containing the field names, which are determined as described below). In addition, the
+    #   following options also apply to {#transpose}:
+    # @param opts [nil, Integer] :field_names_width Determines the width of the left-most column of the
+    #   new Table, which contains the names of "fields" (corresponding to the original Table's
+    #   column headings). If this is not provided, then by default this column will be made just
+    #   wide enough to accommodate its contents.
+    # @param opts [String] :field_names_header ("") By default the left-most column will have a
+    #   blank header; but this can be overridden by passing a String to this option.
+    # @param opts [:left, :center, :right] :field_names_header_alignment (:left) Specifies how the
+    #   header text of the left-most column (if it has header text) should be aligned.
+    # @param opts [:left, :center, :right] :field_names_body_alignment (:left) Specifies how the
+    #   body text of the left-most column should be aligned.
+    #
+    # FIXME Add an option to facilitate customization of the new Table's headers.
+    #
+    # @return [Table] a new {Table}
+    # @raise [InvalidHorizontalRuleCharacterError] if invalid argument passed to horizontal_rule_character.
+    # @raise [InvalidVerticalRuleCharacterError] if invalid argument passed to vertical_rule_character.
+    def transpose(opts = {})
+      default_opts = {
+        column_width: @default_column_width,
+        column_padding: @column_padding,
+        header_frequency: @header_frequency,
+        wrap_header_cells_to: @wrap_header_cells_to,
+        wrap_body_cells_to: @wrap_body_cells_to,
+        horizontal_rule_character: @horizontal_rule_character,
+        vertical_rule_character: @vertical_rule_character,
+        intersection_character: @intersection_character,
+        truncation_indicator: @truncation_indicator,
+        align_header: @align_header,
+        align_body: @align_body,
+      }
+      initializer_opts = default_opts.merge(opts.slice(*default_opts.keys))
+      default_extra_opts = { field_names_width: nil, field_names_header: "",
+        field_names_body_alignment: nil, field_names_header_alignment: nil }
+      extra_opts = default_extra_opts.merge(opts.slice(*default_extra_opts.keys))
 
       # The underlying enumerable for the new table, is the columns of the original table.
-      new_table = Table.new(column_registry.values) do |t|
+      fields = column_registry.values
+
+      Table.new(fields, **initializer_opts) do |t|
 
         # Left hand column of new table, containing field names
-        t.add_column(:dummy, header: "", &:header)
+        initial_column_width =
+          if extra_opts[:field_names_width].nil?
+            fields.map { |field| field.header.length }.max
+          else
+            extra_opts[:field_names_width]
+          end
+
+        t.add_column(:dummy, header: extra_opts[:field_names_header], width: initial_column_width, &:header)
 
         # Add a column to the new table for each of the original table's sources
         sources.each_with_index do |source, i|
@@ -312,9 +366,6 @@ module Tabulo
           end
         end
       end
-
-      yield new_table if block_given?
-      new_table
     end
 
     # @deprecated Use {#pack} instead.

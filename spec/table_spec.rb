@@ -1338,8 +1338,10 @@ describe Tabulo::Table do
     end
   end
 
-  # FIXME Test various options once added.
+  # FIXME Test various options
   describe "#transpose" do
+    let(:source) { 1..3 }
+
     it "returns another table" do
       result = table.transpose
       expect(result).not_to be(table)
@@ -1347,13 +1349,12 @@ describe Tabulo::Table do
     end
 
     it "returns a table that's transposed relative to the original one" do
-      transposed_table = table.transpose.pack
-      expect(transposed_table.to_s).to eq \
-        %q(+---------+---+---+---+---+----+
-           |         | 1 | 2 | 3 | 4 |  5 |
-           +---------+---+---+---+---+----+
-           | N       | 1 | 2 | 3 | 4 |  5 |
-           | Doubled | 2 | 4 | 6 | 8 | 10 |).gsub(/^ +/, "")
+      expect(table.transpose(column_width: 3).to_s).to eq \
+        %q(+---------+-----+-----+-----+
+           |         |  1  |  2  |  3  |
+           +---------+-----+-----+-----+
+           | N       |   1 |   2 |   3 |
+           | Doubled |   2 |   4 |   6 |).gsub(/^ +/, "")
     end
   end
 
