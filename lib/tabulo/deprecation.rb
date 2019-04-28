@@ -1,5 +1,6 @@
 module Tabulo
 
+  # @!visibility private
   module Deprecation
 
     # @!visibility private
