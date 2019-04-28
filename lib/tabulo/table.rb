@@ -40,7 +40,7 @@ module Tabulo
     #   be unique. Each element of the Array  will be used to create a column whose content is
     #   created by calling the corresponding method on each element of sources. Note
     #   the {#add_column} method is a much more flexible way to set up columns on the table.
-    # @param [Array[Symbol]] columns <b>DEPRECATED</b> Use {cols} instead.
+    # @param [Array[Symbol]] columns <b>DEPRECATED</b> Use <tt>cols</tt> instead.
     # @param [Integer, nil] column_width The default column width for columns in this
     #   table, not excluding padding. If <tt>nil</tt>, then {DEFAULT_COLUMN_WIDTH} will be used.
     # @param [:start, nil, Integer] header_frequency Controls the display of column headers.
@@ -307,13 +307,16 @@ module Tabulo
     #     #    |   abs |            1 |            0 |            1 |
     #
     # @param [Hash] opts Options for configuring the new, transposed {Table}.
-    #   These are the same as the keyword params for the {#initialize} method for {Table}, other
-    #   than the `columns` param, which does not apply here. These are applied in the same way as
-    #   documented for {#initialize}, when creating the new, transposed Table. Any options not
-    #   specified explicitly in the call to {#transpose} will inherit their
-    #   values from the original {Table} (with the exception of settings for the left-most column,
-    #   containing the field names, which are determined as described below). In addition, the
-    #   following options also apply to {#transpose}:
+    #   The following options are the same as the keyword params for the {#initialize} method for
+    #   {Table}: <tt>column_width</tt>, <tt>column_padding</tt>, <tt>header_frequency</tt>,
+    #   <tt>wrap_header_cells_to</tt>, <tt>wrap_body_cells_to</tt>, <tt>horizontal_rule_character</tt>,
+    #   <tt>vertical_rule_character</tt>, <tt>intersection_character</tt>, <tt>truncation_indicator</tt>,
+    #   <tt>align_header</tt>, <tt>align_body</tt>.
+    #   These are applied in the same way as documented for {#initialize}, when creating the
+    #   new, transposed Table. Any options not specified explicitly in the call to {#transpose}
+    #   will inherit their values from the original {Table} (with the exception of settings
+    #   for the left-most column, containing the field names, which are determined as described
+    #   below). In addition, the following options also apply to {#transpose}:
     # @option opts [nil, Integer] :field_names_width Determines the width of the left-most column of the
     #   new Table, which contains the names of "fields" (corresponding to the original Table's
     #   column headings). If this is not provided, then by default this column will be made just
@@ -333,11 +336,11 @@ module Tabulo
     # @raise [InvalidHorizontalRuleCharacterError] if invalid argument passed to horizontal_rule_character.
     # @raise [InvalidVerticalRuleCharacterError] if invalid argument passed to vertical_rule_character.
     def transpose(opts = {})
-      default_opts = { column_width: @default_column_width, column_padding: @column_padding,
-        header_frequency: @header_frequency, wrap_header_cells_to: @wrap_header_cells_to,
-        wrap_body_cells_to: @wrap_body_cells_to, horizontal_rule_character: @horizontal_rule_character,
-        vertical_rule_character: @vertical_rule_character, intersection_character: @intersection_character,
-        truncation_indicator: @truncation_indicator, align_header: @align_header, align_body: @align_body }
+      default_opts = [:column_width, :column_padding, :header_frequency, :wrap_header_cells_to,
+        :wrap_body_cells_to, :horizontal_rule_character, :vertical_rule_character,
+        :intersection_character, :truncation_indicator, :align_header, :align_body].map do |sym|
+        [sym, instance_variable_get("@#{sym}")]
+      end.to_h
 
       initializer_opts = default_opts.merge(Util.slice_hash(opts, *default_opts.keys))
       default_extra_opts = { field_names_width: nil, field_names_header: "",
