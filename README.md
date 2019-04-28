@@ -465,11 +465,11 @@ table.each do |row|
 end
 ```
 
-The first argument to `add_column`, considered as a `Symbol`, always provides the key
-for the purpose of accessing the `Hash` form of a `Tabulo::Row`. This key serves as
-a sort of "logical label" for the column; and it need not be the same as the column
-header. If we want the header to be different to the label, we can achieve this
-using the `header` option to `add_column`:
+The first argument to `add_column` always provides the key for the purpose of accessing the `Hash`
+form of a `Tabulo::Row`. (If the provided argument was a `String`, it will be converted to a
+`Symbol` for purposes of accessing this `Hash`.) This key serves as a sort of "logical label" for
+the column; and it need not be the same as the column header. If we want the header to be different
+to the label, we can achieve this using the `header` option to `add_column`:
 
 ```ruby
 table = Tabulo::Table.new(1..5) do |t|

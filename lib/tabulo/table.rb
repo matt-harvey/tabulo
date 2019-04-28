@@ -125,11 +125,12 @@ module Tabulo
 
     # Adds a column to the Table.
     #
-    # @param [Symbol, String] label A unique identifier for this column, which by default will
-    #   also be used as the column header text (see also the header param). If the
+    # @param [Symbol, String, Integer] label A unique identifier for this column, which by
+    #   default will also be used as the column header text (see also the header param). If the
     #   extractor argument is not also provided, then the label argument should correspond to
     #   a method to be called on each item in the table sources to provide the content
-    #   for this column.
+    #   for this column. If a String is passed as the label, then it will be converted to
+    #   a Symbol for the purpose of serving as this label.
     # @param [nil, #to_s] header (nil) Text to be displayed in the column header. If passed nil,
     #   the column's label will also be used as its header text.
     # @param [:left, :center, :right, nil] align_header (nil) Specifies how the header text
@@ -163,7 +164,13 @@ module Tabulo
     def add_column(label, header: nil, align_header: nil, align_body: nil,
       width: nil, formatter: :to_s.to_proc, &extractor)
 
-      column_label = label.to_sym
+      column_label =
+        case label
+        when Integer, Symbol
+          label
+        when String
+          label.to_sym
+        end
 
       if column_registry.include?(column_label)
         raise InvalidColumnLabelError, "Column label already used in this table."
@@ -351,13 +358,7 @@ module Tabulo
 
         # Add a column to the new table for each of the original table's sources
         sources.each_with_index do |source, i|
-
-          # The string value of the index of the original source forms the label of the new column.
-          # FIXME I don't like this. These will be converted into symbols. It would be better
-          # if the column labels could actually just be numbers.
-          label = i.to_s
-
-          t.add_column(label, header: extra_opts[:headers].call(source)) do |original_column|
+          t.add_column(i, header: extra_opts[:headers].call(source)) do |original_column|
             original_column.body_cell_value(source)
           end
         end
