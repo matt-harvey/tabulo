@@ -7,7 +7,7 @@
 [![Code Climate][CC img]][Code Climate]
 [![Awesome][AR img]][Awesome Ruby]
 
-Tabulo is an ASCII table generator for Ruby.
+Tabulo is a terminal table generator for Ruby.
 
 It offers a DRY, "column-centric" interface, and is designed to make it very easy it produce highly
 readable tables, even from large and unwieldy data sets and streams.

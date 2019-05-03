@@ -29,6 +29,7 @@ Gem::Specification.new do |spec|
   }
 
   spec.add_runtime_dependency "tty-screen", "0.6.5"
+  spec.add_runtime_dependency "unicode-display_width", "1.5.0"
 
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "rake", "~> 11.0"

@@ -1,3 +1,5 @@
+require "unicode/display_width"
+
 module Tabulo
 
   # @!visibility private
@@ -38,15 +40,28 @@ module Tabulo
 
     def infilled_subcells(str, real_alignment)
       str.split($/, -1).flat_map do |substr|
-        num_subsubcells = [1, (substr.length.to_f / width).ceil].max
-        (0...num_subsubcells).map do |i|
-          align_cell_content(substr.slice(i * width, width), real_alignment)
+        substr_grapheme_clusters = substr.scan(/\X/)
+        subsubcells = []
+        current_subsubcell_grapheme_clusters = []
+        current_subsubcell_display_width = 0
+        substr_grapheme_clusters.each do |sgc|
+          sgc_display_width = Unicode::DisplayWidth.of(sgc)
+          if sgc_display_width + current_subsubcell_display_width > width
+            subsubcells << current_subsubcell_grapheme_clusters.join("")
+            current_subsubcell_grapheme_clusters.clear
+            current_subsubcell_display_width = 0
+          end
+
+          current_subsubcell_grapheme_clusters << sgc
+          current_subsubcell_display_width += sgc_display_width
         end
+        subsubcells << current_subsubcell_grapheme_clusters.join("")
+        subsubcells.map { |s| align_cell_content(s, real_alignment) }
       end
     end
 
     def align_cell_content(content, real_alignment)
-      padding = [@width - content.length, 0].max
+      padding = [@width - Unicode::DisplayWidth.of(content), 0].max
       left_padding, right_padding =
         case real_alignment
         when :center

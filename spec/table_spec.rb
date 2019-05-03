@@ -385,6 +385,41 @@ describe Tabulo::Table do
       end
     end
 
+    context "when there are multibyte characters in the headers or body cell contents" do
+      it "calculates widths and aligns content correctly" do
+        table = Tabulo::Table.new(1..3) do |t|
+          t.add_column("Something") { |n| "很酷的时候" }
+          t.add_column("很酷的时") { |n| n * 2 }
+        end
+
+        expect(table.to_s).to eq \
+          %q(+--------------+--------------+
+             |   Something  |   很酷的时   |
+             +--------------+--------------+
+             | 很酷的时候   |            2 |
+             | 很酷的时候   |            4 |
+             | 很酷的时候   |            6 |).gsub(/^ +/, "")
+      end
+
+      it "wraps content correctly" do
+        table = Tabulo::Table.new(1..2) do |t|
+          t.add_column("很\n酷") { |n| "很酷的时候很酷的时候" }
+          t.add_column("很酷的时候很酷的时候很酷的时候") { |n| n * 2 }
+        end
+
+        expect(table.to_s).to eq \
+          %q(+--------------+--------------+
+             |      很      | 很酷的时候很 |
+             |      酷      | 酷的时候很酷 |
+             |              |    的时候    |
+             +--------------+--------------+
+             | 很酷的时候很 |            2 |
+             | 酷的时候     |              |
+             | 很酷的时候很 |            4 |
+             | 酷的时候     |              |).gsub(/^ +/, "")
+      end
+    end
+
     context "when there are newlines in headers or body cell contents" do
       context "with unlimited wrapping" do
         it "respects newlines within header and cells" do

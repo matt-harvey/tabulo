@@ -1,4 +1,5 @@
 require "tty-screen"
+require "unicode/display_width"
 
 module Tabulo
 
@@ -511,7 +512,7 @@ module Tabulo
       when nil
         ; # do nothing
       when String
-        if c.length != 1
+        if Unicode::DisplayWidth.of(c) != 1
           raise exception_class, "#{message_fragment} is neither nil nor a single-character String"
         end
       else
@@ -524,8 +525,9 @@ module Tabulo
     # @return [Integer] the length of the longest segment of str when split by newlines
     def wrapped_width(str)
       segments = str.split($/)
-      segments.inject(1) do |length, segment|
-        length > segment.length ? length : segment.length
+      segments.inject(1) do |longest_length_so_far, segment|
+        length = Unicode::DisplayWidth.of(segment)
+        longest_length_so_far > length ? longest_length_so_far : length
       end
     end
   end
