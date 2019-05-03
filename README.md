@@ -548,8 +548,8 @@ a new table in which the rows and columns are swapped:
 
 By default, a header row is added to the new table, showing the string value of the element
 represented in that column. This can be configured, however, along with other aspects of
-`transpose`'s behaviour. For details, see the documentation. (TODO Link to
-documentation for #transpose, once available at rubydoc site.)
+`transpose`'s behaviour. For details, see the
+[documentation](https://www.rubydoc.info/gems/tabulo/1.4.0/Tabulo/Table#transpose-instance_method).
 
 <a name="additional-configuration-options"></a>
 ### Additional configuration options
