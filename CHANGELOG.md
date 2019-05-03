@@ -1,5 +1,11 @@
 # Changelog
 
+### v1.4.0
+
+* New `#transpose` function to produced a new Table in which the rows and
+  columns are transposed relative to the original one.
+* Properly handle multibyte characters when calculating widths, wrapping etc..
+
 ### v1.3.0
 
 * More ergonomic Table initializer, allowing you to specify columns directly as varargs rather
