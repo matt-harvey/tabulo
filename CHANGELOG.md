@@ -1,5 +1,9 @@
 # Changelog
 
+### v1.4.1
+
+* Minor documentation fix
+
 ### v1.4.0
 
 * New `#transpose` function to produce a new Table in which the rows and
