@@ -84,8 +84,16 @@ describe Tabulo::Row do
   end
 
   describe "#to_h" do
-    it "returns a Hash mapping from column labels to cell values" do
-      expect(row.to_h).to eq({ :N => 3, :Doubled => 6 })
+    let!(:table) do
+      Tabulo::Table.new(0..3) do |t|
+        t.add_column("Number") { |n| n }
+        t.add_column(:Doubled) { |n| n * 2 }
+        t.add_column(2) { |n| 5.8 }
+      end
+    end
+
+    it "returns a Hash mapping from column labels to cell values, with keys being Symbols or Integers" do
+      expect(row.to_h).to eq({ :Number => 3, :Doubled => 6, 2 => 5.8 })
     end
   end
 end

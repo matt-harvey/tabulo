@@ -40,7 +40,7 @@ module Tabulo
     #   be unique. Each element of the Array  will be used to create a column whose content is
     #   created by calling the corresponding method on each element of sources. Note
     #   the {#add_column} method is a much more flexible way to set up columns on the table.
-    # @param [Array[Symbol]] columns <b>DEPRECATED</b> Use {cols} instead.
+    # @param [Array[Symbol]] columns <b>DEPRECATED</b> Use <tt>cols</tt> instead.
     # @param [Integer, nil] column_width The default column width for columns in this
     #   table, not excluding padding. If <tt>nil</tt>, then {DEFAULT_COLUMN_WIDTH} will be used.
     # @param [:start, nil, Integer] header_frequency Controls the display of column headers.
@@ -125,11 +125,12 @@ module Tabulo
 
     # Adds a column to the Table.
     #
-    # @param [Symbol, String] label A unique identifier for this column, which by default will
-    #   also be used as the column header text (see also the header param). If the
+    # @param [Symbol, String, Integer] label A unique identifier for this column, which by
+    #   default will also be used as the column header text (see also the header param). If the
     #   extractor argument is not also provided, then the label argument should correspond to
     #   a method to be called on each item in the table sources to provide the content
-    #   for this column.
+    #   for this column. If a String is passed as the label, then it will be converted to
+    #   a Symbol for the purpose of serving as this label.
     # @param [nil, #to_s] header (nil) Text to be displayed in the column header. If passed nil,
     #   the column's label will also be used as its header text.
     # @param [:left, :center, :right, nil] align_header (nil) Specifies how the header text
@@ -163,7 +164,13 @@ module Tabulo
     def add_column(label, header: nil, align_header: nil, align_body: nil,
       width: nil, formatter: :to_s.to_proc, &extractor)
 
-      column_label = label.to_sym
+      column_label =
+        case label
+        when Integer, Symbol
+          label
+        when String
+          label.to_sym
+        end
 
       if column_registry.include?(column_label)
         raise InvalidColumnLabelError, "Column label already used in this table."
@@ -282,6 +289,83 @@ module Tabulo
       end
 
       self
+    end
+
+    # Creates a new {Table} from the current Table, transposed, that is rotated 90 degrees,
+    # relative to the current Table, so that the header names of the current Table form the
+    # content of left-most column of the new Table, and each column thereafter corresponds to one of the
+    # elements of the current Table's <tt>sources</tt>, with the header of that column being the String
+    # value of that element.
+    #
+    # @example
+    #   puts Tabulo::Table.new(-1..1, :even?, :odd?, :abs).transpose
+    #     # => +-------+--------------+--------------+--------------+
+    #     #    |       |      -1      |       0      |       1      |
+    #     #    +-------+--------------+--------------+--------------+
+    #     #    | even? |     false    |     true     |     false    |
+    #     #    |  odd? |     true     |     false    |     true     |
+    #     #    |   abs |            1 |            0 |            1 |
+    #
+    # @param [Hash] opts Options for configuring the new, transposed {Table}.
+    #   The following options are the same as the keyword params for the {#initialize} method for
+    #   {Table}: <tt>column_width</tt>, <tt>column_padding</tt>, <tt>header_frequency</tt>,
+    #   <tt>wrap_header_cells_to</tt>, <tt>wrap_body_cells_to</tt>, <tt>horizontal_rule_character</tt>,
+    #   <tt>vertical_rule_character</tt>, <tt>intersection_character</tt>, <tt>truncation_indicator</tt>,
+    #   <tt>align_header</tt>, <tt>align_body</tt>.
+    #   These are applied in the same way as documented for {#initialize}, when creating the
+    #   new, transposed Table. Any options not specified explicitly in the call to {#transpose}
+    #   will inherit their values from the original {Table} (with the exception of settings
+    #   for the left-most column, containing the field names, which are determined as described
+    #   below). In addition, the following options also apply to {#transpose}:
+    # @option opts [nil, Integer] :field_names_width Determines the width of the left-most column of the
+    #   new Table, which contains the names of "fields" (corresponding to the original Table's
+    #   column headings). If this is not provided, then by default this column will be made just
+    #   wide enough to accommodate its contents.
+    # @option opts [String] :field_names_header ("") By default the left-most column will have a
+    #   blank header; but this can be overridden by passing a String to this option.
+    # @option opts [:left, :center, :right] :field_names_header_alignment (:right) Specifies how the
+    #   header text of the left-most column (if it has header text) should be aligned.
+    # @option opts [:left, :center, :right] :field_names_body_alignment (:right) Specifies how the
+    #   body text of the left-most column should be aligned.
+    # @option opts [#to_proc] :headers (:to_s.to_proc) A lambda or other callable object that
+    #   will be passed in turn each of the elements of the current Table's <tt>sources</tt>
+    #   Enumerable, to determine the text to be displayed in the header of each column of the
+    #   new Table (other than the left-most column's header, which is determined as described
+    #   above).
+    # @return [Table] a new {Table}
+    # @raise [InvalidHorizontalRuleCharacterError] if invalid argument passed to horizontal_rule_character.
+    # @raise [InvalidVerticalRuleCharacterError] if invalid argument passed to vertical_rule_character.
+    def transpose(opts = {})
+      default_opts = [:column_width, :column_padding, :header_frequency, :wrap_header_cells_to,
+        :wrap_body_cells_to, :horizontal_rule_character, :vertical_rule_character,
+        :intersection_character, :truncation_indicator, :align_header, :align_body].map do |sym|
+        [sym, instance_variable_get("@#{sym}")]
+      end.to_h
+
+      initializer_opts = default_opts.merge(Util.slice_hash(opts, *default_opts.keys))
+      default_extra_opts = { field_names_width: nil, field_names_header: "",
+        field_names_body_alignment: :right, field_names_header_alignment: :right, headers: :to_s.to_proc }
+      extra_opts = default_extra_opts.merge(Util.slice_hash(opts, *default_extra_opts.keys))
+
+      # The underlying enumerable for the new table, is the columns of the original table.
+      fields = column_registry.values
+
+      Table.new(fields, **initializer_opts) do |t|
+
+        # Left hand column of new table, containing field names
+        width_opt = extra_opts[:field_names_width]
+        field_names_width = (width_opt.nil? ? fields.map { |f| f.header.length }.max : width_opt)
+
+        t.add_column(:dummy, header: extra_opts[:field_names_header], width: field_names_width, align_header:
+          extra_opts[:field_names_header_alignment], align_body: extra_opts[:field_names_body_alignment], &:header)
+
+        # Add a column to the new table for each of the original table's sources
+        sources.each_with_index do |source, i|
+          t.add_column(i, header: extra_opts[:headers].call(source)) do |original_column|
+            original_column.body_cell_value(source)
+          end
+        end
+      end
     end
 
     # @deprecated Use {#pack} instead.

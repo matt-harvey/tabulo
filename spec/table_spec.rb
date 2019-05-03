@@ -1338,6 +1338,59 @@ describe Tabulo::Table do
     end
   end
 
+  # FIXME Test various options
+  describe "#transpose" do
+    let(:source) { 1..3 }
+    let(:intersection_character) { "*" }
+
+    it "returns another table" do
+      result = table.transpose
+      expect(result).not_to be(table)
+      expect(result).to be_a(Tabulo::Table)
+    end
+
+    it "returns a table that's transposed relative to the original one, with config options overridably "\
+      "inherited from the original table, other than for the left-most column's width and alignment, which are "\
+      "determined automatically, and default to left-aligned, respectively" do
+      expect(table.transpose(column_width: 3).to_s).to eq \
+        %q(*---------*-----*-----*-----*
+           |         |  1  |  2  |  3  |
+           *---------*-----*-----*-----*
+           |       N |   1 |   2 |   3 |
+           | Doubled |   2 |   4 |   6 |).gsub(/^ +/, "")
+    end
+
+    it "accepts options for determining the header, width and alignment of the left-most column of the "\
+      "transposed table" do
+      expect(table.transpose(column_width: 3, field_names_width: 20, field_names_header: "FIELDS",
+        field_names_header_alignment: :center, field_names_body_alignment: :left).to_s).to eq \
+        %q(*----------------------*-----*-----*-----*
+           |        FIELDS        |  1  |  2  |  3  |
+           *----------------------*-----*-----*-----*
+           | N                    |   1 |   2 |   3 |
+           | Doubled              |   2 |   4 |   6 |).gsub(/^ +/, "")
+    end
+
+    it "right-aligns the left-hand column of the new table by default" do
+      expect(table.transpose(column_width: 3, field_names_width: 20, field_names_header: "FIELDS").to_s).to eq \
+        %q(*----------------------*-----*-----*-----*
+           |               FIELDS |  1  |  2  |  3  |
+           *----------------------*-----*-----*-----*
+           |                    N |   1 |   2 |   3 |
+           |              Doubled |   2 |   4 |   6 |).gsub(/^ +/, "")
+    end
+
+    it "accepts a :headers option, allowing the caller to customize the column headers, "\
+      "(other than the left-most column)" do
+      expect(table.transpose(column_width: 3, headers: -> (n) { n * 2 }).to_s).to eq \
+        %q(*---------*-----*-----*-----*
+           |         |  2  |  4  |  6  |
+           *---------*-----*-----*-----*
+           |       N |   1 |   2 |   3 |
+           | Doubled |   2 |   4 |   6 |).gsub(/^ +/, "")
+    end
+  end
+
   describe "#shrinkwrap" do
     let(:column_width) { 8 }
 

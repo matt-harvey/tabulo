@@ -62,6 +62,7 @@ end
   underlying cell values.
 * The header row can be [repeated](#repeating-headers) at arbitrary intervals.
 * Newlines within cell content are correctly handled.
+* Easily [transpose](#transposition) the table, so that rows are swapped with columns.
 * [Customize](#additional-configuration-options) border and divider characters.
 * Use a [DRY initialization interface](#configuring-columns): by being "column based", it is
   designed to spare the developer the burden of syncing the ordering within the header row with that of the body rows.
@@ -88,6 +89,7 @@ Tabulo has also been ported to Crystal (with some modifications): see [Tablo](ht
      * [Using a Table Enumerator](#using-a-table-enumerator)
      * [Accessing cell values](#accessing-cell-values)
      * [Accessing the underlying enumerable](#accessing-sources)
+     * [Transposing rows and columns](#transposition)
      * [Additional configuration options](#additional-configuration-options)
   * [Motivation](#motivation)
   * [Contributing](#contributing)
@@ -464,11 +466,11 @@ table.each do |row|
 end
 ```
 
-The first argument to `add_column`, considered as a `Symbol`, always provides the key
-for the purpose of accessing the `Hash` form of a `Tabulo::Row`. This key serves as
-a sort of "logical label" for the column; and it need not be the same as the column
-header. If we want the header to be different to the label, we can achieve this
-using the `header` option to `add_column`:
+The first argument to `add_column` always provides the key for the purpose of accessing the `Hash`
+form of a `Tabulo::Row`. (If the provided argument was a `String`, it will be converted to a
+`Symbol` for purposes of accessing this `Hash`.) This key serves as a sort of "logical label" for
+the column; and it need not be the same as the column header. If we want the header to be different
+to the label, we can achieve this using the `header` option to `add_column`:
 
 ```ruby
 table = Tabulo::Table.new(1..5) do |t|
@@ -516,8 +518,37 @@ row can be accessed by calling the `source` method on that row:
 table.each do |row|
   puts row.source # 50...60...
 end
-
 ```
+
+<a name="transposition"></a>
+### Transposing rows and columns
+
+By default, Tabulo generates a table in which each row corresponds to a _record_, i.e. an element of
+the underlying enumerable, and each column to a _field_. However, there are times when one instead
+wants each row to represent a field, and each column a record. This is generally the case when there
+are a small number or records but a large number of fields. To produce such a table, we can first
+initialize an ordinary table, specifying fields as columns, and then call `transpose`, which returns
+a new table in which the rows and columns are swapped:
+
+```ruby
+> puts Tabulo::Table.new(-1..1, :even?, :odd?, :zero?, :pred, :succ, :abs).transpose
+```
+```
++-------+--------------+--------------+--------------+
+|       |      -1      |       0      |       1      |
++-------+--------------+--------------+--------------+
+| even? |     false    |     true     |     false    |
+|  odd? |     true     |     false    |     true     |
+| zero? |     false    |     true     |     false    |
+|  pred |           -2 |           -1 |            0 |
+|  succ |            0 |            1 |            2 |
+|   abs |            1 |            0 |            1 |
+```
+
+By default, a header row is added to the new table, showing the string value of the element
+represented in that column. This can be configured, however, along with other aspects of
+`transpose`'s behaviour. For details, see the documentation. (TODO Link to
+documentation for #transpose, once available at rubydoc site.)
 
 <a name="additional-configuration-options"></a>
 ### Additional configuration options
