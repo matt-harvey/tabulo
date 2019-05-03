@@ -62,6 +62,7 @@ end
   underlying cell values.
 * The header row can be [repeated](#repeating-headers) at arbitrary intervals.
 * Newlines within cell content are correctly handled.
+* Multibyte characters are correctly handled.
 * Easily [transpose](#transposition) the table, so that rows are swapped with columns.
 * [Customize](#additional-configuration-options) border and divider characters.
 * Use a [DRY initialization interface](#configuring-columns): by being "column based", it is
