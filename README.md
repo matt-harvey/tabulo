@@ -697,7 +697,7 @@ License](http://opensource.org/licenses/MIT).
 [Awesome Ruby]: https://github.com/markets/awesome-ruby#cli-utilities
 
 [GV img]: https://img.shields.io/gem/v/tabulo.svg
-[DC img]: https://img.shields.io/badge/documentation-v1.4.0
+[DC img]: https://img.shields.io/badge/documentation-v1.4.0-blue.svg
 [BS img]: https://img.shields.io/travis/matt-harvey/tabulo.svg
 [CS img]: https://img.shields.io/coveralls/matt-harvey/tabulo.svg
 [CC img]: https://codeclimate.com/github/matt-harvey/tabulo/badges/gpa.svg
