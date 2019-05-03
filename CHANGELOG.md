@@ -2,7 +2,7 @@
 
 ### v1.4.0
 
-* New `#transpose` function to produced a new Table in which the rows and
+* New `#transpose` function to produce a new Table in which the rows and
   columns are transposed relative to the original one.
 * Properly handle multibyte characters when calculating widths, wrapping etc..
 
