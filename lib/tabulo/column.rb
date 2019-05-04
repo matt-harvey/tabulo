@@ -8,24 +8,25 @@ module Tabulo
     attr_accessor :width
     attr_reader :header
 
-    def initialize(header:, width:, align_header:, align_body:, formatter:, extractor:)
+    def initialize(header:, width:, align_header:, align_body:, formatter:, extractor:, styler:)
       @header = header
       @width = width
       @align_header = align_header
       @align_body = align_body
       @formatter = formatter
       @extractor = extractor
+      @styler = styler
     end
 
     def header_subcells
-      infilled_subcells(@header, @align_header)
+      infilled_subcells(@header, @header, @align_header, nil)
     end
 
     def body_subcells(source)
       cell_datum = body_cell_value(source)
       formatted_content = @formatter.call(cell_datum)
       real_alignment = (@align_body == :auto ? infer_alignment(cell_datum) : @align_body)
-      infilled_subcells(formatted_content, real_alignment)
+      infilled_subcells(cell_datum, formatted_content, real_alignment, @styler)
     end
 
     def formatted_cell_content(source)
@@ -38,29 +39,27 @@ module Tabulo
 
     private
 
-    def infilled_subcells(str, real_alignment)
+    def infilled_subcells(cell_datum, str, real_alignment, styler)
       str.split($/, -1).flat_map do |substr|
-        substr_grapheme_clusters = substr.scan(/\X/)
-        subsubcells = []
-        current_subsubcell_grapheme_clusters = []
-        current_subsubcell_display_width = 0
-        substr_grapheme_clusters.each do |sgc|
-          sgc_display_width = Unicode::DisplayWidth.of(sgc)
-          if sgc_display_width + current_subsubcell_display_width > width
-            subsubcells << current_subsubcell_grapheme_clusters.join("")
-            current_subsubcell_grapheme_clusters.clear
-            current_subsubcell_display_width = 0
+        subsubcells, subsubcell, subsubcell_width = [], String.new(""), 0
+
+        substr.scan(/\X/).each do |grapheme_cluster|
+          grapheme_cluster_width = Unicode::DisplayWidth.of(grapheme_cluster)
+          if subsubcell_width + grapheme_cluster_width > width
+            subsubcells << style_and_align_cell_content(subsubcell, cell_datum, real_alignment, styler)
+            subsubcell_width = 0
+            subsubcell.clear
           end
 
-          current_subsubcell_grapheme_clusters << sgc
-          current_subsubcell_display_width += sgc_display_width
+          subsubcell << grapheme_cluster
+          subsubcell_width += grapheme_cluster_width
         end
-        subsubcells << current_subsubcell_grapheme_clusters.join("")
-        subsubcells.map { |s| align_cell_content(s, real_alignment) }
+
+        subsubcells << style_and_align_cell_content(subsubcell, cell_datum, real_alignment, styler)
       end
     end
 
-    def align_cell_content(content, real_alignment)
+    def style_and_align_cell_content(content, cell_datum, real_alignment, styler)
       padding = [@width - Unicode::DisplayWidth.of(content), 0].max
       left_padding, right_padding =
         case real_alignment
@@ -73,7 +72,8 @@ module Tabulo
           [padding, 0]
         end
 
-      "#{' ' * left_padding}#{content}#{' ' * right_padding}"
+      styled_content = (styler ? styler.call(cell_datum, content) : content)
+      "#{' ' * left_padding}#{styled_content}#{' ' * right_padding}"
     end
 
     def infer_alignment(cell_datum)

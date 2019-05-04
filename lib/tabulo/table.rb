@@ -155,6 +155,19 @@ module Tabulo
     #   generates a Date, then the formatter might format that Date in a particular way.
     #   If no formatter is provided, then <tt>.to_s</tt> will be called on
     #   the extracted value of each cell to determine its displayed content.
+    # @param [nil, #to_proc] styler (nil) A lambda or other callable object that will be passed
+    #   two arguments: the calculated value of the cell (prior to the {formatter} being applied);
+    #   and a string representing a single formatted line within the cell. For example, if the
+    #   cell content is wrapped over three lines, then for that cell, the {styler} will be called
+    #   three times, once for each line of content within the cell. If passed <tt>nil</tt>, then
+    #   no additional styling will be applied to the cell content (other than what was already
+    #   applied by the {formatter}). If passed a callable, then that callable will be called for
+    #   each line of content within the cell, and the resulting string rendered in place of that
+    #   line. The {styler} option differs from the {formatter} option in that the width of the
+    #   string returned by {styler} is not taken into consideration by the internal table and
+    #   cell width calculations involved in rendering the table. Thus it can be used to apply
+    #   ANSI escape codes to cell content, to colour the cell content for example, without
+    #   breaking the table formatting.
     # @param [#to_proc] extractor A block or other callable
     #   that will be passed each of the Table sources to determine the value in each cell of this
     #   column. If this is not provided, then the column label will be treated as a method to be
@@ -163,7 +176,7 @@ module Tabulo
     #   Table. (This is case-sensitive, but is insensitive to whether a String or Symbol is passed
     #   to the label parameter.)
     def add_column(label, header: nil, align_header: nil, align_body: nil,
-      width: nil, formatter: :to_s.to_proc, &extractor)
+      width: nil, formatter: :to_s.to_proc, styler: nil, &extractor)
 
       column_label =
         case label
@@ -184,6 +197,7 @@ module Tabulo
           align_body: align_body || @align_body,
           width: (width || @default_column_width),
           formatter: formatter,
+          styler: styler,
           extractor: (extractor || label.to_proc)
         )
     end

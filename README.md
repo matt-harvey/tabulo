@@ -63,6 +63,7 @@ end
 * The header row can be [repeated](#repeating-headers) at arbitrary intervals.
 * Newlines within cell content are correctly handled.
 * Multibyte characters are correctly handled.
+* Apply [colours](#colours-and-styling) and other styling to table content without breaking the table.
 * Easily [transpose](#transposition) the table, so that rows are swapped with columns.
 * [Customize](#additional-configuration-options) border and divider characters.
 * Use a [DRY initialization interface](#configuring-columns): by being "column based", it is
@@ -86,6 +87,7 @@ Tabulo has also been ported to Crystal (with some modifications): see [Tablo](ht
         * [Automating column widths](#automating-column-widths)
         * [Overflow handling](#overflow-handling)
      * [Formatting cell values](#formatting-cell-values)
+     * [Colours and stying[(#colours-and-styling)
      * [Repeating headers](#repeating-headers)
      * [Using a Table Enumerator](#using-a-table-enumerator)
      * [Accessing cell values](#accessing-cell-values)
@@ -365,6 +367,7 @@ table = Tabulo::Table.new(
 | abcdefghijkl~|           26 |
 ```
 
+<a name="formatting-cell-values"></a>
 ### Formatting cell values
 
 While the callable passed to `add_column` determines the underyling, calculated value in each
@@ -398,6 +401,50 @@ of the underlying cell value, not the way it is formatted. This is usually the d
 
 Note also that the item yielded to `.each` for each cell when enumerating over a `Tabulo::Row` is
 the underlying value of that cell, not its formatted value.
+
+<a name="colours-and-styling"></a>
+### Colours and styling
+
+In most terminals, if you want print text that is coloured, or has other styles
+such as underlining, you need to use ANSI escape sequences, either directly, or by means of a library
+such as [Rainbow](http://github.com/sickill/rainbow) that uses them under the hood. When added
+to a string, ANSI escape codes increase a string's length without increasing the width
+it visually occupies in the terminal. So that Tabulo can perform the width calculations required to
+render the table correctly, the `styler` option should be passed to `add_column` to apply colours
+or other styling that requiring escape sequences.
+
+For example, suppose you have a table to which you want to add a column that
+displays `true` in green if a given number is even, or else displays `false` in red.
+You can achieve this as follows using raw ANSI escape codes:
+
+```
+table.add_column(
+  :even?,
+  styler: -> (n, s) { n.even? ? "\033[32m#{s}\033[0m" : "\033[31m#{s}\033[0m" }
+)
+```
+
+Or, if you are using the [rainbow](https://github.com/sickill/rainbow) gem for colouring, you
+could do the following:
+
+```
+require "rainbow"
+
+# ...
+
+table.add_column(
+  :even?,
+  styler: -> (n, s) { n.even? ? Rainbow(s).red : Rainbow(s).green }
+)
+```
+
+The `styler` option should be passed a callable that takes two parameters: the
+first represents the element of the underlying enumerable for a given table
+row; and the second the represents formatted string value of that cell, i.e. the
+cell content after any processing by the [formatter](#formatting-cell-values) (if any).
+If the content of a cell is wrapped over multiple lines, then the `styler` will be called
+once per line, so that each line of the cell will have the escape sequence applied
+separately (ensuring the stying doesn't bleed into neighbouring cells).
 
 <a name="repeating-headers"></a>
 ### Repeating headers

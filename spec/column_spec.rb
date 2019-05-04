@@ -8,7 +8,8 @@ describe Tabulo::Column do
       align_header: :left,
       align_body: :left,
       formatter: -> (n) { "%.2f" % n },
-      extractor: -> (n) { n * 10 }
+      extractor: -> (n) { n * 10 },
+      styler: nil, # FIXME test different values for this
     )
   end
 
