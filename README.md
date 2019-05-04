@@ -129,6 +129,15 @@ A simple case involves initializing columns from symbols corresponding to method
 underlying `Enumerable`. In this case the symbol also provides the header for each column:
 
 ```ruby
+table = Tabulo::Table.new([1, 2, 5])
+table.add_column(:itself)
+table.add_column(:even?)
+table.add_column(:odd?)
+```
+
+Alternatively, you can pass an initialization block to `new`:
+
+```ruby
 table = Tabulo::Table.new([1, 2, 5]) do |t|
   t.add_column(:itself)
   t.add_column(:even?)
@@ -136,7 +145,8 @@ table = Tabulo::Table.new([1, 2, 5]) do |t|
 end
 ```
 
-Or equivalently, using the "quick API":
+When the columns correspond to methods, you can also use the "quick API", by passing a symbol
+directly to `new` for each column:
 
 ```ruby
 table = Tabulo::Table.new([1, 2, 5], :itself, :even?, :odd?)
