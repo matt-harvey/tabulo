@@ -9,7 +9,7 @@
 
 Tabulo is a terminal table generator for Ruby.
 
-It offers a DRY, "column-centric" interface, and is designed to make it very easy it produce highly
+It offers a DRY, "column-centric" interface, and is designed to make it very easy to produce highly
 readable tables, even from large and unwieldy data sets and streams.
 
 ## Overview
@@ -465,8 +465,8 @@ calculated.)
 <a name="accessing-cell-values"></a>
 ### Accessing cell values
 Each `Tabulo::Table` is an `Enumerable` of which each element is a `Tabulo::Row`. Each `Tabulo::Row`
-is itself an `Enumerable` comprising the underlying the values of each cell. A `Tabulo::Row` can
-also be converted to a `Hash` for keyed access. For example:
+is itself an `Enumerable` comprising the underlying values of each cell. A `Tabulo::Row` can also
+be converted to a `Hash` for keyed access. For example:
 
 ```ruby
 table = Tabulo::Table.new(1..5, :itself, :even?, :odd?)
