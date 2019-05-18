@@ -8,7 +8,7 @@ module Tabulo
     attr_accessor :width
     attr_reader :header
 
-    def initialize(header:, width:, align_header:, align_body:, formatter:, extractor:, styler:)
+    def initialize(header:, width:, align_header:, align_body:, formatter:, extractor:, styler:, header_styler:)
       @header = header
       @width = width
       @align_header = align_header
@@ -16,10 +16,16 @@ module Tabulo
       @formatter = formatter
       @extractor = extractor
       @styler = styler
+      @header_styler = header_styler
     end
 
     def header_subcells
-      infilled_subcells(@header, @header, @align_header, nil)
+      infilled_subcells(
+        @header,
+        @header,
+        @align_header,
+        @header_styler ? -> (_, s) { @header_styler.call(s) } : nil
+      )
     end
 
     def body_subcells(source)

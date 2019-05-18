@@ -981,7 +981,7 @@ describe Tabulo::Table do
     end
 
     describe "`styler` param" do
-      it "styes the cell value by calling the styler on the underlying cell value and the formatted value, "\
+      it "styles the cell value by calling the styler on the underlying cell value and the formatted value, "\
         "without changing the underlying cell value's default alignment, and without affecting column width "\
         "calculations" do
         table.add_column(
@@ -1019,6 +1019,46 @@ describe Tabulo::Table do
              | \033[31mlo\033[0m  |
              | \033[31myes\033[0m |).gsub(/^ +/, "")
       end
+    end
+
+    describe "`header_styler` param" do
+      it "styles the header cell content by calling the header_styler on the header text without "\
+        "affecting width calculations" do
+        table.add_column(
+          "Trebled",
+          formatter: -> (val) { "%.2f" % val },
+          header_styler: -> (str) { "\033[31;1;4m#{str}\033[0m" }
+        ) do |n|
+          n * 3
+        end
+
+        expect(table.to_s).to eq \
+          %Q(+--------------+--------------+--------------+
+             |       N      |    Doubled   |    \033[31;1;4mTrebled\033[0m   |
+             +--------------+--------------+--------------+
+             |            1 |            2 |         3.00 |
+             |            2 |            4 |         6.00 |
+             |            3 |            6 |         9.00 |
+             |            4 |            8 |        12.00 |
+             |            5 |           10 |        15.00 |).gsub(/^ +/, "")
+        top_right_body_cell = table.first.to_a.last
+        expect(top_right_body_cell).to eq(3)
+        expect(top_right_body_cell).to be_a(Integer)
+      end
+
+#       it "applies styling separately to each part of the wrapped cell content that's on its own line" do
+#         table = Tabulo::Table.new(%w[hello yes])
+#         table.add_column(:itself, width: 3, styler: -> (val, str) { "\033[31m#{str}\033[0m" })
+
+#         expect(table.to_s).to eq \
+#           %Q(+-----+
+#              | its |
+#              | elf |
+#              +-----+
+#              | \033[31mhel\033[0m |
+#              | \033[31mlo\033[0m  |
+#              | \033[31myes\033[0m |).gsub(/^ +/, "")
+#       end
     end
 
     describe "`extractor` param" do

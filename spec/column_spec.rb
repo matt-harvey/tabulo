@@ -10,6 +10,7 @@ describe Tabulo::Column do
       formatter: -> (n) { "%.2f" % n },
       extractor: -> (n) { n * 10 },
       styler: nil, # FIXME test different values for this
+      header_styler: nil, # FIXME test different values for this
     )
   end
 

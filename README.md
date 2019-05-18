@@ -417,7 +417,7 @@ For example, suppose you have a table to which you want to add a column that
 displays `true` in green if a given number is even, or else displays `false` in red.
 You can achieve this as follows using raw ANSI escape codes:
 
-```
+```ruby
 table.add_column(
   :even?,
   styler: -> (n, s) { n.even? ? "\033[32m#{s}\033[0m" : "\033[31m#{s}\033[0m" }
@@ -427,7 +427,7 @@ table.add_column(
 Or, if you are using the [rainbow](https://github.com/sickill/rainbow) gem for colouring, you
 could do the following:
 
-```
+```ruby
 require "rainbow"
 
 # ...
@@ -445,6 +445,14 @@ cell content after any processing by the [formatter](#formatting-cell-values) (i
 If the content of a cell is wrapped over multiple lines, then the `styler` will be called
 once per line, so that each line of the cell will have the escape sequence applied
 separately (ensuring the stying doesn't bleed into neighbouring cells).
+
+If you want to apply colours or other styling to the content of a column header, as opposed
+to cells in the table body, use the `header_styler` option, e.g.:
+
+```ruby
+table.add_column(:even?, header_styler: -> (s) { "\033[32m#{s}\033[0m" }) 
+```
+
 
 <a name="repeating-headers"></a>
 ### Repeating headers

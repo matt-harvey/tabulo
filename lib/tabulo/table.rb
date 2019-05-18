@@ -168,6 +168,17 @@ module Tabulo
     #   cell width calculations involved in rendering the table. Thus it can be used to apply
     #   ANSI escape codes to cell content, to colour the cell content for example, without
     #   breaking the table formatting.
+    # @param [nil, #to_proc] header_styler (nil) A lambda or other callable object taking
+    #   a single parameter, representing a single line of within the header content for
+    #   this column. For example, if the header cell content is wrapped over three lines, then
+    #   the {header_styler} will be called once for each line. If passed <tt>nil</tt>, then
+    #   no additional styling will be applied to the header cell content. If passed a callable,
+    #   then that callable will be called for each line of content within the header cell, and the
+    #   resulting string rendered in place of that line. The width of the string returned by the
+    #   {header_styler} is not taken into consideration by the internal table and
+    #   cell width calculations involved in rendering the table. Thus it can be used to apply
+    #   ANSI escape codes to header cell content, to colour the cell content for example, without
+    #   breaking the table formatting.
     # @param [#to_proc] extractor A block or other callable
     #   that will be passed each of the Table sources to determine the value in each cell of this
     #   column. If this is not provided, then the column label will be treated as a method to be
@@ -176,7 +187,9 @@ module Tabulo
     #   Table. (This is case-sensitive, but is insensitive to whether a String or Symbol is passed
     #   to the label parameter.)
     def add_column(label, header: nil, align_header: nil, align_body: nil,
-      width: nil, formatter: :to_s.to_proc, styler: nil, &extractor)
+      width: nil, formatter: :to_s.to_proc, styler: nil, header_styler: nil, &extractor)
+
+      # FIXME Document the header_styler option above and in README.
 
       column_label =
         case label
@@ -198,6 +211,7 @@ module Tabulo
           width: (width || @default_column_width),
           formatter: formatter,
           styler: styler,
+          header_styler: header_styler,
           extractor: (extractor || label.to_proc)
         )
     end
