@@ -17,7 +17,8 @@ describe Tabulo::Table do
       vertical_rule_character: vertical_rule_character,
       intersection_character: intersection_character,
       truncation_indicator: truncation_indicator,
-      column_padding: column_padding
+      column_padding: column_padding,
+      border_styler: border_styler
     ) do |t|
       t.add_column("N") { |n| n }
       t.add_column("Doubled") { |n| n * 2 }
@@ -34,6 +35,7 @@ describe Tabulo::Table do
   let(:intersection_character) { nil }
   let(:truncation_indicator) { nil }
   let(:column_padding) { nil }
+  let(:border_styler) { nil }
 
   it "is an Enumerable" do
     expect(table).to be_a(Enumerable)
@@ -884,6 +886,22 @@ describe Tabulo::Table do
              | 5            | 10           |        false |).gsub(/^ +/, "")
       end
     end
+
+    describe "`border_styler` param" do
+      let(:table) do
+        Tabulo::Table.new(1..2, :itself, :even?, border_styler: -> (str) { "\033[31m#{str}\033[0m" })
+      end
+
+      it "styles border, divider and intersection characters without affecting width calculations" do
+        expect(table.to_s).to eq \
+          %Q(\033[31m+--------------+--------------+\033[0m
+             \033[31m|\033[0m    itself    \033[31m|\033[0m     even?    \033[31m|\033[0m
+             \033[31m+--------------+--------------+\033[0m
+             \033[31m|\033[0m            1 \033[31m|\033[0m     false    \033[31m|\033[0m
+             \033[31m|\033[0m            2 \033[31m|\033[0m     true     \033[31m|\033[0m).gsub(/^ +/, "")
+
+      end
+    end
   end
 
   describe "#add_column" do
@@ -1046,19 +1064,19 @@ describe Tabulo::Table do
         expect(top_right_body_cell).to be_a(Integer)
       end
 
-#       it "applies styling separately to each part of the wrapped cell content that's on its own line" do
-#         table = Tabulo::Table.new(%w[hello yes])
-#         table.add_column(:itself, width: 3, styler: -> (val, str) { "\033[31m#{str}\033[0m" })
+      it "applies styling separately to each part of the wrapped header cell content that's on its own line" do
+        table = Tabulo::Table.new(%w[hello yes])
+        table.add_column(:itself, width: 3, header_styler: -> (str) { "\033[31m#{str}\033[0m" })
 
-#         expect(table.to_s).to eq \
-#           %Q(+-----+
-#              | its |
-#              | elf |
-#              +-----+
-#              | \033[31mhel\033[0m |
-#              | \033[31mlo\033[0m  |
-#              | \033[31myes\033[0m |).gsub(/^ +/, "")
-#       end
+        expect(table.to_s).to eq \
+          %Q(+-----+
+             | \033[31mits\033[0m |
+             | \033[31melf\033[0m |
+             +-----+
+             | hel |
+             | lo  |
+             | yes |).gsub(/^ +/, "")
+      end
     end
 
     describe "`extractor` param" do

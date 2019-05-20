@@ -85,6 +85,15 @@ module Tabulo
     #   using the <tt>align_body</tt> option passed to {#add_column}. If passed <tt>:auto</tt>,
     #   alignment is determined by cell content, with numbers aligned right, booleans
     #   center-aligned, and other values left-aligned.
+    # @param [nil, #to_proc] border_styler (nil) A lambda or other callable object taking
+    #   a single parameter, representing a section of the table's borders (which for this purpose
+    #   include any horizontal and vertical lines inside the table).
+    #   If passed <tt>nil</tt>, then no additional styling will be applied to borders. If passed a
+    #   callable, then that callable will be called for each border section, with the
+    #   resulting string rendered in place of that border. The extra width of the string returned by the
+    #   {border_styler} is not taken into consideration by the internal table rendering calculations
+    #   Thus it can be used to apply ANSI escape codes to border characters, to colour the borders
+    #   for example, without breaking the table formatting.
     # @return [Table] a new {Table}
     # @raise [InvalidColumnLabelError] if non-unique Symbols are provided to columns.
     # @raise [InvalidHorizontalRuleCharacterError] if invalid argument passed to horizontal_rule_character.
@@ -92,7 +101,10 @@ module Tabulo
     def initialize(sources, *cols, columns: [], column_width: nil, column_padding: nil, header_frequency: :start,
       wrap_header_cells_to: nil, wrap_body_cells_to: nil, horizontal_rule_character: nil,
       vertical_rule_character: nil, intersection_character: nil, truncation_indicator: nil,
-      align_header: :center, align_body: :auto)
+      align_header: :center, align_body: :auto, border_styler: nil)
+
+      # FIXME Should border styler be applied to the truncation indicator? Probably not... the
+      # actual column styler should probably be applied instead.
 
       if columns.any?
         Deprecation.warn("`columns' option to Tabulo::Table#initialize",
@@ -107,6 +119,7 @@ module Tabulo
       @column_padding = (column_padding || DEFAULT_COLUMN_PADDING)
       @align_header = align_header
       @align_body = align_body
+      @border_styler = border_styler
 
       @horizontal_rule_character = validate_character(horizontal_rule_character,
         DEFAULT_HORIZONTAL_RULE_CHARACTER, InvalidHorizontalRuleCharacterError, "horizontal rule character")
@@ -163,7 +176,7 @@ module Tabulo
     #   no additional styling will be applied to the cell content (other than what was already
     #   applied by the {formatter}). If passed a callable, then that callable will be called for
     #   each line of content within the cell, and the resulting string rendered in place of that
-    #   line. The {styler} option differs from the {formatter} option in that the width of the
+    #   line. The {styler} option differs from the {formatter} option in that the extra width of the
     #   string returned by {styler} is not taken into consideration by the internal table and
     #   cell width calculations involved in rendering the table. Thus it can be used to apply
     #   ANSI escape codes to cell content, to colour the cell content for example, without
@@ -174,7 +187,7 @@ module Tabulo
     #   the {header_styler} will be called once for each line. If passed <tt>nil</tt>, then
     #   no additional styling will be applied to the header cell content. If passed a callable,
     #   then that callable will be called for each line of content within the header cell, and the
-    #   resulting string rendered in place of that line. The width of the string returned by the
+    #   resulting string rendered in place of that line. The extra width of the string returned by the
     #   {header_styler} is not taken into consideration by the internal table and
     #   cell width calculations involved in rendering the table. Thus it can be used to apply
     #   ANSI escape codes to header cell content, to colour the cell content for example, without
@@ -188,8 +201,6 @@ module Tabulo
     #   to the label parameter.)
     def add_column(label, header: nil, align_header: nil, align_body: nil,
       width: nil, formatter: :to_s.to_proc, styler: nil, header_styler: nil, &extractor)
-
-      # FIXME Document the header_styler option above and in README.
 
       column_label =
         case label
@@ -210,9 +221,9 @@ module Tabulo
           align_body: align_body || @align_body,
           width: (width || @default_column_width),
           formatter: formatter,
+          extractor: (extractor || label.to_proc),
           styler: styler,
-          header_styler: header_styler,
-          extractor: (extractor || label.to_proc)
+          header_styler: header_styler
         )
     end
 
@@ -268,7 +279,8 @@ module Tabulo
       inner = column_registry.map do |_, column|
         @horizontal_rule_character * (column.width + @column_padding * 2)
       end
-      surround_join(inner, @intersection_character)
+      rule = surround_join(inner, @intersection_character)
+      @border_styler ? @border_styler.call(rule) : rule
     end
 
     # Reset all the column widths so that each column is *just* wide enough to accommodate
@@ -513,7 +525,8 @@ module Tabulo
           "#{lpad}#{inner}#{rpad}"
         end
 
-        surround_join(subrow_components, @vertical_rule_character)
+        vertical = @border_styler ? @border_styler.call(@vertical_rule_character) : @vertical_rule_character
+        surround_join(subrow_components, vertical)
       end
 
       join_lines(subrows)

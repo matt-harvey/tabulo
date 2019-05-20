@@ -450,9 +450,15 @@ If you want to apply colours or other styling to the content of a column header,
 to cells in the table body, use the `header_styler` option, e.g.:
 
 ```ruby
-table.add_column(:even?, header_styler: -> (s) { "\033[32m#{s}\033[0m" }) 
+table.add_column(:even?, header_styler: -> (s) { "\033[32m#{s}\033[0m" })
 ```
 
+To apply colours or other styling to the row divider, column divider, corner and border
+characters of the table, use the `border_styler` option when initializing the table, e.g.:
+
+```ruby
+table = Tabulo::Table.new(1..5, :itself, :even?, :odd?, border_styler: -> (s) { "\033[32m#{s}\033[0m" })
+```
 
 <a name="repeating-headers"></a>
 ### Repeating headers
