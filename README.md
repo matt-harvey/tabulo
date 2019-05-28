@@ -460,6 +460,9 @@ characters of the table, use the `border_styler` option when initializing the ta
 table = Tabulo::Table.new(1..5, :itself, :even?, :odd?, border_styler: -> (s) { "\033[32m#{s}\033[0m" })
 ```
 
+If the content of a cell has been [truncated](#overflow-handling), then whatever colours or other styling
+apply to the cell content will also be applied the truncation indicator character.
+
 <a name="repeating-headers"></a>
 ### Repeating headers
 

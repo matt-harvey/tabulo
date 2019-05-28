@@ -103,12 +103,8 @@ module Tabulo
       vertical_rule_character: nil, intersection_character: nil, truncation_indicator: nil,
       align_header: :center, align_body: :auto, border_styler: nil)
 
-      # FIXME Should border styler be applied to the truncation indicator? Probably not... the
-      # actual column styler should probably be applied instead.
-
       if columns.any?
-        Deprecation.warn("`columns' option to Tabulo::Table#initialize",
-                               "the variable length parameter `cols'", 2)
+        Deprecation.warn("`columns' option to Tabulo::Table#initialize", "the variable length parameter `cols'", 2)
       end
 
       @sources = sources
@@ -181,6 +177,8 @@ module Tabulo
     #   cell width calculations involved in rendering the table. Thus it can be used to apply
     #   ANSI escape codes to cell content, to colour the cell content for example, without
     #   breaking the table formatting.
+    #   Note that if the content of a cell is truncated, then the whatever styling is applied by the
+    #   {styler} to the cell content will also be applied to the truncation indicator character.
     # @param [nil, #to_proc] header_styler (nil) A lambda or other callable object taking
     #   a single parameter, representing a single line of within the header content for
     #   this column. For example, if the header cell content is wrapped over three lines, then
@@ -192,6 +190,8 @@ module Tabulo
     #   cell width calculations involved in rendering the table. Thus it can be used to apply
     #   ANSI escape codes to header cell content, to colour the cell content for example, without
     #   breaking the table formatting.
+    #   Note that if the header content is truncated, then any {header_styler} will be applied to the
+    #   truncation indicator character as well as to the truncated content.
     # @param [#to_proc] extractor A block or other callable
     #   that will be passed each of the Table sources to determine the value in each cell of this
     #   column. If this is not provided, then the column label will be treated as a method to be
@@ -223,7 +223,9 @@ module Tabulo
           formatter: formatter,
           extractor: (extractor || label.to_proc),
           styler: styler,
-          header_styler: header_styler
+          header_styler: header_styler,
+          truncation_indicator: @truncation_indicator,
+          padding_character: PADDING_CHARACTER,
         )
     end
 
@@ -263,7 +265,7 @@ module Tabulo
 
     # @return [String] an "ASCII" graphical representation of the Table column headers.
     def formatted_header
-      cells = column_registry.map { |_, column| column.header_subcells }
+      cells = column_registry.map { |_, column| column.header_cell }
       format_row(cells, @wrap_header_cells_to)
     end
 
@@ -319,7 +321,7 @@ module Tabulo
 
       @sources.each do |source|
         columns.each do |column|
-          width = wrapped_width(column.formatted_cell_content(source))
+          width = wrapped_width(column.body_cell(source).formatted_content)
           column.width = width if width > column.width
         end
       end
@@ -446,7 +448,7 @@ module Tabulo
 
     # @!visibility private
     def formatted_body_row(source, with_header: false)
-      cells = column_registry.map { |_, column| column.body_subcells(source) }
+      cells = column_registry.map { |_, column| column.body_cell(source) }
       inner = format_row(cells, @wrap_body_cells_to)
       if with_header
         join_lines([horizontal_rule, formatted_header, horizontal_rule, inner])
@@ -499,42 +501,16 @@ module Tabulo
     #   before truncating.
     # @return [String] the entire formatted row including all padding and borders.
     def format_row(cells, wrap_cells_to)
-      row_height = ([wrap_cells_to, cells.map(&:size).max].compact.min || 1)
-
-      subrows = (0...row_height).map do |subrow_index|
-        subrow_components = cells.zip(column_registry.values).map do |cell, column|
-          num_subcells = cell.size
-          cell_truncated = (num_subcells > row_height)
-          append_truncator = (cell_truncated && subrow_index + 1 == row_height)
-
-          lpad = PADDING_CHARACTER * @column_padding
-          rpad =
-            if append_truncator && @column_padding != 0
-              @truncation_indicator + PADDING_CHARACTER * (@column_padding - 1)
-            else
-              PADDING_CHARACTER * @column_padding
-            end
-
-          inner =
-            if subrow_index < num_subcells
-              cell[subrow_index]
-            else
-              PADDING_CHARACTER * column.width
-            end
-
-          "#{lpad}#{inner}#{rpad}"
-        end
-
-        vertical = @border_styler ? @border_styler.call(@vertical_rule_character) : @vertical_rule_character
-        surround_join(subrow_components, vertical)
-      end
-
+      row_height = ([wrap_cells_to, cells.map(&:height).max].compact.min || 1)
+      vertical = @border_styler ? @border_styler.call(@vertical_rule_character) : @vertical_rule_character
+      subcell_stacks = cells.map { |cell| cell.padded_truncated_subcells(row_height, @column_padding) }
+      subrows = subcell_stacks.transpose.map { |subrow_components| surround_join(subrow_components, vertical) }
       join_lines(subrows)
     end
 
     # @!visibility private
-    def surround(str, ch0)
-      "#{ch0}#{str}#{ch0}"
+    def surround(str, ch)
+      "#{ch}#{str}#{ch}"
     end
 
     # @!visibility private

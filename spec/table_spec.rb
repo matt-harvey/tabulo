@@ -1024,6 +1024,19 @@ describe Tabulo::Table do
         expect(top_right_body_cell).to be_a(Integer)
       end
 
+      it "applies the same styling to the truncation indicator as to the cell content" do
+        table = Tabulo::Table.new(%w[hello yes], wrap_body_cells_to: 1)
+        table.add_column(:itself, width: 3, styler: -> (val, str) { "\033[31m#{str}\033[0m" })
+
+        expect(table.to_s).to eq \
+          %Q(+-----+
+             | its |
+             | elf |
+             +-----+
+             | \033[31mhel\033[0m\033[31m~\033[0m|
+             | \033[31myes\033[0m |).gsub(/^ +/, "")
+      end
+
       it "applies styling separately to each part of the wrapped cell content that's on its own line" do
         table = Tabulo::Table.new(%w[hello yes])
         table.add_column(:itself, width: 3, styler: -> (val, str) { "\033[31m#{str}\033[0m" })
@@ -1062,6 +1075,19 @@ describe Tabulo::Table do
         top_right_body_cell = table.first.to_a.last
         expect(top_right_body_cell).to eq(3)
         expect(top_right_body_cell).to be_a(Integer)
+      end
+
+      it "applies the same styling to the truncation indicator as to the cell content" do
+        table = Tabulo::Table.new(%w[hello yes], wrap_header_cells_to: 1)
+        table.add_column(:itself, width: 3, header_styler: -> (str) { "\033[31m#{str}\033[0m" })
+
+        expect(table.to_s).to eq \
+          %Q(+-----+
+             | \033[31mits\033[0m\033[31m~\033[0m|
+             +-----+
+             | hel |
+             | lo  |
+             | yes |).gsub(/^ +/, "")
       end
 
       it "applies styling separately to each part of the wrapped header cell content that's on its own line" do
@@ -1472,7 +1498,6 @@ describe Tabulo::Table do
     end
   end
 
-  # FIXME Test various options
   describe "#transpose" do
     let(:source) { 1..3 }
     let(:intersection_character) { "*" }
