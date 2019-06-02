@@ -434,7 +434,7 @@ require "rainbow"
 
 table.add_column(
   :even?,
-  styler: -> (cell_value, s) { cell_value ? Rainbow(s).red : Rainbow(s).green }
+  styler: -> (cell_value, s) { cell_value ? Rainbow(s).green : Rainbow(s).red }
 )
 ```
 
