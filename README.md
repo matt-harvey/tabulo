@@ -87,7 +87,7 @@ Tabulo has also been ported to Crystal (with some modifications): see [Tablo](ht
         * [Automating column widths](#automating-column-widths)
         * [Overflow handling](#overflow-handling)
      * [Formatting cell values](#formatting-cell-values)
-     * [Colours and stying[(#colours-and-styling)
+     * [Colours and styling](#colours-and-styling)
      * [Repeating headers](#repeating-headers)
      * [Using a Table Enumerator](#using-a-table-enumerator)
      * [Accessing cell values](#accessing-cell-values)
