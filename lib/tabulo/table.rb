@@ -123,6 +123,11 @@ module Tabulo
         DEFAULT_VERTICAL_RULE_CHARACTER, InvalidVerticalRuleCharacterError, "vertical rule character")
       @intersection_character = validate_character(intersection_character,
         DEFAULT_INTERSECTION_CHARACTER, InvalidIntersectionCharacterError, "intersection character")
+
+      @border = Border.from_classic_options(horizontal_rule_character: @horizontal_rule_character,
+        vertical_rule_character: @vertical_rule_character, intersection_character: @intersection_character,
+        styler: @border_styler)
+
       @truncation_indicator = validate_character(truncation_indicator,
         DEFAULT_TRUNCATION_INDICATOR, InvalidTruncationIndicatorError, "truncation indicator")
 
@@ -278,11 +283,8 @@ module Tabulo
     #   end
     #
     def horizontal_rule
-      inner = column_registry.map do |_, column|
-        @horizontal_rule_character * (column.width + @column_padding * 2)
-      end
-
-      styled_border(surround_join(inner, @intersection_character))
+      column_widths = column_registry.map { |_, column| column.width + @column_padding * 2 }
+      @border.horizontal_rule(column_widths)
     end
 
     # Reset all the column widths so that each column is *just* wide enough to accommodate
@@ -503,15 +505,12 @@ module Tabulo
     def format_row(cells, wrap_cells_to)
       max_cell_height = cells.map(&:height).max
       row_height = ([wrap_cells_to, max_cell_height].compact.min || 1)
-      vertical = styled_border(@vertical_rule_character)
       subcell_stacks = cells.map { |cell| cell.padded_truncated_subcells(row_height, @column_padding) }
-      subrows = subcell_stacks.transpose.map { |subrow_components| surround_join(subrow_components, vertical) }
-      join_lines(subrows)
-    end
+      subrows = subcell_stacks.transpose.map do |subrow_components|
+        @border.join_cell_contents(subrow_components)
+      end
 
-    # @!visibility private
-    def styled_border(str)
-      @border_styler ? @border_styler.call(str) : str
+      join_lines(subrows)
     end
 
     # @!visibility private
