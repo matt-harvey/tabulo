@@ -281,8 +281,8 @@ module Tabulo
       inner = column_registry.map do |_, column|
         @horizontal_rule_character * (column.width + @column_padding * 2)
       end
-      rule = surround_join(inner, @intersection_character)
-      @border_styler ? @border_styler.call(rule) : rule
+
+      styled_border(surround_join(inner, @intersection_character))
     end
 
     # Reset all the column widths so that each column is *just* wide enough to accommodate
@@ -501,11 +501,17 @@ module Tabulo
     #   before truncating.
     # @return [String] the entire formatted row including all padding and borders.
     def format_row(cells, wrap_cells_to)
-      row_height = ([wrap_cells_to, cells.map(&:height).max].compact.min || 1)
-      vertical = @border_styler ? @border_styler.call(@vertical_rule_character) : @vertical_rule_character
+      max_cell_height = cells.map(&:height).max
+      row_height = ([wrap_cells_to, max_cell_height].compact.min || 1)
+      vertical = styled_border(@vertical_rule_character)
       subcell_stacks = cells.map { |cell| cell.padded_truncated_subcells(row_height, @column_padding) }
       subrows = subcell_stacks.transpose.map { |subrow_components| surround_join(subrow_components, vertical) }
       join_lines(subrows)
+    end
+
+    # @!visibility private
+    def styled_border(str)
+      @border_styler ? @border_styler.call(str) : str
     end
 
     # @!visibility private
