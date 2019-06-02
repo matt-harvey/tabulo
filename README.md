@@ -411,7 +411,7 @@ such as [Rainbow](http://github.com/sickill/rainbow) that uses them under the ho
 to a string, ANSI escape codes increase a string's length without increasing the width
 it visually occupies in the terminal. So that Tabulo can perform the width calculations required to
 render the table correctly, the `styler` option should be passed to `add_column` to apply colours
-or other styling that requiring escape sequences.
+or other styling that require escape sequences.
 
 For example, suppose you have a table to which you want to add a column that
 displays `true` in green if a given number is even, or else displays `false` in red.
@@ -443,7 +443,7 @@ first represents the element of the underlying enumerable for a given table
 row; and the second the represents formatted string value of that cell, i.e. the
 cell content after any processing by the [formatter](#formatting-cell-values) (if any).
 If the content of a cell is wrapped over multiple lines, then the `styler` will be called
-once per line, so that each line of the cell will have the escape sequence applied
+once per line, so that each line of the cell will have the escape sequence applied to it
 separately (ensuring the stying doesn't bleed into neighbouring cells).
 
 If you want to apply colours or other styling to the content of a column header, as opposed
