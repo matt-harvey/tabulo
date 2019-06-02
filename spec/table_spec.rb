@@ -889,7 +889,10 @@ describe Tabulo::Table do
 
     describe "`border_styler` param" do
       let(:table) do
-        Tabulo::Table.new(1..2, :itself, :even?, border_styler: -> (str) { "\033[31m#{str}\033[0m" })
+        Tabulo::Table.new(1..2, border_styler: -> (str) { "\033[31m#{str}\033[0m" }) do |t|
+          t.add_column(:itself) { |n| n }
+          t.add_column(:even?)
+        end
       end
 
       it "styles border, divider and intersection characters without affecting width calculations" do
@@ -1026,7 +1029,7 @@ describe Tabulo::Table do
 
       it "applies the same styling to the truncation indicator as to the cell content" do
         table = Tabulo::Table.new(%w[hello yes], wrap_body_cells_to: 1)
-        table.add_column(:itself, width: 3, styler: -> (val, str) { "\033[31m#{str}\033[0m" })
+        table.add_column(:itself, width: 3, styler: -> (val, str) { "\033[31m#{str}\033[0m" }) { |n| n }
 
         expect(table.to_s).to eq \
           %Q(+-----+
@@ -1039,7 +1042,7 @@ describe Tabulo::Table do
 
       it "applies styling separately to each part of the wrapped cell content that's on its own line" do
         table = Tabulo::Table.new(%w[hello yes])
-        table.add_column(:itself, width: 3, styler: -> (val, str) { "\033[31m#{str}\033[0m" })
+        table.add_column(:itself, width: 3, styler: -> (val, str) { "\033[31m#{str}\033[0m" }) { |n| n }
 
         expect(table.to_s).to eq \
           %Q(+-----+
@@ -1079,7 +1082,7 @@ describe Tabulo::Table do
 
       it "applies the same styling to the truncation indicator as to the cell content" do
         table = Tabulo::Table.new(%w[hello yes], wrap_header_cells_to: 1)
-        table.add_column(:itself, width: 3, header_styler: -> (str) { "\033[31m#{str}\033[0m" })
+        table.add_column("itself", width: 3, header_styler: -> (str) { "\033[31m#{str}\033[0m" }) { |n| n }
 
         expect(table.to_s).to eq \
           %Q(+-----+
@@ -1092,7 +1095,7 @@ describe Tabulo::Table do
 
       it "applies styling separately to each part of the wrapped header cell content that's on its own line" do
         table = Tabulo::Table.new(%w[hello yes])
-        table.add_column(:itself, width: 3, header_styler: -> (str) { "\033[31m#{str}\033[0m" })
+        table.add_column("itself", width: 3, header_styler: -> (str) { "\033[31m#{str}\033[0m" }) { |n| n }
 
         expect(table.to_s).to eq \
           %Q(+-----+
@@ -1254,7 +1257,7 @@ describe Tabulo::Table do
 
         # Let's do a quick check to make sure that it will also expand the total table width if required.
         small_table = Tabulo::Table.new(%w(hello goodbye), column_width: 3) do |t|
-          t.add_column(:itself) { |s| s }
+          t.add_column("itself") { |s| s }
         end
         expect { small_table.pack }.to change(small_table, :to_s).from(
           %q(+-----+
