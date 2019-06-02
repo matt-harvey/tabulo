@@ -1,5 +1,11 @@
 # Changelog
 
+### v1.5.0
+
+* Support use of ANSI escape sequences to add colours and
+  other styling to table elements without breaking the formatting.
+* Major refactor, moving various computations into a new Cell class.
+
 ### v1.4.1
 
 * Minor documentation fix
