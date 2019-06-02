@@ -420,7 +420,7 @@ You can achieve this as follows using raw ANSI escape codes:
 ```ruby
 table.add_column(
   :even?,
-  styler: -> (n, s) { n.even? ? "\033[32m#{s}\033[0m" : "\033[31m#{s}\033[0m" }
+  styler: -> (cell_value, s) { cell_value ? "\033[32m#{s}\033[0m" : "\033[31m#{s}\033[0m" }
 )
 ```
 
@@ -434,13 +434,13 @@ require "rainbow"
 
 table.add_column(
   :even?,
-  styler: -> (n, s) { n.even? ? Rainbow(s).red : Rainbow(s).green }
+  styler: -> (cell_value, s) { cell_value ? Rainbow(s).red : Rainbow(s).green }
 )
 ```
 
 The `styler` option should be passed a callable that takes two parameters: the
-first represents the element of the underlying enumerable for a given table
-row; and the second the represents formatted string value of that cell, i.e. the
+first represents the content of the cell (in this case a boolean indicating whether the
+number is even) row; and the second the represents formatted string value of that cell, i.e. the
 cell content after any processing by the [formatter](#formatting-cell-values) (if any).
 If the content of a cell is wrapped over multiple lines, then the `styler` will be called
 once per line, so that each line of the cell will have the escape sequence applied to it
