@@ -405,13 +405,11 @@ the underlying value of that cell, not its formatted value.
 <a name="colours-and-styling"></a>
 ### Colours and styling
 
-In most terminals, if you want print text that is coloured, or has other styles
-such as underlining, you need to use ANSI escape sequences, either directly, or by means of a library
-such as [Rainbow](http://github.com/sickill/rainbow) that uses them under the hood. When added
-to a string, ANSI escape codes increase a string's length without increasing the width
-it visually occupies in the terminal. So that Tabulo can perform the width calculations required to
-render the table correctly, the `styler` option should be passed to `add_column` to apply colours
-or other styling that require escape sequences.
+In most terminals, if you want to print text that is coloured, or has certain other styles such as
+underlining, you need to use ANSI escape sequences, either directly, or by means of a library such
+as [Rainbow](http://github.com/sickill/rainbow) that uses them internally. Tabulo needs to properly
+account for escape sequences when performing the width calculations required to render tables.
+The `styler` option on the `add_column` method is intended to facilitate this.
 
 For example, suppose you have a table to which you want to add a column that
 displays `true` in green if a given number is even, or else displays `false` in red.
