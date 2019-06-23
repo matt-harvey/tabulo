@@ -438,11 +438,11 @@ table.add_column(
 
 The `styler` option should be passed a callable that takes two parameters: the
 first represents the content of the cell (in this case a boolean indicating whether the
-number is even) row; and the second the represents formatted string value of that cell, i.e. the
-cell content after any processing by the [formatter](#formatting-cell-values) (if any).
+number is even); and the second represents the formatted string value of that cell, i.e. the
+cell content after any processing by the [formatter](#formatting-cell-values).
 If the content of a cell is wrapped over multiple lines, then the `styler` will be called
 once per line, so that each line of the cell will have the escape sequence applied to it
-separately (ensuring the stying doesn't bleed into neighbouring cells).
+separately (ensuring the styling doesn't bleed into neighbouring cells).
 
 If you want to apply colours or other styling to the content of a column header, as opposed
 to cells in the table body, use the `header_styler` option, e.g.:
