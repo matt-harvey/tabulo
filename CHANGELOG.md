@@ -1,5 +1,10 @@
 # Changelog
 
+### v1.5.1
+
+* Dependency version upgrades
+* Minor documentation fixes
+
 ### v1.5.0
 
 * Support use of ANSI escape sequences to add colours and
