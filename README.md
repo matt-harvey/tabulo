@@ -752,9 +752,9 @@ Issues and pull requests are welcome on GitHub at https://github.com/matt-harvey
 To start working on Tabulo, `git clone` and `cd` into your fork of the repo, then run `bin/setup` to
 install dependencies.
 
-`bin/console` will give you an interactive prompt that will allow you to experiment; and `rake spec`
-will run the test suite. For a list of other Rake tasks that are available in the development
-environment, run `rake -T`.
+`bin/console` will give you an interactive prompt that will allow you to experiment; and
+`bundle exec rake spec` will run the test suite. For a list of other Rake tasks that are available in
+the development environment, run `bundle exec rake -T`.
 
 ## License
 
