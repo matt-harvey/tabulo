@@ -31,6 +31,10 @@ describe Tabulo::Column do
     it "returns a new Cell initialized with the value returned by calling the extractor on the passed source" do
       expect(subject.body_cell(3).instance_variable_get(:@value)).to eq(30)
     end
+
+    it "returns a new Cell which formats its content using the formatter with which the Column was initialized" do
+      expect(subject.body_cell(3).formatted_content).to eq("30.00")
+    end
   end
 
   describe "#body_cell_value" do
