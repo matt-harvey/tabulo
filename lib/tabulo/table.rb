@@ -101,7 +101,7 @@ module Tabulo
     def initialize(sources, *cols, columns: [], column_width: nil, column_padding: nil, header_frequency: :start,
       wrap_header_cells_to: nil, wrap_body_cells_to: nil, horizontal_rule_character: nil,
       vertical_rule_character: nil, intersection_character: nil, truncation_indicator: nil,
-      align_header: :center, align_body: :auto, border_styler: nil)
+      align_header: :center, align_body: :auto, border: nil, border_styler: nil)
 
       if columns.any?
         Deprecation.warn("`columns' option to Tabulo::Table#initialize", "the variable length parameter `cols'", 2)
@@ -124,9 +124,19 @@ module Tabulo
       @intersection_character = validate_character(intersection_character,
         DEFAULT_INTERSECTION_CHARACTER, InvalidIntersectionCharacterError, "intersection character")
 
-      @border = Border.from_classic_options(horizontal_rule_character: @horizontal_rule_character,
-        vertical_rule_character: @vertical_rule_character, intersection_character: @intersection_character,
-        styler: @border_styler)
+      @border =
+        case border
+        when :classic, :modern
+          Border.public_send(border, styler: border_styler)
+        when nil
+          Border.from_classic_options(horizontal_rule_character: @horizontal_rule_character,
+            vertical_rule_character: @vertical_rule_character, intersection_character: @intersection_character,
+            styler: @border_styler)
+        when Border
+          border
+        else
+          # FIXME Raise an error?
+        end
 
       @truncation_indicator = validate_character(truncation_indicator,
         DEFAULT_TRUNCATION_INDICATOR, InvalidTruncationIndicatorError, "truncation indicator")
@@ -258,9 +268,13 @@ module Tabulo
         include_header =
           case @header_frequency
           when :start
-            index == 0
+            :top if index == 0
           when Integer
-            index % @header_frequency == 0
+            if index == 0
+              :top
+            elsif index % @header_frequency == 0
+              :middle
+            end
           else
             @header_frequency
           end
@@ -282,9 +296,9 @@ module Tabulo
     #     puts table.horizontal_rule
     #   end
     #
-    def horizontal_rule
+    def horizontal_rule(position = :middle)
       column_widths = column_registry.map { |_, column| column.width + @column_padding * 2 }
-      @border.horizontal_rule(column_widths)
+      @border.horizontal_rule(column_widths, position == true ? :top : position)
     end
 
     # Reset all the column widths so that each column is *just* wide enough to accommodate
@@ -449,11 +463,16 @@ module Tabulo
     end
 
     # @!visibility private
-    def formatted_body_row(source, with_header: false)
+    def formatted_body_row(source, with_header: nil)
       cells = column_registry.map { |_, column| column.body_cell(source) }
       inner = format_row(cells, @wrap_body_cells_to)
       if with_header
-        join_lines([horizontal_rule, formatted_header, horizontal_rule, inner])
+        join_lines([
+          horizontal_rule(with_header),
+          formatted_header,
+          horizontal_rule,
+          inner,
+        ])
       else
         inner
       end
@@ -485,7 +504,7 @@ module Tabulo
     end
 
     # @!visibility private
-    def body_row(source, with_header: false)
+    def body_row(source, with_header: nil)
       Row.new(self, source, with_header: with_header)
     end
 

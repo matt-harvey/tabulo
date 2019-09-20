@@ -7,7 +7,7 @@ module Tabulo
     attr_reader :source
 
     # @!visibility private
-    def initialize(table, source, with_header: true)
+    def initialize(table, source, with_header: :top)
       @table = table
       @source = source
       @with_header = with_header
