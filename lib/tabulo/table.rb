@@ -228,7 +228,7 @@ module Tabulo
     #   display in a fixed-width font.
     def to_s
       if column_registry.any?
-        join_lines(map(&:to_s) + [horizontal_rule(:bottom)])
+        join_lines(map(&:to_s) + [horizontal_rule(for_position: :bottom)])
       else
         ""
       end
@@ -276,9 +276,9 @@ module Tabulo
     #     puts table.horizontal_rule
     #   end
     #
-    def horizontal_rule(position = :middle)
+    def horizontal_rule(for_position: :bottom)
       column_widths = column_registry.map { |_, column| column.width + @column_padding * 2 }
-      @border.horizontal_rule(column_widths, position == true ? :top : position)
+      @border.horizontal_rule(column_widths, for_position == true ? :top : for_position)
     end
 
     # Reset all the column widths so that each column is *just* wide enough to accommodate
@@ -448,9 +448,9 @@ module Tabulo
       inner = format_row(cells, @wrap_body_cells_to)
       if with_header
         join_lines([
-          horizontal_rule(with_header),
+          horizontal_rule(for_position: with_header),
           formatted_header,
-          horizontal_rule,
+          horizontal_rule(for_position: :middle),
           inner,
         ].reject(&:empty?))
       else

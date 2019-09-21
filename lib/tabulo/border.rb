@@ -118,9 +118,9 @@ module Tabulo
         styler: styler)
     end
 
-    def horizontal_rule(column_widths, placement = :middle)
+    def horizontal_rule(column_widths, for_position = :bottom)
       left, center, right, segment =
-        case placement
+        case for_position
         when :top
           [@corner_top_left, @tee_top, @corner_top_right, @edge_top]
         when :middle
