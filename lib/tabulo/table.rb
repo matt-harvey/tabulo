@@ -99,9 +99,8 @@ module Tabulo
     # @raise [InvalidHorizontalRuleCharacterError] if invalid argument passed to horizontal_rule_character.
     # @raise [InvalidVerticalRuleCharacterError] if invalid argument passed to vertical_rule_character.
     def initialize(sources, *cols, columns: [], column_width: nil, column_padding: nil, header_frequency: :start,
-      wrap_header_cells_to: nil, wrap_body_cells_to: nil, horizontal_rule_character: nil,
-      vertical_rule_character: nil, intersection_character: nil, truncation_indicator: nil,
-      align_header: :center, align_body: :auto, border: nil, border_styler: nil)
+      wrap_header_cells_to: nil, wrap_body_cells_to: nil, truncation_indicator: nil, align_header: :center,
+      align_body: :auto, border: :modern, border_styler: nil)
 
       if columns.any?
         Deprecation.warn("`columns' option to Tabulo::Table#initialize", "the variable length parameter `cols'", 2)
@@ -117,25 +116,16 @@ module Tabulo
       @align_body = align_body
       @border_styler = border_styler
 
-      @horizontal_rule_character = validate_character(horizontal_rule_character,
-        DEFAULT_HORIZONTAL_RULE_CHARACTER, InvalidHorizontalRuleCharacterError, "horizontal rule character")
-      @vertical_rule_character = validate_character(vertical_rule_character,
-        DEFAULT_VERTICAL_RULE_CHARACTER, InvalidVerticalRuleCharacterError, "vertical rule character")
-      @intersection_character = validate_character(intersection_character,
-        DEFAULT_INTERSECTION_CHARACTER, InvalidIntersectionCharacterError, "intersection character")
-
       @border =
         case border
-        when :classic, :modern
+        when :modern, :classic
           Border.public_send(border, styler: border_styler)
         when nil
-          Border.from_classic_options(horizontal_rule_character: @horizontal_rule_character,
-            vertical_rule_character: @vertical_rule_character, intersection_character: @intersection_character,
-            styler: @border_styler)
+          # FIXME Deal with this case
         when Border
           border
         else
-          # FIXME Raise an error?
+          raise InvalidBorderError
         end
 
       @truncation_indicator = validate_character(truncation_indicator,
@@ -248,7 +238,7 @@ module Tabulo
     #   display in a fixed-width font.
     def to_s
       if column_registry.any?
-        join_lines(map(&:to_s))
+        join_lines(map(&:to_s) + [horizontal_rule(:bottom)])
       else
         ""
       end
