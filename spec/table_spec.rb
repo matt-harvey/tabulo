@@ -13,11 +13,9 @@ describe Tabulo::Table do
       header_frequency: header_frequency,
       wrap_header_cells_to: wrap_header_cells_to,
       wrap_body_cells_to: wrap_body_cells_to,
-      horizontal_rule_character: horizontal_rule_character,
-      vertical_rule_character: vertical_rule_character,
-      intersection_character: intersection_character,
       truncation_indicator: truncation_indicator,
       column_padding: column_padding,
+      border: border,
       border_styler: border_styler
     ) do |t|
       t.add_column("N") { |n| n }
@@ -30,11 +28,9 @@ describe Tabulo::Table do
   let(:header_frequency) { :start }
   let(:wrap_header_cells_to) { nil }
   let(:wrap_body_cells_to) { nil }
-  let(:horizontal_rule_character) { nil }
-  let(:vertical_rule_character) { nil }
-  let(:intersection_character) { nil }
   let(:truncation_indicator) { nil }
   let(:column_padding) { nil }
+  let(:border) { :classic }
   let(:border_styler) { nil }
 
   it "is an Enumerable" do
@@ -53,7 +49,8 @@ describe Tabulo::Table do
              +--------------+--------------+
              |            1 |          1.0 |
              |            2 |          2.0 |
-             |            3 |          3.0 |).gsub(/^ +/, "")
+             |            3 |          3.0 |
+             +--------------+--------------+).gsub(/^ +/, "")
       end
 
       it "raises Tabulo::InvalidColumnLabelError if symbols are not unique" do
@@ -76,7 +73,8 @@ describe Tabulo::Table do
              +--------------+--------------+
              |            1 |          1.0 |
              |            2 |          2.0 |
-             |            3 |          3.0 |).gsub(/^ +/, "")
+             |            3 |          3.0 |
+             +--------------+--------------+).gsub(/^ +/, "")
       end
 
       it "raises Tabulo::InvalidColumnLabelError if symbols are not unique" do
@@ -106,7 +104,8 @@ describe Tabulo::Table do
                |            2 |            4 |
                |            3 |            6 |
                |            4 |            8 |
-               |            5 |           10 |).gsub(/^ +/, "")
+               |            5 |           10 |
+               +--------------+--------------+).gsub(/^ +/, "")
         end
       end
 
@@ -120,7 +119,8 @@ describe Tabulo::Table do
                |            2 |            4 |
                |            3 |            6 |
                |            4 |            8 |
-               |            5 |           10 |).gsub(/^ +/, "")
+               |            5 |           10 |
+               +--------------+--------------+).gsub(/^ +/, "")
         end
       end
 
@@ -140,7 +140,8 @@ describe Tabulo::Table do
                |       N      |    Doubled   |
                +--------------+--------------+
                |            4 |            8 |
-               |            5 |           10 |).gsub(/^ +/, "")
+               |            5 |           10 |
+               +--------------+--------------+).gsub(/^ +/, "")
         end
       end
 
@@ -169,7 +170,8 @@ describe Tabulo::Table do
                |            2 |            4 |            2 |
                |            3 |            6 |            3 |
                |            4 |            8 |            4 |
-               |            5 |           10 |            5 |).gsub(/^ +/, "")
+               |            5 |           10 |            5 |
+               +--------------+--------------+--------------+).gsub(/^ +/, "")
         end
       end
 
@@ -188,7 +190,8 @@ describe Tabulo::Table do
                  |            2 |            4 |            2 |
                  |            3 |            6 |            3 |
                  |            4 |            8 |            4 |
-                 |            5 |           10 |            5 |).gsub(/^ +/, "")
+                 |            5 |           10 |            5 |
+                 +--------------+--------------+--------------+).gsub(/^ +/, "")
           end
         end
 
@@ -207,7 +210,8 @@ describe Tabulo::Table do
                  |           2|           4|           2|
                  |           3|           6|           3|
                  |           4|           8|           4|
-                 |           5|          10|           5|).gsub(/^ +/, "")
+                 |           5|          10|           5|
+                 +------------+------------+------------+).gsub(/^ +/, "")
           end
         end
 
@@ -226,7 +230,8 @@ describe Tabulo::Table do
                  |             2  |             4  |             2  |
                  |             3  |             6  |             3  |
                  |             4  |             8  |             4  |
-                 |             5  |            10  |             5  |).gsub(/^ +/, "")
+                 |             5  |            10  |             5  |
+                 +----------------+----------------+----------------+).gsub(/^ +/, "")
           end
         end
 
@@ -244,7 +249,8 @@ describe Tabulo::Table do
                  |            2 |            4 |            2 |
                  |            3 |            6 |            3 |
                  |            4 |            8 |            4 |
-                 |            5 |           10 |            5 |).gsub(/^ +/, "")
+                 |            5 |           10 |            5 |
+                 +--------------+--------------+--------------+).gsub(/^ +/, "")
           end
         end
 
@@ -263,7 +269,8 @@ describe Tabulo::Table do
                  |            2 |            4 |            2 |
                  |            3 |            6 |            3 |
                  |            4 |            8 |            4 |
-                 |            5 |           10 |            5 |).gsub(/^ +/, "")
+                 |            5 |           10 |            5 |
+                 +--------------+--------------+--------------+).gsub(/^ +/, "")
           end
         end
       end
@@ -284,7 +291,8 @@ describe Tabulo::Table do
                |            1 |            2 |
                |            2 |            4 |
                | 500000000000 | 100000000000 |
-               |              |            0 |).gsub(/^ +/, "")
+               |              |            0 |
+               +--------------+--------------+).gsub(/^ +/, "")
         end
       end
 
@@ -299,7 +307,8 @@ describe Tabulo::Table do
                  +--------------+--------------+
                  |            1 |            2 |
                  |            2 |            4 |
-                 | 500000000000 | 100000000000~|).gsub(/^ +/, "")
+                 | 500000000000 | 100000000000~|
+                 +--------------+--------------+).gsub(/^ +/, "")
           end
         end
 
@@ -314,7 +323,8 @@ describe Tabulo::Table do
                  |            1 |            2 |
                  |            2 |            4 |
                  | 500000000000 | 100000000000 |
-                 |              |            0 |).gsub(/^ +/, "")
+                 |              |            0 |
+                 +--------------+--------------+).gsub(/^ +/, "")
           end
         end
 
@@ -330,7 +340,8 @@ describe Tabulo::Table do
                  |            1 |            2 |
                  |            2 |            4 |
                  | 500000000000 | 100000000000 |
-                 |              |            0 |).gsub(/^ +/, "")
+                 |              |            0 |
+                 +--------------+--------------+).gsub(/^ +/, "")
           end
         end
 
@@ -347,7 +358,8 @@ describe Tabulo::Table do
                  |             1  |             2  |
                  |             2  |             4  |
                  |  500000000000  |  100000000000  |
-                 |                |             0  |).gsub(/^ +/, "")
+                 |                |             0  |
+                 +----------------+----------------+).gsub(/^ +/, "")
           end
         end
       end
@@ -364,7 +376,8 @@ describe Tabulo::Table do
                |            2 |            4 |
                |            3 |            6 |
                |            4 |            8 |
-               |            5 |           10 |).gsub(/^ +/, "")
+               |            5 |           10 |
+               +--------------+--------------+).gsub(/^ +/, "")
         end
       end
 
@@ -382,7 +395,8 @@ describe Tabulo::Table do
                |         2 |         4 |  true |
                |         3 |         6 | false |
                |         4 |         8 |  true |
-               |         5 |        10 | false |).gsub(/^ +/, "")
+               |         5 |        10 | false |
+               +-----------+-----------+-------+).gsub(/^ +/, "")
         end
       end
     end
@@ -400,7 +414,8 @@ describe Tabulo::Table do
              +--------------+--------------+
              | 很酷的时候   |            2 |
              | 很酷的时候   |            4 |
-             | 很酷的时候   |            6 |).gsub(/^ +/, "")
+             | 很酷的时候   |            6 |
+             +--------------+--------------+).gsub(/^ +/, "")
       end
 
       it "wraps content correctly" do
@@ -418,7 +433,8 @@ describe Tabulo::Table do
              | 很酷的时候很 |            2 |
              | 酷的时候     |              |
              | 很酷的时候很 |            4 |
-             | 酷的时候     |              |).gsub(/^ +/, "")
+             | 酷的时候     |              |
+             +--------------+--------------+).gsub(/^ +/, "")
       end
     end
 
@@ -447,7 +463,8 @@ describe Tabulo::Table do
                | Multipl |           18 |     Multiple |
                | e       |              |          new |
                | new     |              |        lines |
-               | lines   |              |              |).gsub(/^ +/, "")
+               | lines   |              |              |
+               +---------+--------------+--------------+).gsub(/^ +/, "")
 
         end
       end
@@ -469,205 +486,8 @@ describe Tabulo::Table do
                | Two         ~|            9 |          Two~|
                |             ~|            8 |             ~|
                | Final       ~|            6 |        Final~|
-               | Multiple    ~|           18 |     Multiple~|).gsub(/^ +/, "")
-        end
-      end
-    end
-
-    describe "`horizontal_rule_character` param" do
-      context "when passed nil" do
-        let(:horizontal_rule_character) { nil }
-
-        it "determines the character used for all horizontal lines in the table (excluding corners), "\
-          "defaulting to '-'" do
-          expect(table.to_s).to eq \
-            %q(+--------------+--------------+
-               |       N      |    Doubled   |
-               +--------------+--------------+
-               |            1 |            2 |
-               |            2 |            4 |
-               |            3 |            6 |
-               |            4 |            8 |
-               |            5 |           10 |).gsub(/^ +/, "")
-        end
-      end
-
-      context "when passed a non-nil character" do
-        let(:horizontal_rule_character) { "!" }
-
-        it "causes the character used for all horizontal lines in the table (excluding corners), "\
-          "to be that character" do
-          expect(table.to_s).to eq \
-            %q(+!!!!!!!!!!!!!!+!!!!!!!!!!!!!!+
-               |       N      |    Doubled   |
-               +!!!!!!!!!!!!!!+!!!!!!!!!!!!!!+
-               |            1 |            2 |
-               |            2 |            4 |
-               |            3 |            6 |
-               |            4 |            8 |
-               |            5 |           10 |).gsub(/^ +/, "")
-        end
-      end
-
-      context "when passed something other than nil or a single-character String" do
-        subject do
-          Tabulo::Table.new(source, horizontal_rule_character: horizontal_rule_character)
-        end
-
-        context "when passed an empty string" do
-          let(:horizontal_rule_character) { "" }
-
-          it "raises a Tabulo::InvalidHorizontalRuleCharacterError" do
-            expect { subject }.to raise_error(Tabulo::InvalidHorizontalRuleCharacterError)
-          end
-        end
-
-        context "when passed an string longer than one character" do
-          let(:horizontal_rule_character) { "!!" }
-
-          it "raises a Tabulo::InvalidHorizontalRuleCharacterError" do
-            expect { subject }.to raise_error(Tabulo::InvalidHorizontalRuleCharacterError)
-          end
-        end
-
-        context "when passed something other than nil or a String" do
-          let(:horizontal_rule_character) { 1 }
-
-          it "raises a Tabulo::InvalidHorizontalRuleCharacterError" do
-            expect { subject }.to raise_error(Tabulo::InvalidHorizontalRuleCharacterError)
-          end
-        end
-      end
-    end
-
-    describe "`vertical_rule_character` param" do
-      context "when passed nil" do
-        let(:vertical_rule_character) { nil }
-
-        it "determines the character used for all vertical lines in the table (excluding corners), "\
-          "defaulting to '|'" do
-          expect(table.to_s).to eq \
-            %q(+--------------+--------------+
-               |       N      |    Doubled   |
-               +--------------+--------------+
-               |            1 |            2 |
-               |            2 |            4 |
-               |            3 |            6 |
-               |            4 |            8 |
-               |            5 |           10 |).gsub(/^ +/, "")
-        end
-      end
-
-      context "when passed a non-nil character" do
-        let(:vertical_rule_character) { "!" }
-
-        it "causes the character used for all vertical lines in the table (excluding corners), "\
-          "to be that character" do
-          expect(table.to_s).to eq \
-            %q(+--------------+--------------+
-               !       N      !    Doubled   !
-               +--------------+--------------+
-               !            1 !            2 !
-               !            2 !            4 !
-               !            3 !            6 !
-               !            4 !            8 !
-               !            5 !           10 !).gsub(/^ +/, "")
-        end
-      end
-
-      context "when passed something other than nil or a single-character String" do
-        subject do
-          Tabulo::Table.new(source, vertical_rule_character: vertical_rule_character)
-        end
-
-        context "when passed an empty string" do
-          let(:vertical_rule_character) { "" }
-
-          it "raises a Tabulo::InvalidVerticalRuleCharacterError" do
-            expect { subject }.to raise_error(Tabulo::InvalidVerticalRuleCharacterError)
-          end
-        end
-
-        context "when passed an string longer than one character" do
-          let(:vertical_rule_character) { "!!" }
-
-          it "raises a Tabulo::InvalidVerticalRuleCharacterError" do
-            expect { subject }.to raise_error(Tabulo::InvalidVerticalRuleCharacterError)
-          end
-        end
-
-        context "when passed something other than nil or a String" do
-          let(:vertical_rule_character) { 1 }
-
-          it "raises a Tabulo::InvalidVerticalRuleCharacterError" do
-            expect { subject }.to raise_error(Tabulo::InvalidVerticalRuleCharacterError)
-          end
-        end
-      end
-    end
-
-    describe "`intersection_character` param" do
-      context "when passed nil" do
-        let(:intersection_character) { nil }
-
-        it "determines the character used for all intersections and corners in the table, "\
-          "defaulting to '+'" do
-          expect(table.to_s).to eq \
-            %q(+--------------+--------------+
-               |       N      |    Doubled   |
-               +--------------+--------------+
-               |            1 |            2 |
-               |            2 |            4 |
-               |            3 |            6 |
-               |            4 |            8 |
-               |            5 |           10 |).gsub(/^ +/, "")
-        end
-      end
-
-      context "when passed a non-nil character" do
-        let(:intersection_character) { "*" }
-
-        it "causes the character used for all intersections and corners in the table to be that "\
-          "character" do
-          expect(table.to_s).to eq \
-            %q(*--------------*--------------*
-               |       N      |    Doubled   |
-               *--------------*--------------*
-               |            1 |            2 |
-               |            2 |            4 |
-               |            3 |            6 |
-               |            4 |            8 |
-               |            5 |           10 |).gsub(/^ +/, "")
-        end
-      end
-
-      context "when passed something other than nil or a single-character String" do
-        subject do
-          Tabulo::Table.new(source, intersection_character: intersection_character)
-        end
-
-        context "when passed an empty string" do
-          let(:intersection_character) { "" }
-
-          it "raises a Tabulo::InvalidIntersectionCharacterError" do
-            expect { subject }.to raise_error(Tabulo::InvalidIntersectionCharacterError)
-          end
-        end
-
-        context "when passed an string longer than one character" do
-          let(:intersection_character) { "!!" }
-
-          it "raises a Tabulo::InvalidIntersectionCharacterError" do
-            expect { subject }.to raise_error(Tabulo::InvalidIntersectionCharacterError)
-          end
-        end
-
-        context "when passed something other than nil or a String" do
-          let(:intersection_character) { 1 }
-
-          it "raises a Tabulo::InvalidIntersectionCharacterError" do
-            expect { subject }.to raise_error(Tabulo::InvalidIntersectionCharacterError)
-          end
+               | Multiple    ~|           18 |     Multiple~|
+               +--------------+--------------+--------------+).gsub(/^ +/, "")
         end
       end
     end
@@ -696,7 +516,8 @@ describe Tabulo::Table do
                |       N      | AAAAAAAAAAAA~|
                +--------------+--------------+
                | 400000000000~| 800000000000~|
-               | 400000000000~| 800000000000~|).gsub(/^ +/, "")
+               | 400000000000~| 800000000000~|
+               +--------------+--------------+).gsub(/^ +/, "")
         end
       end
 
@@ -710,7 +531,8 @@ describe Tabulo::Table do
                |       N      | AAAAAAAAAAAA*|
                +--------------+--------------+
                | 400000000000*| 800000000000*|
-               | 400000000000*| 800000000000*|).gsub(/^ +/, "")
+               | 400000000000*| 800000000000*|
+               +--------------+--------------+).gsub(/^ +/, "")
         end
       end
 
@@ -756,7 +578,8 @@ describe Tabulo::Table do
                |            2 |            4 |
                |            3 |            6 |
                |            4 |            8 |
-               |            5 |           10 |).gsub(/^ +/, "")
+               |            5 |           10 |
+               +--------------+--------------+).gsub(/^ +/, "")
         end
       end
 
@@ -772,7 +595,8 @@ describe Tabulo::Table do
                |             2  |             4  |
                |             3  |             6  |
                |             4  |             8  |
-               |             5  |            10  |).gsub(/^ +/, "")
+               |             5  |            10  |
+               +----------------+----------------+).gsub(/^ +/, "")
         end
       end
 
@@ -788,7 +612,8 @@ describe Tabulo::Table do
                |           2|           4|
                |           3|           6|
                |           4|           8|
-               |           5|          10|).gsub(/^ +/, "")
+               |           5|          10|
+               +------------+------------+).gsub(/^ +/, "")
         end
       end
     end
@@ -801,12 +626,11 @@ describe Tabulo::Table do
           header_frequency: header_frequency,
           wrap_header_cells_to: wrap_header_cells_to,
           wrap_body_cells_to: wrap_body_cells_to,
-          horizontal_rule_character: horizontal_rule_character,
-          vertical_rule_character: vertical_rule_character,
-          intersection_character: intersection_character,
           truncation_indicator: truncation_indicator,
           column_padding: column_padding,
-          align_header: :left
+          align_header: :left,
+          border: border,
+          border_styler: border_styler
         ) do |t|
           t.add_column("N") { |n| n }
           t.add_column("Doubled") { |n| n * 2 }
@@ -822,7 +646,8 @@ describe Tabulo::Table do
              |            2 |            4 |
              |            3 |            6 |
              |            4 |            8 |
-             |            5 |           10 |).gsub(/^ +/, "")
+             |            5 |           10 |
+             +--------------+--------------+).gsub(/^ +/, "")
       end
 
       it "sets a default header alignment that can be overriden via #add_column" do
@@ -836,7 +661,8 @@ describe Tabulo::Table do
              |            2 |            4 |     true     |
              |            3 |            6 |     false    |
              |            4 |            8 |     true     |
-             |            5 |           10 |     false    |).gsub(/^ +/, "")
+             |            5 |           10 |     false    |
+             +--------------+--------------+--------------+).gsub(/^ +/, "")
       end
     end
 
@@ -848,12 +674,11 @@ describe Tabulo::Table do
           header_frequency: header_frequency,
           wrap_header_cells_to: wrap_header_cells_to,
           wrap_body_cells_to: wrap_body_cells_to,
-          horizontal_rule_character: horizontal_rule_character,
-          vertical_rule_character: vertical_rule_character,
-          intersection_character: intersection_character,
           truncation_indicator: truncation_indicator,
           column_padding: column_padding,
-          align_body: :left
+          align_body: :left,
+          border: border,
+          border_styler: border_styler
         ) do |t|
           t.add_column("N") { |n| n }
           t.add_column("Doubled") { |n| n * 2 }
@@ -869,7 +694,8 @@ describe Tabulo::Table do
              | 2            | 4            |
              | 3            | 6            |
              | 4            | 8            |
-             | 5            | 10           |).gsub(/^ +/, "")
+             | 5            | 10           |
+             +--------------+--------------+).gsub(/^ +/, "")
       end
 
       it "sets a default body cell alignment that can be overriden via #add_column" do
@@ -883,7 +709,8 @@ describe Tabulo::Table do
              | 2            | 4            |         true |
              | 3            | 6            |        false |
              | 4            | 8            |         true |
-             | 5            | 10           |        false |).gsub(/^ +/, "")
+             | 5            | 10           |        false |
+             +--------------+--------------+--------------+).gsub(/^ +/, "")
       end
     end
 
@@ -901,7 +728,8 @@ describe Tabulo::Table do
              \033[31m|\033[0m    itself    \033[31m|\033[0m     even?    \033[31m|\033[0m
              \033[31m+--------------+--------------+\033[0m
              \033[31m|\033[0m            1 \033[31m|\033[0m     false    \033[31m|\033[0m
-             \033[31m|\033[0m            2 \033[31m|\033[0m     true     \033[31m|\033[0m).gsub(/^ +/, "")
+             \033[31m|\033[0m            2 \033[31m|\033[0m     true     \033[31m|\033[0m
+             \033[31m+--------------+--------------+\033[0m).gsub(/^ +/, "")
 
       end
     end
@@ -923,7 +751,8 @@ describe Tabulo::Table do
              |            2 |            4 |     true     |
              |            3 |            6 |     false    |
              |            4 |            8 |     true     |
-             |            5 |           10 |     false    |).gsub(/^ +/, "")
+             |            5 |           10 |     false    |
+             +--------------+--------------+--------------+).gsub(/^ +/, "")
       end
     end
 
@@ -943,7 +772,8 @@ describe Tabulo::Table do
              |        2 |        4 | 2        |   true   |      2.0 |
              |        3 |        6 | 3        |   false  |      3.0 |
              |        4 |        8 | 4        |   true   |      4.0 |
-             |        5 |       10 | 5        |   false  |      5.0 |).gsub(/^ +/, "")
+             |        5 |       10 | 5        |   false  |      5.0 |
+             +----------+----------+----------+----------+----------+).gsub(/^ +/, "")
       end
 
       context "when passed `align_header` and `align_body` are passed :left, :center or :right" do
@@ -959,7 +789,8 @@ describe Tabulo::Table do
                |        2 |        4 |     2    |     true | 2.0      |
                |        3 |        6 |     3    |    false | 3.0      |
                |        4 |        8 |     4    |     true | 4.0      |
-               |        5 |       10 |     5    |    false | 5.0      |).gsub(/^ +/, "")
+               |        5 |       10 |     5    |    false | 5.0      |
+               +----------+----------+----------+----------+----------+).gsub(/^ +/, "")
         end
       end
     end
@@ -976,7 +807,8 @@ describe Tabulo::Table do
              |            2 |            4 |                6 |
              |            3 |            6 |                9 |
              |            4 |            8 |               12 |
-             |            5 |           10 |               15 |).gsub(/^ +/, "")
+             |            5 |           10 |               15 |
+             +--------------+--------------+------------------+).gsub(/^ +/, "")
       end
     end
 
@@ -994,7 +826,8 @@ describe Tabulo::Table do
              |            2 |            4 |         6.00 |
              |            3 |            6 |         9.00 |
              |            4 |            8 |        12.00 |
-             |            5 |           10 |        15.00 |).gsub(/^ +/, "")
+             |            5 |           10 |        15.00 |
+             +--------------+--------------+--------------+).gsub(/^ +/, "")
         top_right_body_cell = table.first.to_a.last
         expect(top_right_body_cell).to eq(3)
         expect(top_right_body_cell).to be_a(Integer)
@@ -1021,7 +854,8 @@ describe Tabulo::Table do
              |            2 |            4 |         \033[31;1;4m6.00\033[0m |
              |            3 |            6 |         9.00 |
              |            4 |            8 |        12.00 |
-             |            5 |           10 |        15.00 |).gsub(/^ +/, "")
+             |            5 |           10 |        15.00 |
+             +--------------+--------------+--------------+).gsub(/^ +/, "")
         top_right_body_cell = table.first.to_a.last
         expect(top_right_body_cell).to eq(3)
         expect(top_right_body_cell).to be_a(Integer)
@@ -1037,7 +871,8 @@ describe Tabulo::Table do
              | elf |
              +-----+
              | \033[31mhel\033[0m\033[31m~\033[0m|
-             | \033[31myes\033[0m |).gsub(/^ +/, "")
+             | \033[31myes\033[0m |
+             +-----+).gsub(/^ +/, "")
       end
 
       it "applies styling separately to each part of the wrapped cell content that's on its own line" do
@@ -1051,7 +886,8 @@ describe Tabulo::Table do
              +-----+
              | \033[31mhel\033[0m |
              | \033[31mlo\033[0m  |
-             | \033[31myes\033[0m |).gsub(/^ +/, "")
+             | \033[31myes\033[0m |
+             +-----+).gsub(/^ +/, "")
       end
     end
 
@@ -1074,7 +910,8 @@ describe Tabulo::Table do
              |            2 |            4 |         6.00 |
              |            3 |            6 |         9.00 |
              |            4 |            8 |        12.00 |
-             |            5 |           10 |        15.00 |).gsub(/^ +/, "")
+             |            5 |           10 |        15.00 |
+             +--------------+--------------+--------------+).gsub(/^ +/, "")
         top_right_body_cell = table.first.to_a.last
         expect(top_right_body_cell).to eq(3)
         expect(top_right_body_cell).to be_a(Integer)
@@ -1090,7 +927,8 @@ describe Tabulo::Table do
              +-----+
              | hel |
              | lo  |
-             | yes |).gsub(/^ +/, "")
+             | yes |
+             +-----+).gsub(/^ +/, "")
       end
 
       it "applies styling separately to each part of the wrapped header cell content that's on its own line" do
@@ -1104,7 +942,8 @@ describe Tabulo::Table do
              +-----+
              | hel |
              | lo  |
-             | yes |).gsub(/^ +/, "")
+             | yes |
+             +-----+).gsub(/^ +/, "")
       end
     end
 
@@ -1131,7 +970,8 @@ describe Tabulo::Table do
                |            2 |            4 |            6 |            8 |           10 |
                |            3 |            6 |            9 |           12 |           15 |
                |            4 |            8 |           12 |           16 |           20 |
-               |            5 |           10 |           15 |           20 |           25 |).gsub(/^ +/, "")
+               |            5 |           10 |           15 |           20 |           25 |
+               +--------------+--------------+--------------+--------------+--------------+).gsub(/^ +/, "")
         end
       end
 
@@ -1151,7 +991,8 @@ describe Tabulo::Table do
                |     true     |
                |     false    |
                |     true     |
-               |     false    |).gsub(/^ +/, "")
+               |     false    |
+               +--------------+).gsub(/^ +/, "")
         end
       end
     end
@@ -1240,7 +1081,8 @@ describe Tabulo::Table do
              |        4 |        8 | 4        |   true   |   4.0000 | wwwww |          |
              |          |          |          |          |          | www   |          |
              |        5 |       10 | 5        |   false  |  5.00000 | wwwww |          |
-             |          |          |          |          |          | wwwww |          |).gsub(/^ +/, "")
+             |          |          |          |          |          | wwwww |          |
+             +----------+----------+----------+----------+----------+-------+----------+).gsub(/^ +/, "")
 
         ).to(
           %q(+---+---------+------+-------+---------+------------+-------+
@@ -1252,7 +1094,8 @@ describe Tabulo::Table do
              | 3 |       6 | 3    | false |   3.000 | wwwwww     | two   |
              |   |         |      |       |         |            | lines |
              | 4 |       8 | 4    |  true |  4.0000 | wwwwwwww   |       |
-             | 5 |      10 | 5    | false | 5.00000 | wwwwwwwwww |       |).gsub(/^ +/, "")
+             | 5 |      10 | 5    | false | 5.00000 | wwwwwwwwww |       |
+             +---+---------+------+-------+---------+------------+-------+).gsub(/^ +/, "")
         )
 
         # Let's do a quick check to make sure that it will also expand the total table width if required.
@@ -1268,13 +1111,15 @@ describe Tabulo::Table do
              | lo  |
              | goo |
              | dby |
-             | e   |).gsub(/^ +/, "")
+             | e   |
+             +-----+).gsub(/^ +/, "")
         ).to(
           %q(+---------+
              |  itself |
              +---------+
              | hello   |
-             | goodbye |).gsub(/^ +/, "")
+             | goodbye |
+             +---------+).gsub(/^ +/, "")
         )
       end
     end
@@ -1299,7 +1144,8 @@ describe Tabulo::Table do
                |  3  |        6  |  3     |  false  |    3.000  |  wwwwww      |  two    |
                |     |           |        |         |           |              |  lines  |
                |  4  |        8  |  4     |   true  |   4.0000  |  wwwwwwww    |         |
-               |  5  |       10  |  5     |  false  |  5.00000  |  wwwwwwwwww  |         |).gsub(/^ +/, "")
+               |  5  |       10  |  5     |  false  |  5.00000  |  wwwwwwwwww  |         |
+               +-----+-----------+--------+---------+-----------+--------------+---------+).gsub(/^ +/, "")
           )
         end
       end
@@ -1323,7 +1169,8 @@ describe Tabulo::Table do
                |        4 |        8 | 4        |   true   |   4.0000 | wwwww |          |
                |          |          |          |          |          | www   |          |
                |        5 |       10 | 5        |   false  |  5.00000 | wwwww |          |
-               |          |          |          |          |          | wwwww |          |).gsub(/^ +/, "")
+               |          |          |          |          |          | wwwww |          |
+               +----------+----------+----------+----------+----------+-------+----------+).gsub(/^ +/, "")
 
           ).to(
             %q(+---+---------+------+-------+---------+------------+-------+
@@ -1335,7 +1182,8 @@ describe Tabulo::Table do
                | 3 |       6 | 3    | false |   3.000 | wwwwww     | two   |
                |   |         |      |       |         |            | lines |
                | 4 |       8 | 4    |  true |  4.0000 | wwwwwwww   |       |
-               | 5 |      10 | 5    | false | 5.00000 | wwwwwwwwww |       |).gsub(/^ +/, "")
+               | 5 |      10 | 5    | false | 5.00000 | wwwwwwwwww |       |
+               +---+---------+------+-------+---------+------------+-------+).gsub(/^ +/, "")
 
           )
         end
@@ -1359,7 +1207,8 @@ describe Tabulo::Table do
                |        4 |        8 | 4        |   true   |   4.0000 | wwwww |          |
                |          |          |          |          |          | www   |          |
                |        5 |       10 | 5        |   false  |  5.00000 | wwwww |          |
-               |          |          |          |          |          | wwwww |          |).gsub(/^ +/, "")
+               |          |          |          |          |          | wwwww |          |
+               +----------+----------+----------+----------+----------+-------+----------+).gsub(/^ +/, "")
           ).to(
             %q(+---+--------+------+-------+--------+--------+-------+
                | N | Double | to_s | Is it |   dec  |  word  |  cool |
@@ -1372,7 +1221,8 @@ describe Tabulo::Table do
                | 4 |      8 | 4    |  true | 4.0000 | wwwwww |       |
                |   |        |      |       |        | ww     |       |
                | 5 |     10 | 5    | false | 5.0000 | wwwwww |       |
-               |   |        |      |       |      0 | wwww   |       |).gsub(/^ +/, "")
+               |   |        |      |       |      0 | wwww   |       |
+               +---+--------+------+-------+--------+--------+-------+).gsub(/^ +/, "")
           )
         end
 
@@ -1397,7 +1247,8 @@ describe Tabulo::Table do
                  |         4  |         8  |  4         |    true    |    4.0000  |  wwwww  |            |
                  |            |            |            |            |            |  www    |            |
                  |         5  |        10  |  5         |    false   |   5.00000  |  wwwww  |            |
-                 |            |            |            |            |            |  wwwww  |            |).gsub(/^ +/, "")
+                 |            |            |            |            |            |  wwwww  |            |
+                 +------------+------------+------------+------------+------------+---------+------------+).gsub(/^ +/, "")
             ).to(
               %q(+-----+----------+--------+---------+----------+----------+---------+
                  |  N  |  Double  |  to_s  |  Is it  |    dec   |   word   |   cool  |
@@ -1410,7 +1261,8 @@ describe Tabulo::Table do
                  |  4  |       8  |  4     |   true  |  4.0000  |  wwwwww  |         |
                  |     |          |        |         |          |  ww      |         |
                  |  5  |      10  |  5     |  false  |  5.0000  |  wwwwww  |         |
-                 |     |          |        |         |       0  |  wwww    |         |).gsub(/^ +/, "")
+                 |     |          |        |         |       0  |  wwww    |         |
+                 +-----+----------+--------+---------+----------+----------+---------+).gsub(/^ +/, "")
             )
           end
         end
@@ -1436,7 +1288,8 @@ describe Tabulo::Table do
                  |       4|       8|4       |  true  |  4.0000|wwwww|        |
                  |        |        |        |        |        |www  |        |
                  |       5|      10|5       |  false | 5.00000|wwwww|        |
-                 |        |        |        |        |        |wwwww|        |).gsub(/^ +/, "")
+                 |        |        |        |        |        |wwwww|        |
+                 +--------+--------+--------+--------+--------+-----+--------+).gsub(/^ +/, "")
             ).to(
               %q(+-+------+----+-----+------+------+-----+
                  |N|Double|to_s|Is it|  dec | word | cool|
@@ -1449,7 +1302,8 @@ describe Tabulo::Table do
                  |4|     8|4   | true|4.0000|wwwwww|     |
                  | |      |    |     |      |ww    |     |
                  |5|    10|5   |false|5.0000|wwwwww|     |
-                 | |      |    |     |     0|wwww  |     |).gsub(/^ +/, "")
+                 | |      |    |     |     0|wwww  |     |
+                 +-+------+----+-----+------+------+-----+).gsub(/^ +/, "")
             )
           end
         end
@@ -1479,7 +1333,8 @@ describe Tabulo::Table do
                | h |   |
                | e |   |
                | r |   |
-               | e |   |).gsub(/^ +/, "")
+               | e |   |
+               +---+---+).gsub(/^ +/, "")
         end
       end
 
@@ -1495,7 +1350,8 @@ describe Tabulo::Table do
                +-----+-----+
                |   1 | 1.0 |
                |   2 | 2.0 |
-               |   3 | 3.0 |).gsub(/^ +/, "")
+               |   3 | 3.0 |
+               +-----+-----+).gsub(/^ +/, "")
         end
       end
     end
@@ -1503,7 +1359,15 @@ describe Tabulo::Table do
 
   describe "#transpose" do
     let(:source) { 1..3 }
-    let(:intersection_character) { "*" }
+
+    let(:border) do
+      Tabulo::Border.from_classic_options(
+        horizontal_rule_character: "-",
+        vertical_rule_character: "|",
+        intersection_character: "*",
+        styler: nil,
+      )
+    end
 
     it "returns another table" do
       result = table.transpose
@@ -1519,7 +1383,8 @@ describe Tabulo::Table do
            |         |  1  |  2  |  3  |
            *---------*-----*-----*-----*
            |       N |   1 |   2 |   3 |
-           | Doubled |   2 |   4 |   6 |).gsub(/^ +/, "")
+           | Doubled |   2 |   4 |   6 |
+           *---------*-----*-----*-----*).gsub(/^ +/, "")
     end
 
     it "accepts options for determining the header, width and alignment of the left-most column of the "\
@@ -1530,7 +1395,8 @@ describe Tabulo::Table do
            |        FIELDS        |  1  |  2  |  3  |
            *----------------------*-----*-----*-----*
            | N                    |   1 |   2 |   3 |
-           | Doubled              |   2 |   4 |   6 |).gsub(/^ +/, "")
+           | Doubled              |   2 |   4 |   6 |
+           *----------------------*-----*-----*-----*).gsub(/^ +/, "")
     end
 
     it "right-aligns the left-hand column of the new table by default" do
@@ -1539,7 +1405,8 @@ describe Tabulo::Table do
            |               FIELDS |  1  |  2  |  3  |
            *----------------------*-----*-----*-----*
            |                    N |   1 |   2 |   3 |
-           |              Doubled |   2 |   4 |   6 |).gsub(/^ +/, "")
+           |              Doubled |   2 |   4 |   6 |
+           *----------------------*-----*-----*-----*).gsub(/^ +/, "")
     end
 
     it "accepts a :headers option, allowing the caller to customize the column headers, "\
@@ -1549,7 +1416,8 @@ describe Tabulo::Table do
            |         |  2  |  4  |  6  |
            *---------*-----*-----*-----*
            |       N |   1 |   2 |   3 |
-           | Doubled |   2 |   4 |   6 |).gsub(/^ +/, "")
+           | Doubled |   2 |   4 |   6 |
+           *---------*-----*-----*-----*).gsub(/^ +/, "")
     end
   end
 
@@ -1593,7 +1461,8 @@ describe Tabulo::Table do
              |        4 |        8 | 4        |   true   |   4.0000 | wwwww |          |
              |          |          |          |          |          | www   |          |
              |        5 |       10 | 5        |   false  |  5.00000 | wwwww |          |
-             |          |          |          |          |          | wwwww |          |).gsub(/^ +/, "")
+             |          |          |          |          |          | wwwww |          |
+             +----------+----------+----------+----------+----------+-------+----------+).gsub(/^ +/, "")
 
         ).to(
           %q(+---+---------+------+-------+---------+------------+-------+
@@ -1605,7 +1474,8 @@ describe Tabulo::Table do
              | 3 |       6 | 3    | false |   3.000 | wwwwww     | two   |
              |   |         |      |       |         |            | lines |
              | 4 |       8 | 4    |  true |  4.0000 | wwwwwwww   |       |
-             | 5 |      10 | 5    | false | 5.00000 | wwwwwwwwww |       |).gsub(/^ +/, "")
+             | 5 |      10 | 5    | false | 5.00000 | wwwwwwwwww |       |
+             +---+---------+------+-------+---------+------------+-------+).gsub(/^ +/, "")
         )
 
         # Let's do a quick check to make sure that it will also expand the total table width if required.
@@ -1621,13 +1491,15 @@ describe Tabulo::Table do
              | lo  |
              | goo |
              | dby |
-             | e   |).gsub(/^ +/, "")
+             | e   |
+             +-----+).gsub(/^ +/, "")
         ).to(
           %q(+---------+
              |  itself |
              +---------+
              | hello   |
-             | goodbye |).gsub(/^ +/, "")
+             | goodbye |
+             +---------+).gsub(/^ +/, "")
         )
       end
     end
@@ -1652,7 +1524,8 @@ describe Tabulo::Table do
                |  3  |        6  |  3     |  false  |    3.000  |  wwwwww      |  two    |
                |     |           |        |         |           |              |  lines  |
                |  4  |        8  |  4     |   true  |   4.0000  |  wwwwwwww    |         |
-               |  5  |       10  |  5     |  false  |  5.00000  |  wwwwwwwwww  |         |).gsub(/^ +/, "")
+               |  5  |       10  |  5     |  false  |  5.00000  |  wwwwwwwwww  |         |
+               +-----+-----------+--------+---------+-----------+--------------+---------+).gsub(/^ +/, "")
           )
         end
       end
@@ -1676,7 +1549,8 @@ describe Tabulo::Table do
                |        4 |        8 | 4        |   true   |   4.0000 | wwwww |          |
                |          |          |          |          |          | www   |          |
                |        5 |       10 | 5        |   false  |  5.00000 | wwwww |          |
-               |          |          |          |          |          | wwwww |          |).gsub(/^ +/, "")
+               |          |          |          |          |          | wwwww |          |
+               +----------+----------+----------+----------+----------+-------+----------+).gsub(/^ +/, "")
 
           ).to(
             %q(+---+---------+------+-------+---------+------------+-------+
@@ -1688,7 +1562,8 @@ describe Tabulo::Table do
                | 3 |       6 | 3    | false |   3.000 | wwwwww     | two   |
                |   |         |      |       |         |            | lines |
                | 4 |       8 | 4    |  true |  4.0000 | wwwwwwww   |       |
-               | 5 |      10 | 5    | false | 5.00000 | wwwwwwwwww |       |).gsub(/^ +/, "")
+               | 5 |      10 | 5    | false | 5.00000 | wwwwwwwwww |       |
+               +---+---------+------+-------+---------+------------+-------+).gsub(/^ +/, "")
 
           )
         end
@@ -1712,7 +1587,8 @@ describe Tabulo::Table do
                |        4 |        8 | 4        |   true   |   4.0000 | wwwww |          |
                |          |          |          |          |          | www   |          |
                |        5 |       10 | 5        |   false  |  5.00000 | wwwww |          |
-               |          |          |          |          |          | wwwww |          |).gsub(/^ +/, "")
+               |          |          |          |          |          | wwwww |          |
+               +----------+----------+----------+----------+----------+-------+----------+).gsub(/^ +/, "")
           ).to(
             %q(+---+--------+------+-------+--------+--------+-------+
                | N | Double | to_s | Is it |   dec  |  word  |  cool |
@@ -1725,7 +1601,8 @@ describe Tabulo::Table do
                | 4 |      8 | 4    |  true | 4.0000 | wwwwww |       |
                |   |        |      |       |        | ww     |       |
                | 5 |     10 | 5    | false | 5.0000 | wwwwww |       |
-               |   |        |      |       |      0 | wwww   |       |).gsub(/^ +/, "")
+               |   |        |      |       |      0 | wwww   |       |
+               +---+--------+------+-------+--------+--------+-------+).gsub(/^ +/, "")
           )
         end
 
@@ -1750,7 +1627,8 @@ describe Tabulo::Table do
                  |         4  |         8  |  4         |    true    |    4.0000  |  wwwww  |            |
                  |            |            |            |            |            |  www    |            |
                  |         5  |        10  |  5         |    false   |   5.00000  |  wwwww  |            |
-                 |            |            |            |            |            |  wwwww  |            |).gsub(/^ +/, "")
+                 |            |            |            |            |            |  wwwww  |            |
+                 +------------+------------+------------+------------+------------+---------+------------+).gsub(/^ +/, "")
             ).to(
               %q(+-----+----------+--------+---------+----------+----------+---------+
                  |  N  |  Double  |  to_s  |  Is it  |    dec   |   word   |   cool  |
@@ -1763,7 +1641,8 @@ describe Tabulo::Table do
                  |  4  |       8  |  4     |   true  |  4.0000  |  wwwwww  |         |
                  |     |          |        |         |          |  ww      |         |
                  |  5  |      10  |  5     |  false  |  5.0000  |  wwwwww  |         |
-                 |     |          |        |         |       0  |  wwww    |         |).gsub(/^ +/, "")
+                 |     |          |        |         |       0  |  wwww    |         |
+                 +-----+----------+--------+---------+----------+----------+---------+).gsub(/^ +/, "")
             )
           end
         end
@@ -1789,7 +1668,8 @@ describe Tabulo::Table do
                  |       4|       8|4       |  true  |  4.0000|wwwww|        |
                  |        |        |        |        |        |www  |        |
                  |       5|      10|5       |  false | 5.00000|wwwww|        |
-                 |        |        |        |        |        |wwwww|        |).gsub(/^ +/, "")
+                 |        |        |        |        |        |wwwww|        |
+                 +--------+--------+--------+--------+--------+-----+--------+).gsub(/^ +/, "")
             ).to(
               %q(+-+------+----+-----+------+------+-----+
                  |N|Double|to_s|Is it|  dec | word | cool|
@@ -1802,7 +1682,8 @@ describe Tabulo::Table do
                  |4|     8|4   | true|4.0000|wwwwww|     |
                  | |      |    |     |      |ww    |     |
                  |5|    10|5   |false|5.0000|wwwwww|     |
-                 | |      |    |     |     0|wwww  |     |).gsub(/^ +/, "")
+                 | |      |    |     |     0|wwww  |     |
+                 +-+------+----+-----+------+------+-----+).gsub(/^ +/, "")
             )
           end
         end
@@ -1832,7 +1713,8 @@ describe Tabulo::Table do
                | h |   |
                | e |   |
                | r |   |
-               | e |   |).gsub(/^ +/, "")
+               | e |   |
+               +---+---+).gsub(/^ +/, "")
         end
       end
 
@@ -1848,7 +1730,8 @@ describe Tabulo::Table do
                +-----+-----+
                |   1 | 1.0 |
                |   2 | 2.0 |
-               |   3 | 3.0 |).gsub(/^ +/, "")
+               |   3 | 3.0 |
+               +-----+-----+).gsub(/^ +/, "")
         end
       end
     end

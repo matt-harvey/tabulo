@@ -376,8 +376,7 @@ module Tabulo
     # @raise [InvalidVerticalRuleCharacterError] if invalid argument passed to vertical_rule_character.
     def transpose(opts = {})
       default_opts = [:column_width, :column_padding, :header_frequency, :wrap_header_cells_to,
-        :wrap_body_cells_to, :horizontal_rule_character, :vertical_rule_character,
-        :intersection_character, :truncation_indicator, :align_header, :align_body].map do |sym|
+        :wrap_body_cells_to, :truncation_indicator, :align_header, :align_body, :border, :border_styler].map do |sym|
         [sym, instance_variable_get("@#{sym}")]
       end.to_h
 
