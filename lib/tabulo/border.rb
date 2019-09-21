@@ -5,23 +5,70 @@ module Tabulo
   # @!visibility private
   class Border
 
+    def self.classic(styler: nil)
+      from_classic_options(
+        horizontal_rule_character: Table::DEFAULT_HORIZONTAL_RULE_CHARACTER,
+        vertical_rule_character: Table::DEFAULT_VERTICAL_RULE_CHARACTER,
+        intersection_character: Table::DEFAULT_INTERSECTION_CHARACTER,
+        styler: styler)
+    end
+
+    def self.modern(styler: nil)
+      new(
+        corner_top_left: '┌',
+        corner_top_right: '┐',
+        corner_bottom_right: '┘',
+        corner_bottom_left: '└',
+        edge_top: '─',
+        edge_right: '│',
+        edge_bottom: '─',
+        edge_left: '│',
+        tee_top: '┬',
+        tee_right: '┤',
+        tee_bottom: '┴',
+        tee_left: '├',
+        divider_vertical: '│',
+        divider_horizontal: '─',
+        intersection: '┼',
+        styler: styler)
+    end
+
+    def self.null
+      new
+    end
+
+    def self.from(initializer, styler)
+      case initializer
+      when :modern
+        modern(styler: styler)
+      when :classic
+        classic(styler: styler)
+      when nil
+        null
+      when Border
+        initializer
+      else
+        raise InvalidBorderError
+      end
+    end
+
     def initialize(
-      corner_top_left:,
-      corner_top_right:,
-      corner_bottom_right:,
-      corner_bottom_left:,
-      edge_top:,
-      edge_right:,
-      edge_bottom:,
-      edge_left:,
-      tee_top:,
-      tee_right:,
-      tee_bottom:,
-      tee_left:,
-      divider_vertical:,
-      divider_horizontal:,
-      intersection:,
-      styler:)
+      corner_top_left: "",
+      corner_top_right: "",
+      corner_bottom_right: "",
+      corner_bottom_left: "",
+      edge_top: "",
+      edge_right: "",
+      edge_bottom: "",
+      edge_left: "",
+      tee_top: "",
+      tee_right: "",
+      tee_bottom: "",
+      tee_left: "",
+      divider_vertical: "",
+      divider_horizontal: "",
+      intersection: "",
+      styler: nil)
 
       @corner_top_left = corner_top_left
       @corner_top_right = corner_top_right
@@ -44,34 +91,6 @@ module Tabulo
       @intersection = intersection
 
       @styler = (styler || -> (s) { s })
-    end
-
-    def self.classic(styler: nil)
-      from_classic_options(
-        horizontal_rule_character: Table::DEFAULT_HORIZONTAL_RULE_CHARACTER,
-        vertical_rule_character: Table::DEFAULT_VERTICAL_RULE_CHARACTER,
-        intersection_character: Table::DEFAULT_INTERSECTION_CHARACTER,
-        styler: styler)
-    end
-
-    def self.modern(styler: nil)
-      new(
-      corner_top_left: '┌',
-      corner_top_right: '┐',
-      corner_bottom_right: '┘',
-      corner_bottom_left: '└',
-      edge_top: '─',
-      edge_right: '│',
-      edge_bottom: '─',
-      edge_left: '│',
-      tee_top: '┬',
-      tee_right: '┤',
-      tee_bottom: '┴',
-      tee_left: '├',
-      divider_vertical: '│',
-      divider_horizontal: '─',
-      intersection: '┼',
-      styler: styler)
     end
 
     def self.from_classic_options(

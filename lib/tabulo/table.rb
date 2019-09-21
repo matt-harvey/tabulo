@@ -116,17 +116,7 @@ module Tabulo
       @align_body = align_body
       @border_styler = border_styler
 
-      @border =
-        case border
-        when :modern, :classic
-          Border.public_send(border, styler: border_styler)
-        when nil
-          # FIXME Deal with this case
-        when Border
-          border
-        else
-          raise InvalidBorderError
-        end
+      @border = Border.from(border, @border_styler)
 
       @truncation_indicator = validate_character(truncation_indicator,
         DEFAULT_TRUNCATION_INDICATOR, InvalidTruncationIndicatorError, "truncation indicator")
@@ -462,7 +452,7 @@ module Tabulo
           formatted_header,
           horizontal_rule,
           inner,
-        ])
+        ].reject(&:empty?))
       else
         inner
       end
