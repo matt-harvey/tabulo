@@ -16,15 +16,6 @@ module Tabulo
     DEFAULT_COLUMN_PADDING = 1
 
     # @!visibility public
-    DEFAULT_HORIZONTAL_RULE_CHARACTER = "-"
-
-    # @!visibility public
-    DEFAULT_VERTICAL_RULE_CHARACTER = "|"
-
-    # @!visibility public
-    DEFAULT_INTERSECTION_CHARACTER = "+"
-
-    # @!visibility public
     DEFAULT_TRUNCATION_INDICATOR = "~"
 
     # @!visibility private
@@ -59,18 +50,6 @@ module Tabulo
     #   headers), if their content is longer than the column's fixed width. If passed <tt>nil</tt>, content will
     #   be wrapped for as many rows as required to accommodate it. If passed an Integer N (> 0), content will be
     #   wrapped up to N rows and then truncated thereafter.
-    # @param [nil, String] horizontal_rule_character Determines the character used to draw
-    #   horizontal lines where required in the table. If omitted or passed <tt>nil</tt>, defaults to
-    #   {DEFAULT_HORIZONTAL_RULE_CHARACTER}. If passed something other than <tt>nil</tt> or a single-character
-    #   String, raises {InvalidHorizontalRuleCharacterError}.
-    # @param [nil, String] vertical_rule_character Determines the character used to draw
-    #   vertical lines where required in the table. If omitted or passed <tt>nil</tt>, defaults to
-    #   {DEFAULT_VERTICAL_RULE_CHARACTER}. If passed something other than <tt>nil</tt> or a single-character
-    #   String, raises {InvalidVerticalRuleCharacterError}.
-    # @param [nil, String] intersection_character Determines the character used to draw
-    #   line intersections and corners where required in the table. If omitted or passed <tt>nil</tt>,
-    #   defaults to {DEFAULT_INTERSECTION_CHARACTER}. If passed something other than <tt>nil</tt> or
-    #   a single-character String, raises {InvalidIntersectionCharacterError}.
     # @param [nil, String] truncation_indicator Determines the character used to indicate that a
     #   cell's content has been truncated. If omitted or passed <tt>nil</tt>,
     #   defaults to {DEFAULT_TRUNCATION_INDICATOR}. If passed something other than <tt>nil</tt> or
@@ -85,22 +64,13 @@ module Tabulo
     #   using the <tt>align_body</tt> option passed to {#add_column}. If passed <tt>:auto</tt>,
     #   alignment is determined by cell content, with numbers aligned right, booleans
     #   center-aligned, and other values left-aligned.
-    # @param [nil, #to_proc] border_styler (nil) A lambda or other callable object taking
-    #   a single parameter, representing a section of the table's borders (which for this purpose
-    #   include any horizontal and vertical lines inside the table).
-    #   If passed <tt>nil</tt>, then no additional styling will be applied to borders. If passed a
-    #   callable, then that callable will be called for each border section, with the
-    #   resulting string rendered in place of that border. The extra width of the string returned by the
-    #   {border_styler} is not taken into consideration by the internal table rendering calculations
-    #   Thus it can be used to apply ANSI escape codes to border characters, to colour the borders
-    #   for example, without breaking the table formatting.
     # @return [Table] a new {Table}
     # @raise [InvalidColumnLabelError] if non-unique Symbols are provided to columns.
     # @raise [InvalidHorizontalRuleCharacterError] if invalid argument passed to horizontal_rule_character.
     # @raise [InvalidVerticalRuleCharacterError] if invalid argument passed to vertical_rule_character.
     def initialize(sources, *cols, columns: [], column_width: nil, column_padding: nil, header_frequency: :start,
       wrap_header_cells_to: nil, wrap_body_cells_to: nil, truncation_indicator: nil, align_header: :center,
-      align_body: :auto, border: :classic, border_styler: nil)
+      align_body: :auto, border: :classic)
 
       if columns.any?
         Deprecation.warn("`columns' option to Tabulo::Table#initialize", "the variable length parameter `cols'", 2)
@@ -114,9 +84,8 @@ module Tabulo
       @column_padding = (column_padding || DEFAULT_COLUMN_PADDING)
       @align_header = align_header
       @align_body = align_body
-      @border_styler = border_styler
 
-      @border = Border.from(border, @border_styler)
+      @border = Border.from(border)
 
       @truncation_indicator = validate_character(truncation_indicator,
         DEFAULT_TRUNCATION_INDICATOR, InvalidTruncationIndicatorError, "truncation indicator")
@@ -376,7 +345,7 @@ module Tabulo
     # @raise [InvalidVerticalRuleCharacterError] if invalid argument passed to vertical_rule_character.
     def transpose(opts = {})
       default_opts = [:column_width, :column_padding, :header_frequency, :wrap_header_cells_to,
-        :wrap_body_cells_to, :truncation_indicator, :align_header, :align_body, :border, :border_styler].map do |sym|
+        :wrap_body_cells_to, :truncation_indicator, :align_header, :align_body, :border].map do |sym|
         [sym, instance_variable_get("@#{sym}")]
       end.to_h
 

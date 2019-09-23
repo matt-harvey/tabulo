@@ -16,7 +16,6 @@ describe Tabulo::Table do
       truncation_indicator: truncation_indicator,
       column_padding: column_padding,
       border: border,
-      border_styler: border_styler
     ) do |t|
       t.add_column("N") { |n| n }
       t.add_column("Doubled") { |n| n * 2 }
@@ -31,7 +30,6 @@ describe Tabulo::Table do
   let(:truncation_indicator) { nil }
   let(:column_padding) { nil }
   let(:border) { :classic }
-  let(:border_styler) { nil }
 
   it "is an Enumerable" do
     expect(table).to be_a(Enumerable)
@@ -630,7 +628,6 @@ describe Tabulo::Table do
           column_padding: column_padding,
           align_header: :left,
           border: border,
-          border_styler: border_styler
         ) do |t|
           t.add_column("N") { |n| n }
           t.add_column("Doubled") { |n| n * 2 }
@@ -678,7 +675,6 @@ describe Tabulo::Table do
           column_padding: column_padding,
           align_body: :left,
           border: border,
-          border_styler: border_styler
         ) do |t|
           t.add_column("N") { |n| n }
           t.add_column("Doubled") { |n| n * 2 }
@@ -714,25 +710,26 @@ describe Tabulo::Table do
       end
     end
 
-    describe "`border_styler` param" do
-      let(:table) do
-        Tabulo::Table.new(1..2, border_styler: -> (str) { "\033[31m#{str}\033[0m" }) do |t|
-          t.add_column(:itself) { |n| n }
-          t.add_column(:even?)
-        end
-      end
+#     FIXME Reuse this in Border specs
+#     describe "`border_styler` param" do
+#       let(:table) do
+#         Tabulo::Table.new(1..2, border_styler: -> (str) { "\033[31m#{str}\033[0m" }) do |t|
+#           t.add_column(:itself) { |n| n }
+#           t.add_column(:even?)
+#         end
+#       end
 
-      it "styles border, divider and intersection characters without affecting width calculations" do
-        expect(table.to_s).to eq \
-          %Q(\033[31m+--------------+--------------+\033[0m
-             \033[31m|\033[0m    itself    \033[31m|\033[0m     even?    \033[31m|\033[0m
-             \033[31m+--------------+--------------+\033[0m
-             \033[31m|\033[0m            1 \033[31m|\033[0m     false    \033[31m|\033[0m
-             \033[31m|\033[0m            2 \033[31m|\033[0m     true     \033[31m|\033[0m
-             \033[31m+--------------+--------------+\033[0m).gsub(/^ +/, "")
+#       it "styles border, divider and intersection characters without affecting width calculations" do
+#         expect(table.to_s).to eq \
+#           %Q(\033[31m+--------------+--------------+\033[0m
+#              \033[31m|\033[0m    itself    \033[31m|\033[0m     even?    \033[31m|\033[0m
+#              \033[31m+--------------+--------------+\033[0m
+#              \033[31m|\033[0m            1 \033[31m|\033[0m     false    \033[31m|\033[0m
+#              \033[31m|\033[0m            2 \033[31m|\033[0m     true     \033[31m|\033[0m
+#              \033[31m+--------------+--------------+\033[0m).gsub(/^ +/, "")
 
-      end
-    end
+#       end
+#     end
   end
 
   describe "#add_column" do

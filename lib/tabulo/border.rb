@@ -1,35 +1,53 @@
 module Tabulo
 
-  # FIXME Specs
+  # FIXME Specs and documentation
+  # FIXME Update documentation in Table class accordingly.
 
-  # @!visibility private
   class Border
 
+    # @param [nil, #to_proc] styler (nil) A lambda or other callable object taking
+    #   a single parameter, representing a section of the table's borders (which for this purpose
+    #   include any horizontal and vertical lines inside the table).
+    #   If passed <tt>nil</tt>, then no additional styling will be applied to borders. If passed a
+    #   callable, then that callable will be called for each border section, with the
+    #   resulting string rendered in place of that border. The extra width of the string returned by the
+    #   {styler} is not taken into consideration by the internal table rendering calculations
+    #   Thus it can be used to apply ANSI escape codes to border characters, to colour the borders
+    #   for example, without breaking the table formatting.
     def self.classic(styler: nil)
       from_classic_options(
-        horizontal_rule_character: Table::DEFAULT_HORIZONTAL_RULE_CHARACTER,
-        vertical_rule_character: Table::DEFAULT_VERTICAL_RULE_CHARACTER,
-        intersection_character: Table::DEFAULT_INTERSECTION_CHARACTER,
+        horizontal_rule_character: "-",
+        vertical_rule_character: "|",
+        intersection_character: "+",
         styler: styler)
     end
 
+    # @param [nil, #to_proc] styler (nil) A lambda or other callable object taking
+    #   a single parameter, representing a section of the table's borders (which for this purpose
+    #   include any horizontal and vertical lines inside the table).
+    #   If passed <tt>nil</tt>, then no additional styling will be applied to borders. If passed a
+    #   callable, then that callable will be called for each border section, with the
+    #   resulting string rendered in place of that border. The extra width of the string returned by the
+    #   {styler} is not taken into consideration by the internal table rendering calculations
+    #   Thus it can be used to apply ANSI escape codes to border characters, to colour the borders
+    #   for example, without breaking the table formatting.
     def self.modern(styler: nil)
       new(
-        corner_top_left: '┌',
-        corner_top_right: '┐',
-        corner_bottom_right: '┘',
-        corner_bottom_left: '└',
-        edge_top: '─',
-        edge_right: '│',
-        edge_bottom: '─',
-        edge_left: '│',
-        tee_top: '┬',
-        tee_right: '┤',
-        tee_bottom: '┴',
-        tee_left: '├',
-        divider_vertical: '│',
-        divider_horizontal: '─',
-        intersection: '┼',
+        corner_top_left: "┌",
+        corner_top_right: "┐",
+        corner_bottom_right: "┘",
+        corner_bottom_left: "└",
+        edge_top: "─",
+        edge_right: "│",
+        edge_bottom: "─",
+        edge_left: "│",
+        tee_top: "┬",
+        tee_right: "┤",
+        tee_bottom: "┴",
+        tee_left: "├",
+        divider_vertical: "│",
+        divider_horizontal: "─",
+        intersection: "┼",
         styler: styler)
     end
 
@@ -37,12 +55,21 @@ module Tabulo
       new
     end
 
-    def self.from(initializer, styler)
+    # @param [nil, #to_proc] styler (nil) A lambda or other callable object taking
+    #   a single parameter, representing a section of the table's borders (which for this purpose
+    #   include any horizontal and vertical lines inside the table).
+    #   If passed <tt>nil</tt>, then no additional styling will be applied to borders. If passed a
+    #   callable, then that callable will be called for each border section, with the
+    #   resulting string rendered in place of that border. The extra width of the string returned by the
+    #   {styler} is not taken into consideration by the internal table rendering calculations
+    #   Thus it can be used to apply ANSI escape codes to border characters, to colour the borders
+    #   for example, without breaking the table formatting.
+    def self.from(initializer)
       case initializer
       when :modern
-        modern(styler: styler)
+        modern
       when :classic
-        classic(styler: styler)
+        classic
       when nil
         null
       when Border
@@ -52,6 +79,15 @@ module Tabulo
       end
     end
 
+    # @param [nil, #to_proc] styler (nil) A lambda or other callable object taking
+    #   a single parameter, representing a section of the table's borders (which for this purpose
+    #   include any horizontal and vertical lines inside the table).
+    #   If passed <tt>nil</tt>, then no additional styling will be applied to borders. If passed a
+    #   callable, then that callable will be called for each border section, with the
+    #   resulting string rendered in place of that border. The extra width of the string returned by the
+    #   {styler} is not taken into consideration by the internal table rendering calculations
+    #   Thus it can be used to apply ANSI escape codes to border characters, to colour the borders
+    #   for example, without breaking the table formatting.
     def initialize(
       corner_top_left: "",
       corner_top_right: "",
@@ -93,6 +129,15 @@ module Tabulo
       @styler = (styler || -> (s) { s })
     end
 
+    # @param [nil, #to_proc] styler (nil) A lambda or other callable object taking
+    #   a single parameter, representing a section of the table's borders (which for this purpose
+    #   include any horizontal and vertical lines inside the table).
+    #   If passed <tt>nil</tt>, then no additional styling will be applied to borders. If passed a
+    #   callable, then that callable will be called for each border section, with the
+    #   resulting string rendered in place of that border. The extra width of the string returned by the
+    #   {styler} is not taken into consideration by the internal table rendering calculations
+    #   Thus it can be used to apply ANSI escape codes to border characters, to colour the borders
+    #   for example, without breaking the table formatting.
     def self.from_classic_options(
       horizontal_rule_character:,
       vertical_rule_character:,
