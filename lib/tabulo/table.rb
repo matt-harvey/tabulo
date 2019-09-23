@@ -481,16 +481,6 @@ module Tabulo
     end
 
     # @!visibility private
-    def surround(str, ch)
-      "#{ch}#{str}#{ch}"
-    end
-
-    # @!visibility private
-    def surround_join(arr, ch)
-      surround(arr.join(ch), ch)
-    end
-
-    # @!visibility private
     def join_lines(lines)
       lines.join($/)  # join strings with cross-platform newline
     end
