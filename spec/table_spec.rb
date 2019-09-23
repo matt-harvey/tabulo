@@ -710,26 +710,108 @@ describe Tabulo::Table do
       end
     end
 
-#     FIXME Reuse this in Border specs
-#     describe "`border_styler` param" do
-#       let(:table) do
-#         Tabulo::Table.new(1..2, border_styler: -> (str) { "\033[31m#{str}\033[0m" }) do |t|
-#           t.add_column(:itself) { |n| n }
-#           t.add_column(:even?)
-#         end
-#       end
+    describe "`border` param" do
+      let(:table) { Tabulo::Table.new([1, 2, 3], :to_i, :to_f, border: border) }
 
-#       it "styles border, divider and intersection characters without affecting width calculations" do
-#         expect(table.to_s).to eq \
-#           %Q(\033[31m+--------------+--------------+\033[0m
-#              \033[31m|\033[0m    itself    \033[31m|\033[0m     even?    \033[31m|\033[0m
-#              \033[31m+--------------+--------------+\033[0m
-#              \033[31m|\033[0m            1 \033[31m|\033[0m     false    \033[31m|\033[0m
-#              \033[31m|\033[0m            2 \033[31m|\033[0m     true     \033[31m|\033[0m
-#              \033[31m+--------------+--------------+\033[0m).gsub(/^ +/, "")
+      context "when passed `:classic`" do
+        let(:border) { :classic }
 
-#       end
-#     end
+        it "produces a table with borders consisting of ASCII characters" do
+          expect(table.to_s).to eq \
+            %q(+--------------+--------------+
+               |     to_i     |     to_f     |
+               +--------------+--------------+
+               |            1 |          1.0 |
+               |            2 |          2.0 |
+               |            3 |          3.0 |
+               +--------------+--------------+).gsub(/^ +/, "")
+        end
+      end
+
+      context "when passed `:legacy`" do
+        let(:border) { :legacy }
+
+        it "produces a table with borders consisting of ASCII characters, with no bottom border" do
+          expect(table.to_s).to eq \
+            %q(+--------------+--------------+
+               |     to_i     |     to_f     |
+               +--------------+--------------+
+               |            1 |          1.0 |
+               |            2 |          2.0 |
+               |            3 |          3.0 |).gsub(/^ +/, "")
+        end
+      end
+
+      context "when passed `:markdown`" do
+        let(:border) { :markdown }
+
+        it "produces a Markdown table" do
+          expect(table.to_s).to eq \
+            %q(|     to_i     |     to_f     |
+               |--------------|--------------|
+               |            1 |          1.0 |
+               |            2 |          2.0 |
+               |            3 |          3.0 |).gsub(/^ +/, "")
+        end
+      end
+
+      context "when passed `:modern`" do
+        let(:border) { :modern }
+
+        it 'produces a table with smoothly joined "Unicode" borders' do
+          expect(table.to_s).to eq \
+            %q(┌──────────────┬──────────────┐
+               │     to_i     │     to_f     │
+               ├──────────────┼──────────────┤
+               │            1 │          1.0 │
+               │            2 │          2.0 │
+               │            3 │          3.0 │
+               └──────────────┴──────────────┘).gsub(/^ +/, "")
+        end
+      end
+
+      context "when passed `:blank`" do
+        let(:border) { :blank }
+
+        it "produces a table with no external or internal borders" do
+          # Using joined array of strings to work around editor auto-trimming trailing whitespace.
+          expect(table.to_s).to eq([
+            "     to_i          to_f     ",
+            "            1           1.0 ",
+            "            2           2.0 ",
+            "            3           3.0 "
+          ].join($/))
+        end
+      end
+
+      context "when passed an unrecognized value" do
+        let(:border) { :fence }
+
+        it "raises an InvalidBorderError" do
+          expect { table.to_s }.to raise_error(Tabulo::InvalidBorderError)
+        end
+      end
+    end
+
+    describe "`border_styler` param" do
+      let(:table) do
+        Tabulo::Table.new(1..2, border_styler: -> (str) { "\033[31m#{str}\033[0m" }) do |t|
+          t.add_column(:itself) { |n| n }
+          t.add_column(:even?)
+        end
+      end
+
+      it "styles border, divider and intersection characters without affecting width calculations" do
+        expect(table.to_s).to eq \
+          %Q(\033[31m+--------------+--------------+\033[0m
+             \033[31m|\033[0m    itself    \033[31m|\033[0m     even?    \033[31m|\033[0m
+             \033[31m+--------------+--------------+\033[0m
+             \033[31m|\033[0m            1 \033[31m|\033[0m     false    \033[31m|\033[0m
+             \033[31m|\033[0m            2 \033[31m|\033[0m     true     \033[31m|\033[0m
+             \033[31m+--------------+--------------+\033[0m).gsub(/^ +/, "")
+
+      end
+    end
   end
 
   describe "#add_column" do
@@ -1357,15 +1439,6 @@ describe Tabulo::Table do
   describe "#transpose" do
     let(:source) { 1..3 }
 
-    let(:border) do
-      Tabulo::Border.from_classic_options(
-        horizontal_rule_character: "-",
-        vertical_rule_character: "|",
-        intersection_character: "*",
-        styler: nil,
-      )
-    end
-
     it "returns another table" do
       result = table.transpose
       expect(result).not_to be(table)
@@ -1376,45 +1449,45 @@ describe Tabulo::Table do
       "inherited from the original table, other than for the left-most column's width and alignment, which are "\
       "determined automatically, and default to left-aligned, respectively" do
       expect(table.transpose(column_width: 3).to_s).to eq \
-        %q(*---------*-----*-----*-----*
+        %q(+---------+-----+-----+-----+
            |         |  1  |  2  |  3  |
-           *---------*-----*-----*-----*
+           +---------+-----+-----+-----+
            |       N |   1 |   2 |   3 |
            | Doubled |   2 |   4 |   6 |
-           *---------*-----*-----*-----*).gsub(/^ +/, "")
+           +---------+-----+-----+-----+).gsub(/^ +/, "")
     end
 
     it "accepts options for determining the header, width and alignment of the left-most column of the "\
       "transposed table" do
       expect(table.transpose(column_width: 3, field_names_width: 20, field_names_header: "FIELDS",
         field_names_header_alignment: :center, field_names_body_alignment: :left).to_s).to eq \
-        %q(*----------------------*-----*-----*-----*
+        %q(+----------------------+-----+-----+-----+
            |        FIELDS        |  1  |  2  |  3  |
-           *----------------------*-----*-----*-----*
+           +----------------------+-----+-----+-----+
            | N                    |   1 |   2 |   3 |
            | Doubled              |   2 |   4 |   6 |
-           *----------------------*-----*-----*-----*).gsub(/^ +/, "")
+           +----------------------+-----+-----+-----+).gsub(/^ +/, "")
     end
 
     it "right-aligns the left-hand column of the new table by default" do
       expect(table.transpose(column_width: 3, field_names_width: 20, field_names_header: "FIELDS").to_s).to eq \
-        %q(*----------------------*-----*-----*-----*
+        %q(+----------------------+-----+-----+-----+
            |               FIELDS |  1  |  2  |  3  |
-           *----------------------*-----*-----*-----*
+           +----------------------+-----+-----+-----+
            |                    N |   1 |   2 |   3 |
            |              Doubled |   2 |   4 |   6 |
-           *----------------------*-----*-----*-----*).gsub(/^ +/, "")
+           +----------------------+-----+-----+-----+).gsub(/^ +/, "")
     end
 
     it "accepts a :headers option, allowing the caller to customize the column headers, "\
       "(other than the left-most column)" do
       expect(table.transpose(column_width: 3, headers: -> (n) { n * 2 }).to_s).to eq \
-        %q(*---------*-----*-----*-----*
+        %q(+---------+-----+-----+-----+
            |         |  2  |  4  |  6  |
-           *---------*-----*-----*-----*
+           +---------+-----+-----+-----+
            |       N |   1 |   2 |   3 |
            | Doubled |   2 |   4 |   6 |
-           *---------*-----*-----*-----*).gsub(/^ +/, "")
+           +---------+-----+-----+-----+).gsub(/^ +/, "")
     end
   end
 

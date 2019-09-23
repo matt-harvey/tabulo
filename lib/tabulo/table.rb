@@ -64,13 +64,32 @@ module Tabulo
     #   using the <tt>align_body</tt> option passed to {#add_column}. If passed <tt>:auto</tt>,
     #   alignment is determined by cell content, with numbers aligned right, booleans
     #   center-aligned, and other values left-aligned.
+    # @param [:classic, :markdown, :modern, :blank] border [:classic] Determines the characters used
+    #   for the Table border, including both the characters around the outside of table, and the lines drawn
+    #   within the table to separate columns from each other and the header row from the Table body.
+    #   Possible values are:
+    #   - `:classic`   Uses ASCII characters only
+    #   - `:markdown`  Produces as a GitHub-flavoured Markdown table
+    #   - `:modern`    Uses non-ASCII Unicode characters to render a border with smooth continuous lines
+    #   - `:blank`     No border characters are rendered
+    #   - `:legacy`    Like `:classic`, but does not have a horizontal line at the bottom of the
+    #                  table. This reproduces the default behaviour in `tabulo` v1.
+    # @param [nil, #to_proc] border_styler (nil) A lambda or other callable object taking
+    #   a single parameter, representing a section of the table's borders (which for this purpose
+    #   include any horizontal and vertical lines inside the table), and returning a string.
+    #   If passed <tt>nil</tt>, then no additional styling will be applied to borders. If passed a
+    #   callable, then that callable will be called for each border section, with the
+    #   resulting string rendered in place of that border. The extra width of the string returned by the
+    #   {border_styler} is not taken into consideration by the internal table rendering calculations
+    #   Thus it can be used to apply ANSI escape codes to border characters, to colour the borders
+    #   for example, without breaking the table formatting.
     # @return [Table] a new {Table}
     # @raise [InvalidColumnLabelError] if non-unique Symbols are provided to columns.
     # @raise [InvalidHorizontalRuleCharacterError] if invalid argument passed to horizontal_rule_character.
     # @raise [InvalidVerticalRuleCharacterError] if invalid argument passed to vertical_rule_character.
     def initialize(sources, *cols, columns: [], column_width: nil, column_padding: nil, header_frequency: :start,
       wrap_header_cells_to: nil, wrap_body_cells_to: nil, truncation_indicator: nil, align_header: :center,
-      align_body: :auto, border: :classic)
+      align_body: :auto, border: :classic, border_styler: nil)
 
       if columns.any?
         Deprecation.warn("`columns' option to Tabulo::Table#initialize", "the variable length parameter `cols'", 2)
@@ -85,7 +104,9 @@ module Tabulo
       @align_header = align_header
       @align_body = align_body
 
-      @border = Border.from(border)
+      @border = border
+      @border_styler = border_styler
+      @border_instance = Border.from(@border, @border_styler)
 
       @truncation_indicator = validate_character(truncation_indicator,
         DEFAULT_TRUNCATION_INDICATOR, InvalidTruncationIndicatorError, "truncation indicator")
@@ -197,7 +218,9 @@ module Tabulo
     #   display in a fixed-width font.
     def to_s
       if column_registry.any?
-        join_lines(map(&:to_s) + [horizontal_rule(for_position: :bottom)])
+        bottom_edge = horizontal_rule(for_position: :bottom)
+        rows = map(&:to_s)
+        bottom_edge.empty? ? join_lines(rows) : join_lines(rows + [bottom_edge])
       else
         ""
       end
@@ -247,7 +270,7 @@ module Tabulo
     #
     def horizontal_rule(for_position: :bottom)
       column_widths = column_registry.map { |_, column| column.width + @column_padding * 2 }
-      @border.horizontal_rule(column_widths, for_position == true ? :top : for_position)
+      @border_instance.horizontal_rule(column_widths, for_position == true ? :top : for_position)
     end
 
     # Reset all the column widths so that each column is *just* wide enough to accommodate
@@ -345,7 +368,8 @@ module Tabulo
     # @raise [InvalidVerticalRuleCharacterError] if invalid argument passed to vertical_rule_character.
     def transpose(opts = {})
       default_opts = [:column_width, :column_padding, :header_frequency, :wrap_header_cells_to,
-        :wrap_body_cells_to, :truncation_indicator, :align_header, :align_body, :border].map do |sym|
+        :wrap_body_cells_to, :truncation_indicator, :align_header, :align_body, :border,
+        :border_styler].map do |sym|
         [sym, instance_variable_get("@#{sym}")]
       end.to_h
 
@@ -474,7 +498,7 @@ module Tabulo
       row_height = ([wrap_cells_to, max_cell_height].compact.min || 1)
       subcell_stacks = cells.map { |cell| cell.padded_truncated_subcells(row_height, @column_padding) }
       subrows = subcell_stacks.transpose.map do |subrow_components|
-        @border.join_cell_contents(subrow_components)
+        @border_instance.join_cell_contents(subrow_components)
       end
 
       join_lines(subrows)
