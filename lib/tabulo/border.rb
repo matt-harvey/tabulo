@@ -51,6 +51,35 @@ module Tabulo
         styler: styler)
     end
 
+    # @param [nil, #to_proc] styler (nil) A lambda or other callable object taking
+    #   a single parameter, representing a section of the table's borders (which for this purpose
+    #   include any horizontal and vertical lines inside the table).
+    #   If passed <tt>nil</tt>, then no additional styling will be applied to borders. If passed a
+    #   callable, then that callable will be called for each border section, with the
+    #   resulting string rendered in place of that border. The extra width of the string returned by the
+    #   {styler} is not taken into consideration by the internal table rendering calculations
+    #   Thus it can be used to apply ANSI escape codes to border characters, to colour the borders
+    #   for example, without breaking the table formatting.
+    def self.markdown(styler: nil)
+      new(
+        corner_top_left: "",
+        corner_top_right: "",
+        corner_bottom_right: "",
+        corner_bottom_left: "",
+        edge_top: "",
+        edge_right: "|",
+        edge_bottom: "",
+        edge_left: "|",
+        tee_top: "",
+        tee_right: "|",
+        tee_bottom: "",
+        tee_left: "|",
+        divider_vertical: "|",
+        divider_horizontal: "-",
+        intersection: "|",
+        styler: styler)
+    end
+
     def self.null
       new
     end
@@ -66,10 +95,8 @@ module Tabulo
     #   for example, without breaking the table formatting.
     def self.from(initializer)
       case initializer
-      when :modern
-        modern
-      when :classic
-        classic
+      when :modern, :classic, :markdown
+        send(initializer)
       when nil
         null
       when Border
