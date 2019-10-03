@@ -29,7 +29,7 @@ describe Tabulo::Table do
   let(:wrap_body_cells_to) { nil }
   let(:truncation_indicator) { nil }
   let(:column_padding) { nil }
-  let(:border) { :classic }
+  let(:border) { :ascii }
 
   it "is an Enumerable" do
     expect(table).to be_a(Enumerable)
@@ -713,8 +713,8 @@ describe Tabulo::Table do
     describe "`border` param" do
       let(:table) { Tabulo::Table.new([1, 2, 3], :to_i, :to_f, border: border) }
 
-      context "when passed `:classic`" do
-        let(:border) { :classic }
+      context "when passed `:ascii`" do
+        let(:border) { :ascii }
 
         it "produces a table with borders consisting of ASCII characters" do
           expect(table.to_s).to eq \
@@ -728,8 +728,8 @@ describe Tabulo::Table do
         end
       end
 
-      context "when passed `:legacy`" do
-        let(:border) { :legacy }
+      context "when passed `:classic`" do
+        let(:border) { :classic }
 
         it "produces a table with borders consisting of ASCII characters, with no bottom border" do
           expect(table.to_s).to eq \

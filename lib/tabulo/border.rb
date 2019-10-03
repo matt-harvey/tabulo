@@ -6,7 +6,7 @@ module Tabulo
   class Border
 
     STYLES = {
-      classic: {
+      ascii: {
         corner_top_left: "+",
         corner_top_right: "+",
         corner_bottom_right: "+",
@@ -23,7 +23,7 @@ module Tabulo
         divider_horizontal: "-",
         intersection: "+",
       },
-      legacy: {
+      classic: {
         corner_top_left: "+",
         corner_top_right: "+",
         edge_top: "-",

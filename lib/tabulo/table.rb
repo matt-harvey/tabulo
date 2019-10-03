@@ -64,15 +64,15 @@ module Tabulo
     #   using the <tt>align_body</tt> option passed to {#add_column}. If passed <tt>:auto</tt>,
     #   alignment is determined by cell content, with numbers aligned right, booleans
     #   center-aligned, and other values left-aligned.
-    # @param [:classic, :markdown, :modern, :blank] border [:classic] Determines the characters used
+    # @param [:ascii, :markdown, :modern, :blank] border [:ascii] Determines the characters used
     #   for the Table border, including both the characters around the outside of table, and the lines drawn
     #   within the table to separate columns from each other and the header row from the Table body.
     #   Possible values are:
-    #   - `:classic`   Uses ASCII characters only
+    #   - `:ascii`     Uses ASCII characters only
     #   - `:markdown`  Produces as a GitHub-flavoured Markdown table
     #   - `:modern`    Uses non-ASCII Unicode characters to render a border with smooth continuous lines
     #   - `:blank`     No border characters are rendered
-    #   - `:legacy`    Like `:classic`, but does not have a horizontal line at the bottom of the
+    #   - `:classic`   Like `:ascii`, but does not have a horizontal line at the bottom of the
     #                  table. This reproduces the default behaviour in `tabulo` v1.
     # @param [nil, #to_proc] border_styler (nil) A lambda or other callable object taking
     #   a single parameter, representing a section of the table's borders (which for this purpose
@@ -89,7 +89,7 @@ module Tabulo
     # @raise [InvalidVerticalRuleCharacterError] if invalid argument passed to vertical_rule_character.
     def initialize(sources, *cols, columns: [], column_width: nil, column_padding: nil, header_frequency: :start,
       wrap_header_cells_to: nil, wrap_body_cells_to: nil, truncation_indicator: nil, align_header: :center,
-      align_body: :auto, border: :classic, border_styler: nil)
+      align_body: :auto, border: :ascii, border_styler: nil)
 
       if columns.any?
         Deprecation.warn("`columns' option to Tabulo::Table#initialize", "the variable length parameter `cols'", 2)

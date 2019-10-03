@@ -27,16 +27,16 @@ describe Tabulo::Border do
 
     let(:styler) { nil }
 
-    context "when passed `:classic`" do
-      let(:initializer) { :classic }
+    context "when passed `:ascii`" do
+      let(:initializer) { :ascii }
 
       it "returns a new Border" do
         expect(subject).to be_a(Tabulo::Border)
       end
     end
 
-    context "when passed `:legacy`" do
-      let(:initializer) { :legacy }
+    context "when passed `:classic`" do
+      let(:initializer) { :classic }
 
       it "returns a new Border" do
         expect(subject).to be_a(Tabulo::Border)
@@ -76,7 +76,7 @@ describe Tabulo::Border do
     end
 
     context "when passed a callable to the `styler` parameter" do
-      let(:initializer) { :classic }
+      let(:initializer) { :ascii }
       let(:styler) { double("styler", call: "some styled border") }
 
       it "uses the styler to style the border characters" do
@@ -100,7 +100,7 @@ describe Tabulo::Border do
 
   describe "#join_cell_contents" do
     it "renders a string in which the passed cell contents are joined by styled border characters" do
-      border = Tabulo::Border.from(:classic, -> (x) { "!#{x}!" })
+      border = Tabulo::Border.from(:ascii, -> (x) { "!#{x}!" })
       expect(border.join_cell_contents([" hello ", " good morning ", " huh "])).to \
         eq("!|! hello !|! good morning !|! huh !|!")
     end
