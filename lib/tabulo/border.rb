@@ -1,7 +1,5 @@
 module Tabulo
 
-  # FIXME Update documentation in README
-
   # @!visibility private
   class Border
 
