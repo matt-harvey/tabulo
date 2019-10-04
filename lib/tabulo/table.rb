@@ -383,41 +383,6 @@ module Tabulo
       end
     end
 
-    # @deprecated Use {#pack} instead.
-    #
-    # Reset all the column widths so that each column is *just* wide enough to accommodate
-    # its header text as well as the formatted content of each its cells for the entire
-    # collection, together with a single character of padding on either side of the column,
-    # without any wrapping.
-    #
-    # Note that calling this method will cause the entire source Enumerable to
-    # be traversed and all the column extractors and formatters to be applied in order
-    # to calculate the required widths.
-    #
-    # Note also that this method causes column widths to be fixed as appropriate to the
-    # formatted cell contents given the state of the source Enumerable at the point it
-    # is called. If the source Enumerable changes between that point, and the point when
-    # the Table is printed, then columns will *not* be resized yet again on printing.
-    #
-    # @param [nil, Numeric] max_table_width (nil) If provided, stops the total table
-    #   width (including padding and borders) from expanding beyond this number of characters.
-    #   If passed <tt>:auto</tt>, the table width will automatically be capped at the current
-    #   terminal width.
-    #   Width is deducted from columns if required to achieve this, with one character progressively
-    #   deducted from the width of the widest column until the target is reached. When the
-    #   table is printed, wrapping or truncation will then occur in these columns as required
-    #   (depending on how they were configured).
-    #   Note that regardless of the value passed to max_table_width, the table will always be left wide
-    #   enough to accommodate at least 1 character's width of content, 1 character of left padding and
-    #   1 character of right padding in each column, together with border characters (1 on each side
-    #   of the table and 1 between adjacent columns). I.e. there is a certain width below width the
-    #   Table will refuse to shrink itself.
-    # @return [Table] the Table itself
-    def shrinkwrap!(max_table_width: nil)
-      Deprecation.warn("`Tabulo::Table#shrinkwrap!'", "`#pack'")
-      pack(max_table_width: max_table_width)
-    end
-
     # @!visibility private
     def formatted_body_row(source, with_header: nil)
       cells = column_registry.map { |_, column| column.body_cell(source) }
