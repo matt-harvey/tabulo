@@ -85,8 +85,7 @@ module Tabulo
     #   for example, without breaking the table formatting.
     # @return [Table] a new {Table}
     # @raise [InvalidColumnLabelError] if non-unique Symbols are provided to columns.
-    # @raise [InvalidHorizontalRuleCharacterError] if invalid argument passed to horizontal_rule_character.
-    # @raise [InvalidVerticalRuleCharacterError] if invalid argument passed to vertical_rule_character.
+    # @raise [InvalidBorderError] if invalid option passed to `border` parameter.
     def initialize(sources, *cols, columns: [], column_width: nil, column_padding: nil, header_frequency: :start,
       wrap_header_cells_to: nil, wrap_body_cells_to: nil, truncation_indicator: nil, align_header: :center,
       align_body: :auto, border: :ascii, border_styler: nil)
@@ -340,9 +339,8 @@ module Tabulo
     # @param [Hash] opts Options for configuring the new, transposed {Table}.
     #   The following options are the same as the keyword params for the {#initialize} method for
     #   {Table}: <tt>column_width</tt>, <tt>column_padding</tt>, <tt>header_frequency</tt>,
-    #   <tt>wrap_header_cells_to</tt>, <tt>wrap_body_cells_to</tt>, <tt>horizontal_rule_character</tt>,
-    #   <tt>vertical_rule_character</tt>, <tt>intersection_character</tt>, <tt>truncation_indicator</tt>,
-    #   <tt>align_header</tt>, <tt>align_body</tt>.
+    #   <tt>wrap_header_cells_to</tt>, <tt>wrap_body_cells_to</tt>, <tt>border</tt>,
+    #   <tt>border_styler</tt>, <tt>truncation_indicator</tt>, <tt>align_header</tt>, <tt>align_body</tt>.
     #   These are applied in the same way as documented for {#initialize}, when creating the
     #   new, transposed Table. Any options not specified explicitly in the call to {#transpose}
     #   will inherit their values from the original {Table} (with the exception of settings
@@ -364,8 +362,7 @@ module Tabulo
     #   new Table (other than the left-most column's header, which is determined as described
     #   above).
     # @return [Table] a new {Table}
-    # @raise [InvalidHorizontalRuleCharacterError] if invalid argument passed to horizontal_rule_character.
-    # @raise [InvalidVerticalRuleCharacterError] if invalid argument passed to vertical_rule_character.
+    # @raise [InvalidBorderError] if invalid argument passed to `border` parameter.
     def transpose(opts = {})
       default_opts = [:column_width, :column_padding, :header_frequency, :wrap_header_cells_to,
         :wrap_body_cells_to, :truncation_indicator, :align_header, :align_body, :border,
