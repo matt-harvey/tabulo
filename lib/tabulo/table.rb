@@ -32,7 +32,6 @@ module Tabulo
     #   be unique. Each element of the Array  will be used to create a column whose content is
     #   created by calling the corresponding method on each element of sources. Note
     #   the {#add_column} method is a much more flexible way to set up columns on the table.
-    # @param [Array[Symbol]] columns <b>DEPRECATED</b> Use <tt>cols</tt> instead.
     # @param [Integer, nil] column_width The default column width for columns in this
     #   table, not excluding padding. If <tt>nil</tt>, then {DEFAULT_COLUMN_WIDTH} will be used.
     # @param [:start, nil, Integer] header_frequency Controls the display of column headers.
@@ -86,13 +85,9 @@ module Tabulo
     # @return [Table] a new {Table}
     # @raise [InvalidColumnLabelError] if non-unique Symbols are provided to columns.
     # @raise [InvalidBorderError] if invalid option passed to `border` parameter.
-    def initialize(sources, *cols, columns: [], column_width: nil, column_padding: nil, header_frequency: :start,
+    def initialize(sources, *cols, column_width: nil, column_padding: nil, header_frequency: :start,
       wrap_header_cells_to: nil, wrap_body_cells_to: nil, truncation_indicator: nil, align_header: :center,
       align_body: :auto, border: :ascii, border_styler: nil)
-
-      if columns.any?
-        Deprecation.warn("`columns' option to Tabulo::Table#initialize", "the variable length parameter `cols'", 2)
-      end
 
       @sources = sources
       @header_frequency = header_frequency
@@ -112,7 +107,6 @@ module Tabulo
 
       @column_registry = { }
       cols.each { |item| add_column(item) }
-      columns.each { |item| add_column(item) }
 
       yield self if block_given?
     end

@@ -63,31 +63,6 @@ describe Tabulo::Table do
       end
     end
 
-    describe "`columns` param" do
-      it "accepts symbols corresponding to methods on the source objects" do
-        expect(Tabulo::Table.new([1, 2, 3], columns: [:to_i, :to_f]).to_s).to eq \
-          %q(+--------------+--------------+
-             |     to_i     |     to_f     |
-             +--------------+--------------+
-             |            1 |          1.0 |
-             |            2 |          2.0 |
-             |            3 |          3.0 |
-             +--------------+--------------+).gsub(/^ +/, "")
-      end
-
-      it "raises Tabulo::InvalidColumnLabelError if symbols are not unique" do
-        expect { Tabulo::Table.new([1, 2, 3], columns: [:to_i, :to_i]) }.to \
-          raise_error(Tabulo::InvalidColumnLabelError)
-      end
-
-      it "issues a deprecation warning" do
-        expect(Tabulo::Deprecation).to receive(:warn).
-          with("`columns' option to Tabulo::Table#initialize", "the variable length parameter `cols'", 2)
-
-        Tabulo::Table.new([1, 2, 3], columns: [:to_i, :to_s])
-      end
-    end
-
     describe "`header_frequency` param" do
       context "when table is initialized with `header_frequency: :start`" do
         let(:header_frequency) { :start }
