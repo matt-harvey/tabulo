@@ -28,7 +28,7 @@ module Tabulo
     attr_accessor :sources
 
     # @param [Enumerable] sources the underlying Enumerable from which the table will derive its data
-    # @param [Array[Symbol]] cols Specifies the initial columns. The Symbols provided must
+    # @param [Array[Symbol]] columns Specifies the initial columns. The Symbols provided must
     #   be unique. Each element of the Array  will be used to create a column whose content is
     #   created by calling the corresponding method on each element of sources. Note
     #   the {#add_column} method is a much more flexible way to set up columns on the table.
@@ -85,7 +85,7 @@ module Tabulo
     # @return [Table] a new {Table}
     # @raise [InvalidColumnLabelError] if non-unique Symbols are provided to columns.
     # @raise [InvalidBorderError] if invalid option passed to `border` parameter.
-    def initialize(sources, *cols, column_width: nil, column_padding: nil, header_frequency: :start,
+    def initialize(sources, *columns, column_width: nil, column_padding: nil, header_frequency: :start,
       wrap_header_cells_to: nil, wrap_body_cells_to: nil, truncation_indicator: nil, align_header: :center,
       align_body: :auto, border: :ascii, border_styler: nil)
 
@@ -106,7 +106,7 @@ module Tabulo
         DEFAULT_TRUNCATION_INDICATOR, InvalidTruncationIndicatorError, "truncation indicator")
 
       @column_registry = { }
-      cols.each { |item| add_column(item) }
+      columns.each { |item| add_column(item) }
 
       yield self if block_given?
     end

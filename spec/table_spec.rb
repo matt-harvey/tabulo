@@ -39,7 +39,7 @@ describe Tabulo::Table do
   end
 
   describe "#initialize / #to_s" do
-    describe "`cols` param" do
+    describe "`columns` param" do
       it "accepts symbols corresponding to methods on the source objects" do
         expect(Tabulo::Table.new([1, 2, 3], :to_i, :to_f).to_s).to eq \
           %q(+--------------+--------------+
