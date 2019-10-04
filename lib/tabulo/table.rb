@@ -259,19 +259,6 @@ module Tabulo
       format_row(cells, @wrap_header_cells_to)
     end
 
-    # @return [String] an "ASCII" graphical representation of a horizontal
-    #   dividing line suitable for printing at any point in the table.
-    # @example Print a horizontal divider after every row:
-    #   table.each do |row|
-    #     puts row
-    #     puts table.horizontal_rule
-    #   end
-    #
-    def horizontal_rule(for_position: :bottom)
-      column_widths = column_registry.map { |_, column| column.width + @column_padding * 2 }
-      @border_instance.horizontal_rule(column_widths, for_position == true ? :top : for_position)
-    end
-
     # Reset all the column widths so that each column is *just* wide enough to accommodate
     # its header text as well as the formatted content of each its cells for the entire
     # collection, together with a single character of padding on either side of the column,
@@ -448,6 +435,12 @@ module Tabulo
     end
 
     private
+
+    # @!visibility private
+    def horizontal_rule(for_position: :bottom)
+      column_widths = column_registry.map { |_, column| column.width + @column_padding * 2 }
+      @border_instance.horizontal_rule(column_widths, for_position == true ? :top : for_position)
+    end
 
     # @!visibility private
     def shrink_to(max_table_width)
