@@ -515,16 +515,21 @@ calculated.)
 
 <a name="accessing-cell-values"></a>
 ### Accessing cell values
+
 Each `Tabulo::Table` is an `Enumerable` of which each element is a `Tabulo::Row`. Each `Tabulo::Row`
-is itself an `Enumerable` comprising the underlying values of each cell. A `Tabulo::Row` can also
+is itself an `Enumerable`, of `Tabulo::Cell`. The `Tabulo::Cell#value` method will return the
+underlying value of the cell; while `Tabulo::Cell#formatted_value` will return its formatted content
+as a string.
+
+A `Tabulo::Row` can also
 be converted to a `Hash` for keyed access. For example:
 
 ```ruby
 table = Tabulo::Table.new(1..5, :itself, :even?, :odd?)
 
 table.each do |row|
-  row.each { |cell| puts cell } # 1...2...3...4...5
-  puts row.to_h[:even?]         # false...true...false...true...false
+  row.each { |cell| puts cell.value } # 1...2...3...4...5
+  puts row.to_h[:even?].value         # false...true...false...true...false
 end
 ```
 
@@ -542,8 +547,8 @@ end
 
 table.each do |row|
   cells = row.to_h
-  puts cells[:Number]  # 1...2...3...4...5
-  puts cells[:doubled] # 2...4...6...8...10
+  puts cells[:Number].value  # 1...2...3...4...5
+  puts cells[:doubled].value # 2...4...6...8...10
 end
 ```
 

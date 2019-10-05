@@ -2,9 +2,13 @@ require "unicode/display_width"
 
 module Tabulo
 
-  # @!visibility private
+  # Represents a single cell within the body of a {Table}.
   class Cell
 
+    # @return the underlying value for this Cell
+    attr_reader :value
+
+    # @!visibility private
     def initialize(value:, formatter:, alignment:, width:, styler:, truncation_indicator:, padding_character:)
       @value = value
       @formatter = formatter
@@ -15,10 +19,12 @@ module Tabulo
       @padding_character = padding_character
     end
 
+    # @!visibility private
     def height
       subcells.size
     end
 
+    # @!visibility private
     def padded_truncated_subcells(target_height, padding_amount)
       truncated = (height > target_height)
       (0...target_height).map do |subcell_index|
@@ -27,6 +33,8 @@ module Tabulo
       end
     end
 
+    # @return [String] the content of the Cell, after applying the formatter for this Column (but
+    #   without applying any wrapping or the styler).
     def formatted_content
       @formatted_content ||= @formatter.call(@value)
     end

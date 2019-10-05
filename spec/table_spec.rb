@@ -867,8 +867,7 @@ describe Tabulo::Table do
     end
 
     describe "`formatter` param" do
-      it "formats the cell value for display, without changing the underlying cell value or its "\
-        "default alignment" do
+      it "formats the cell value for display, without changing the underlying cell value or its default alignment" do
         table.add_column("Trebled", formatter: -> (val) { "%.2f" % val }) do |n|
           n * 3
         end
@@ -883,8 +882,8 @@ describe Tabulo::Table do
              |            5 |           10 |        15.00 |
              +--------------+--------------+--------------+).gsub(/^ +/, "")
         top_right_body_cell = table.first.to_a.last
-        expect(top_right_body_cell).to eq(3)
-        expect(top_right_body_cell).to be_a(Integer)
+        expect(top_right_body_cell.value).to eq(3)
+        expect(top_right_body_cell.value).to be_a(Integer)
       end
     end
 
@@ -911,8 +910,8 @@ describe Tabulo::Table do
              |            5 |           10 |        15.00 |
              +--------------+--------------+--------------+).gsub(/^ +/, "")
         top_right_body_cell = table.first.to_a.last
-        expect(top_right_body_cell).to eq(3)
-        expect(top_right_body_cell).to be_a(Integer)
+        expect(top_right_body_cell.value).to eq(3)
+        expect(top_right_body_cell.value).to be_a(Integer)
       end
 
       it "applies the same styling to the truncation indicator as to the cell content" do
@@ -967,8 +966,8 @@ describe Tabulo::Table do
              |            5 |           10 |        15.00 |
              +--------------+--------------+--------------+).gsub(/^ +/, "")
         top_right_body_cell = table.first.to_a.last
-        expect(top_right_body_cell).to eq(3)
-        expect(top_right_body_cell).to be_a(Integer)
+        expect(top_right_body_cell.value).to eq(3)
+        expect(top_right_body_cell.value).to be_a(Integer)
       end
 
       it "applies the same styling to the truncation indicator as to the cell content" do

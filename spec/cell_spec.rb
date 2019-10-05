@@ -6,7 +6,7 @@ describe Tabulo::Cell do
       value: value,
       formatter: formatter,
       alignment: :right,
-      width: 6,
+      width: width,
       styler: styler,
       truncation_indicator: ".",
       padding_character: " ")
@@ -14,6 +14,7 @@ describe Tabulo::Cell do
 
   let(:value) { 30 }
   let(:formatter) { -> (source) { source.to_s } }
+  let(:width) { 6 }
   let(:styler) { -> (source, str) { str } }
 
   describe "#height" do
@@ -78,8 +79,10 @@ describe Tabulo::Cell do
   describe "#formatted_content" do
     subject { cell.formatted_content }
     let(:formatter) { -> (n) { "%.3f" % n } }
+    let(:width) { 4 }
+    let(:styler) { -> (source, str) { "some styling #{str}" } }
 
-    it "returns the result of calling the Cell's formatter on its value" do
+    it "returns the result of calling the Cell's formatter on its value, without applying styler or wrapping" do
       is_expected.to eq("30.000")
     end
   end
