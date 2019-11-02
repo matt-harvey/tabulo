@@ -1087,6 +1087,13 @@ describe Tabulo::Table do
     end
   end
 
+  describe "#horizontal_rule" do
+    it "returns a horizontal line made up of the horizontal rule character, and appropriately placed "\
+      "corner characters, of an appropriate width for the table" do
+      expect(table.horizontal_rule).to eq("+--------------+--------------+")
+    end
+  end
+
   describe "#pack" do
     let(:column_width) { 8 }
 
