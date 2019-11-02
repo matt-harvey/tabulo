@@ -1083,14 +1083,20 @@ describe Tabulo::Table do
 
   describe "#formatted_header" do
     it "returns a string representing a header row for the table" do
-      expect(table.formatted_header).to eq("|       N      |    Doubled   |")
-    end
+      expect(table.formatted_header).to eq("|       N      |    Doubled   |") end
   end
 
   describe "#horizontal_rule" do
+    let(:border) { :modern }
+
     it "returns a horizontal line made up of the horizontal rule character, and appropriately placed "\
-      "corner characters, of an appropriate width for the table" do
-      expect(table.horizontal_rule).to eq("+--------------+--------------+")
+      "corner characters, of an appropriate width for the table, suitable for the printing at the passed position" do
+      aggregate_failures do
+        expect(table.horizontal_rule(:top)).to    eq("┌──────────────┬──────────────┐")
+        expect(table.horizontal_rule(:middle)).to eq("├──────────────┼──────────────┤")
+        expect(table.horizontal_rule(:bottom)).to eq("└──────────────┴──────────────┘")
+        expect(table.horizontal_rule).to          eq("└──────────────┴──────────────┘")
+      end
     end
   end
 

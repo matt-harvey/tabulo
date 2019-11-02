@@ -78,9 +78,9 @@ module Tabulo
     end
 
     # @!visibility private
-    def horizontal_rule(column_widths, for_position = :bottom)
+    def horizontal_rule(column_widths, position = :bottom)
       left, center, right, segment =
-        case for_position
+        case position
         when :top
           [@corner_top_left, @tee_top, @corner_top_right, @edge_top]
         when :middle

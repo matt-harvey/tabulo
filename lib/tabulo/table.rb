@@ -211,7 +211,7 @@ module Tabulo
     #   display in a fixed-width font.
     def to_s
       if column_registry.any?
-        bottom_edge = horizontal_rule(for_position: :bottom)
+        bottom_edge = horizontal_rule(:bottom)
         rows = map(&:to_s)
         bottom_edge.empty? ? join_lines(rows) : join_lines(rows + [bottom_edge])
       else
@@ -253,17 +253,26 @@ module Tabulo
       format_row(cells, @wrap_header_cells_to)
     end
 
+    # @param [:top, :middle, :bottom] align_body (:bottom) Specifies the position
+    #   for which the resulting horizontal dividing line is intended to be printed.
+    #   This determines the border characters that are used to construct the line.
     # @return [String] an "ASCII" graphical representation of a horizontal
-    #   dividing line suitable for printing at any point in the table.
-    # @example Print a horizontal divider after every row:
-    #   table.each do |row|
-    #     puts row
-    #     puts table.horizontal_rule
-    #   end
+    #   dividing line suitable for printing at the top, bottom or middle of the
+    #   table.
+    # @example Print a horizontal divider between each pair of rows, and again
+    #   at the bottom:
     #
-    def horizontal_rule(for_position: :bottom)
+    #   table.each_with_index do |row, i|
+    #     puts table.horizontal_rule(:middle) unless i == 0
+    #     puts row
+    #   end
+    #   puts table.horizontal_rule(:bottom)
+    #
+    # It may be that `:top`, `:middle` and `:bottom` all look the same. Whether
+    # this is the case depends on the characters used for the table border.
+    def horizontal_rule(position = :bottom)
       column_widths = column_registry.map { |_, column| column.width + @column_padding * 2 }
-      @border_instance.horizontal_rule(column_widths, for_position == true ? :top : for_position)
+      @border_instance.horizontal_rule(column_widths, position)
     end
 
     # Reset all the column widths so that each column is *just* wide enough to accommodate
@@ -396,9 +405,9 @@ module Tabulo
       inner = format_row(cells, @wrap_body_cells_to)
       if with_header
         join_lines([
-          horizontal_rule(for_position: with_header),
+          horizontal_rule(:top),
           formatted_header,
-          horizontal_rule(for_position: :middle),
+          horizontal_rule(:middle),
           inner,
         ].reject(&:empty?))
       else
