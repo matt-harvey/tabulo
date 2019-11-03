@@ -230,7 +230,7 @@ module Tabulo
     # were not disabled when the Table was initialized).
     def each
       @sources.each_with_index do |source, index|
-        include_header =
+        header =
           case @header_frequency
           when :start
             :top if index == 0
@@ -243,7 +243,7 @@ module Tabulo
           else
             @header_frequency
           end
-        yield body_row(source, with_header: include_header)
+        yield body_row(source, header: header)
       end
     end
 
@@ -400,12 +400,12 @@ module Tabulo
     end
 
     # @!visibility private
-    def formatted_body_row(source, with_header: nil)
+    def formatted_body_row(source, header: nil)
       cells = column_registry.map { |_, column| column.body_cell(source) }
       inner = format_row(cells, @wrap_body_cells_to)
-      if with_header
+      if header
         join_lines([
-          horizontal_rule(:top),
+          horizontal_rule(header == :top ? :top : :middle),
           formatted_header,
           horizontal_rule(:middle),
           inner,
@@ -441,8 +441,8 @@ module Tabulo
     end
 
     # @!visibility private
-    def body_row(source, with_header: nil)
-      Row.new(self, source, with_header: with_header)
+    def body_row(source, header: nil)
+      Row.new(self, source, header: header)
     end
 
     # @!visibility private

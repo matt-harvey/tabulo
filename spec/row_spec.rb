@@ -10,10 +10,10 @@ describe Tabulo::Row do
   end
 
   let(:row) do
-    Tabulo::Row.new(table, 3, with_header: with_header)
+    Tabulo::Row.new(table, 3, header: header)
   end
 
-  let(:with_header) { [true, false].sample }
+  let(:header) { [true, false].sample }
 
   it "is an Enumerable" do
     expect(row).to be_a(Enumerable)
@@ -54,8 +54,8 @@ describe Tabulo::Row do
   end
 
   describe "#to_s" do
-    context "when row was initialized with `with_header: true`" do
-      let(:with_header) { true }
+    context "when row was initialized with `header: true`" do
+      let(:header) { true }
 
       it "returns a string showing the column headers and the row contents" do
         expect(row.to_s).to eq \
@@ -66,8 +66,8 @@ describe Tabulo::Row do
       end
     end
 
-    context "when row was initialized with `with_header: false`" do
-      let(:with_header) { false }
+    context "when row was initialized with `header: false`" do
+      let(:header) { false }
 
       it "returns a string showing the row contents without the column headers" do
         expect(row.to_s).to eq("|            3 |            6 |")

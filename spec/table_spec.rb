@@ -99,22 +99,23 @@ describe Tabulo::Table do
 
       context "when table is initialized with `header_frequency: <N>`" do
         let(:header_frequency) { 3 }
+        let(:border) { :modern }
 
         it "initializes a table displaying the formatted table with header at start and then "\
           "before every Nth row thereafter" do
           expect(table.to_s).to eq \
-            %q(+--------------+--------------+
-               |       N      |    Doubled   |
-               +--------------+--------------+
-               |            1 |            2 |
-               |            2 |            4 |
-               |            3 |            6 |
-               +--------------+--------------+
-               |       N      |    Doubled   |
-               +--------------+--------------+
-               |            4 |            8 |
-               |            5 |           10 |
-               +--------------+--------------+).gsub(/^ +/, "")
+            %q(┌──────────────┬──────────────┐
+               │       N      │    Doubled   │
+               ├──────────────┼──────────────┤
+               │            1 │            2 │
+               │            2 │            4 │
+               │            3 │            6 │
+               ├──────────────┼──────────────┤
+               │       N      │    Doubled   │
+               ├──────────────┼──────────────┤
+               │            4 │            8 │
+               │            5 │           10 │
+               └──────────────┴──────────────┘).gsub(/^ +/, "")
         end
       end
 
@@ -1472,9 +1473,9 @@ describe Tabulo::Table do
   end
 
   describe "#formatted_body_row" do
-    context "when passed `with_header: true`" do
+    context "when passed `header: true`" do
       it "returns a string representing a row in the body of the table, with a header" do
-        expect(table.formatted_body_row(3, with_header: true)).to eq \
+        expect(table.formatted_body_row(3, header: true)).to eq \
           %q(+--------------+--------------+
              |       N      |    Doubled   |
              +--------------+--------------+
@@ -1482,9 +1483,9 @@ describe Tabulo::Table do
       end
     end
 
-    context "when passed `with_header: false" do
+    context "when passed `header: false" do
       it "returns a string representing a row in the body of the table, without a header" do
-        expect(table.formatted_body_row(3, with_header: false)).to eq("|            3 |            6 |")
+        expect(table.formatted_body_row(3, header: false)).to eq("|            3 |            6 |")
       end
     end
   end

@@ -7,10 +7,10 @@ module Tabulo
     attr_reader :source
 
     # @!visibility private
-    def initialize(table, source, with_header: :top)
+    def initialize(table, source, header: :top)
       @table = table
       @source = source
-      @with_header = with_header
+      @header = header
     end
 
     # Calls the given block once for each cell in the {Row}, passing that cell as parameter.
@@ -34,7 +34,7 @@ module Tabulo
     #   in the {Table} and how the {Table} was configured with respect to header frequency).
     def to_s
       if @table.column_registry.any?
-        @table.formatted_body_row(@source, with_header: @with_header)
+        @table.formatted_body_row(@source, header: @header)
       else
         ""
       end
