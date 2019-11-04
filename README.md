@@ -73,7 +73,7 @@ Tabulo has also been ported to Crystal (with some modifications): see [Tablo](ht
      * [Accessing the underlying enumerable](#accessing-sources)
      * [Transposing rows and columns](#transposition)
      * [Border configuration](#borders)
-  * [Motivation](#motivation)
+  * [Comparison with other libraries](#motivation)
   * [Contributing](#contributing)
   * [License](#license)
 
@@ -691,13 +691,14 @@ The character used to indicate truncation, which defaults to `~`, can be configu
 `truncation_indicator` option passed to `Table.new`.
 
 <a name="motivation"></a>
-## Motivation
+## Comparison with other libraries
 
-There are other terminal table generators for Ruby. Popular among these are:
+There are other libraries for generating plain text tables in Ruby. Popular among these are:
 
 * [terminal-table](https://github.com/tj/terminal-table)
 * [tty-table](https://github.com/piotrmurach/tty-table)
 * [table\_print](https://github.com/arches/table_print)
+* [hirb](https://github.com/cldwalker/hirb)
 
 *DISCLAIMER: My comments regarding these other libraries are based only on my own, possibly flawed
 reading of the documentation for, and experimentation with, these libraries at the time of my
@@ -705,15 +706,15 @@ writing this. Their APIs, features or documentation may well change between when
 when you read it. Please consult the libraries' own documentation for yourself, rather than relying
 on these comments.*
 
-While these libraries have their strengths, I personally found that for the common use case of
+While these libraries have their strengths, I have personally found that, for the common use case of
 printing a table on the basis of some underlying enumerable collection (such as an ActiveRecord
-query result), using these libraries felt more cumbersome than it needed to be.
+query result), using these libraries feels more cumbersome than it could be.
 
 For example, suppose we have called `User.all` from the Rails console, and want to print
 a table showing the email, first name, last name and ID of each user,
 with column headings. Also, we want the ID column to be right-aligned, because it's a number.
 
-In `terminal-table`, we could achieve this as follows:
+In **terminal-table**, we could achieve this as follows:
 
 ```ruby
 rows = User.all.map { |u| [u.email, u.first_name, u.last_name, u.id] }
@@ -731,7 +732,7 @@ tables, but for tables that have many columns, or that are constructed
 dynamically based on user input or other runtime factors determining the columns
 to be included, this can be a hassle and a source of brittleness.
 
-`tty-table` has a somewhat different API to `terminal-table`. It offers both a
+**tty-table** has a somewhat different API to `terminal-table`. It offers both a
 "row-based" and a "column-based" method of initializing a table. The row-based method
 is similar to `terminal-table`'s in that it burdens the developer with syncing the
 column ordering across multiple code locations. The "column-based" API for `tty-table`, on
@@ -758,20 +759,20 @@ this, but if there is, it doesn't seem to be documented.) So it seems we still h
 `table.align_column(3, :right)`, which again burdens us with keeping the column index
 passed to `align_column` in sync.
 
-Finally, there is [table\_print](https://github.com/arches/table_print). This is a
-handy gem for quickly tabulating ActiveRecord collections from the Rails
-console. `table_print` is similar to `tabulo` in that it has a column-based API, so it doesn't
-suffer from the multiple-source-of-knowledge issue in regards to column orderings. However, as far
-as I can tell, it lacks certain other useful features, such as the ability to repeat headers every N
-rows, the automatic alignment of columns based on cell content (numbers right, strings left), and a
-quick and easy way to automatically resize columns to accommodate cell content without overflowing
-the terminal. Also, as of the time of writing, `table_print`'s last significant commit (ignoring a
-deprecation warning fix in April 2018) was in March 2016.
+As for **table\_print**, this is a handy gem for quickly tabulating ActiveRecord
+collections from the Rails console. `table_print` is similar to `tabulo` in that it has a
+column-based API, so it doesn't suffer from the multiple-source-of-knowledge issue in regards to
+column orderings. However, it lacks certain other useful features, such as the ability to repeat
+headers every N rows, the automatic alignment of columns based on cell content (numbers right,
+strings left), and a quick and easy way to automatically resize columns to accommodate cell content
+without overflowing the terminal. Also, as of the time of writing, `table_print`'s last significant
+commit (ignoring a deprecation warning fix in April 2018) was in March 2016.
 
-I don't mean to disparage any of these other projects&mdash;they each have their strengths&mdash;but
-rather to explain my motivation for developing and maintaining Tabulo despite their existence, and
-to provide reasons one might consider for using `tabulo` rather than another terminal table
-gem.
+Finally, it is worth mentioning the **hirb** library. This is similar to `table_print`, in that it's
+well suited to quickly displaying ActiveRecord collections from the Rails console. However, like
+`table_print`, there are certain useful features it's lacking; and using it outside the console
+environment seems cumbersome. Moreover, it seems no longer to be maintained. At the time of writing,
+its last commit was in March 2015.
 
 <a name="contributing"></a>
 ## Contributing
