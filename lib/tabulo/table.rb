@@ -10,6 +10,9 @@ module Tabulo
     include Enumerable
 
     # @!visibility public
+    DEFAULT_BORDER = :ascii
+
+    # @!visibility public
     DEFAULT_COLUMN_WIDTH = 12
 
     # @!visibility public
@@ -66,7 +69,7 @@ module Tabulo
     #   using the <tt>align_body</tt> option passed to {#add_column}. If passed <tt>:auto</tt>,
     #   alignment is determined by cell content, with numbers aligned right, booleans
     #   center-aligned, and other values left-aligned.
-    # @param [:ascii, :markdown, :modern, :blank] border [:ascii] Determines the characters used
+    # @param [:ascii, :markdown, :modern, :blank, nil] border (nil) Determines the characters used
     #   for the Table border, including both the characters around the outside of table, and the lines drawn
     #   within the table to separate columns from each other and the header row from the Table body.
     #   Possible values are:
@@ -76,6 +79,7 @@ module Tabulo
     #   - `:blank`     No border characters are rendered
     #   - `:classic`   Like `:ascii`, but does not have a horizontal line at the bottom of the
     #                  table. This reproduces the default behaviour in `tabulo` v1.
+    #   If <tt>nil</tt>, then {DEFAULT_BORDER} will be used.
     # @param [nil, #to_proc] border_styler (nil) A lambda or other callable object taking
     #   a single parameter, representing a section of the table's borders (which for this purpose
     #   include any horizontal and vertical lines inside the table), and returning a string.
@@ -90,7 +94,7 @@ module Tabulo
     # @raise [InvalidBorderError] if invalid option passed to `border` parameter.
     def initialize(sources, *columns, column_width: nil, column_padding: nil, header_frequency: :start,
       wrap_header_cells_to: nil, wrap_body_cells_to: nil, truncation_indicator: nil, align_header: :center,
-      align_body: :auto, border: :ascii, border_styler: nil)
+      align_body: :auto, border: nil, border_styler: nil)
 
       @sources = sources
       @header_frequency = header_frequency
@@ -109,7 +113,7 @@ module Tabulo
           [@column_padding, @column_padding]
         end
 
-      @border = border
+      @border = (border || DEFAULT_BORDER)
       @border_styler = border_styler
       @border_instance = Border.from(@border, @border_styler)
 

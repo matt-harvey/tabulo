@@ -706,6 +706,21 @@ describe Tabulo::Table do
     describe "`border` param" do
       let(:table) { Tabulo::Table.new([1, 2, 3], :to_i, :to_f, border: border) }
 
+      context "when passed `nil`" do
+        let(:border) { nil }
+
+        it "produces a table with borders consisting of ASCII characters" do
+          expect(table.to_s).to eq \
+            %q(+--------------+--------------+
+               |     to_i     |     to_f     |
+               +--------------+--------------+
+               |            1 |          1.0 |
+               |            2 |          2.0 |
+               |            3 |          3.0 |
+               +--------------+--------------+).gsub(/^ +/, "")
+        end
+      end
+
       context "when passed `:ascii`" do
         let(:border) { :ascii }
 
