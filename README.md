@@ -624,7 +624,7 @@ represented in that column. This can be configured, however, along with other as
 You can configure the kind of border and divider characters that are used when the table is printed.
 This is done using the `border` option passed to `Table.new`. The options are as follows.
 
-**ascii**&mdash;this is the default; the table is drawn entirely with characters in the ASCII set:
+`:ascii`&mdash;this is the default; the table is drawn entirely with characters in the ASCII set:
 
 ```
 > puts Tabulo::Table.new(1...3, :itself, :even?, :odd?, border: :ascii)
@@ -637,7 +637,7 @@ This is done using the `border` option passed to `Table.new`. The options are as
 +--------------+--------------+--------------+
 ```
 
-**modern**&mdash;uses smoothly joined Unicode characters:
+`:modern`&mdash;uses smoothly joined Unicode characters:
 
 ```
 > puts Tabulo::Table.new(1..3, :itself, :even?, :odd?, border: :modern)
@@ -650,7 +650,7 @@ This is done using the `border` option passed to `Table.new`. The options are as
 └──────────────┴──────────────┴──────────────┘
 ```
 
-**markdown**&mdash;renders a GitHub flavoured Markdown table:
+`:markdown`&mdash;renders a GitHub flavoured Markdown table:
 
 ```
 > puts Tabulo::Table.new(1..3, :itself, :even?, :odd?, border: :markdown)
@@ -661,7 +661,7 @@ This is done using the `border` option passed to `Table.new`. The options are as
 |            3 |     false    |     true     |
 ```
 
-**blank**&mdash;no border or divider characters are printed:
+`:blank`&mdash;no border or divider characters are printed:
 
 ```
 > puts Tabulo::Table.new(1...3, :itself, :even?, :odd?, border: :blank)
@@ -671,7 +671,7 @@ This is done using the `border` option passed to `Table.new`. The options are as
             3      false         true     
 ```
 
-**classic**&mdash;reproduces the default behaviour in Tabulo v1; this is like the `:ascii` option,
+`:classic`&mdash;reproduces the default behaviour in Tabulo v1; this is like the `:ascii` option,
 but without a bottom border:
 
 ```
