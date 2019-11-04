@@ -236,8 +236,44 @@ Widths set for individual columns always override the default column width for t
 #### Configuring padding
 
 The single character of padding either side of each column is not counted in the column width.
-The amount of this padding can be configured for the table as a whole, using the `column_padding`
-option passed to `Table.new`.
+The amount of this extra padding can be configured for the table as a whole, using the `column_padding`
+option passed to `Table.new`&mdash;the default value of this option being `1`.
+
+Passing a single integer to this option causes the given amount of padding to be applied to each
+side of each column. For example:
+
+```ruby
+table = Tabulo::Table.new([1, 2, 5], :itself, :even?, :odd?, column_padding: 0)
+```
+
+```
+> puts table
++------------+------------+------------+
+|   itself   |    even?   |    odd?    |
++------------+------------+------------+
+|           1|    false   |    true    |
+|           2|    true    |    false   |
+|           5|    false   |    true    |
++------------+------------+------------+
+```
+
+Passing an array of _two_ integers to this option configures the left and right padding for each
+column, according to the first and second element of the array, respectively. For example:
+
+```ruby
+table = Tabulo::Table.new([1, 2, 5], :itself, :even?, :odd?, column_padding: [0, 2])
+```
+
+```
+> puts table
++--------------+--------------+--------------+
+|   itself     |    even?     |    odd?      |
++--------------+--------------+--------------+
+|           1  |    false     |    true      |
+|           2  |    true      |    false     |
+|           5  |    false     |    true      |
++--------------+--------------+--------------+
+```
 
 <a name="pack"></a>
 #### Automating column widths

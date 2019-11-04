@@ -590,6 +590,23 @@ describe Tabulo::Table do
                +------------+------------+).gsub(/^ +/, "")
         end
       end
+
+      context "when passed a two-element array" do
+        let(:column_padding) { [1, 2] }
+
+        it "configures the left and right padding with the first and second values of the array, respectively" do
+          expect(table.to_s).to eq \
+            %q(+---------------+---------------+
+               |       N       |    Doubled    |
+               +---------------+---------------+
+               |            1  |            2  |
+               |            2  |            4  |
+               |            3  |            6  |
+               |            4  |            8  |
+               |            5  |           10  |
+               +---------------+---------------+).gsub(/^ +/, "")
+        end
+      end
     end
 
     describe "`align_header` param" do

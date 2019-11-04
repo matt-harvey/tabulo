@@ -27,7 +27,7 @@ describe Tabulo::Cell do
   end
 
   describe "#padded_truncated_subcells" do
-    subject { cell.padded_truncated_subcells(target_height, 2) }
+    subject { cell.padded_truncated_subcells(target_height, 2, 3) }
     let(:value) { "ab\ncde\nfg" }
 
     context "when the target height is greater than required to contain the wrapped cell content" do
@@ -38,11 +38,11 @@ describe Tabulo::Cell do
         "cell width plus the specified amount of extra padding on either side" do
         is_expected.to eq(
           [
-            "      ab  ",
-            "     cde  ",
-            "      fg  ",
-            "          ",
-            "          ",
+            "      ab   ",
+            "     cde   ",
+            "      fg   ",
+            "           ",
+            "           ",
           ])
       end
     end
@@ -54,9 +54,9 @@ describe Tabulo::Cell do
         "with total width equal to cell width plus the specified amount of extra padding on either side" do
         is_expected.to eq(
           [
-            "      ab  ",
-            "     cde  ",
-            "      fg  ",
+            "      ab   ",
+            "     cde   ",
+            "      fg   ",
           ])
       end
     end
@@ -69,8 +69,8 @@ describe Tabulo::Cell do
         "extra padding on either side" do
         is_expected.to eq(
           [
-            "      ab  ",
-            "     cde. ",
+            "      ab   ",
+            "     cde.  ",
           ])
       end
     end
