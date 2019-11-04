@@ -10,10 +10,10 @@ describe Tabulo::Row do
   end
 
   let(:row) do
-    Tabulo::Row.new(table, 3, with_header: with_header)
+    Tabulo::Row.new(table, 3, header: header)
   end
 
-  let(:with_header) { [true, false].sample }
+  let(:header) { [true, false].sample }
 
   it "is an Enumerable" do
     expect(row).to be_a(Enumerable)
@@ -41,21 +41,21 @@ describe Tabulo::Row do
       :aggregate_failures do
 
       row.each_with_index do |cell, i|
-        expect(cell).to be_a(Integer)
+        expect(cell).to be_a(Tabulo::Cell)
 
         case i
         when 0
-          expect(cell).to eq(3)
+          expect(cell.value).to eq(3)
         when 1
-          expect(cell).to eq(6)
+          expect(cell.value).to eq(6)
         end
       end
     end
   end
 
   describe "#to_s" do
-    context "when row was initialized with `with_header: true`" do
-      let(:with_header) { true }
+    context "when row was initialized with `header: true`" do
+      let(:header) { true }
 
       it "returns a string showing the column headers and the row contents" do
         expect(row.to_s).to eq \
@@ -66,8 +66,8 @@ describe Tabulo::Row do
       end
     end
 
-    context "when row was initialized with `with_header: false`" do
-      let(:with_header) { false }
+    context "when row was initialized with `header: false`" do
+      let(:header) { false }
 
       it "returns a string showing the row contents without the column headers" do
         expect(row.to_s).to eq("|            3 |            6 |")
@@ -92,8 +92,11 @@ describe Tabulo::Row do
       end
     end
 
-    it "returns a Hash mapping from column labels to cell values, with keys being Symbols or Integers" do
-      expect(row.to_h).to eq({ :Number => 3, :Doubled => 6, 2 => 5.8 })
+    it "returns a Hash mapping from column labels to Cells, with keys being Symbols or Integers" do
+      hash = row.to_h
+      expect(hash.keys).to eq([:Number, :Doubled, 2])
+      expect(hash.values.map(&:value)).to eq([3, 6, 5.8])
+      expect(hash.values.map(&:class).uniq).to eq([Tabulo::Cell])
     end
   end
 end

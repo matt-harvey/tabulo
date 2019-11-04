@@ -2,9 +2,13 @@ require "unicode/display_width"
 
 module Tabulo
 
-  # @!visibility private
+  # Represents a single cell within the body of a {Table}.
   class Cell
 
+    # @return the underlying value for this Cell
+    attr_reader :value
+
+    # @!visibility private
     def initialize(value:, formatter:, alignment:, width:, styler:, truncation_indicator:, padding_character:)
       @value = value
       @formatter = formatter
@@ -15,18 +19,23 @@ module Tabulo
       @padding_character = padding_character
     end
 
+    # @!visibility private
     def height
       subcells.size
     end
 
-    def padded_truncated_subcells(target_height, padding_amount)
+    # @!visibility private
+    def padded_truncated_subcells(target_height, padding_amount_left, padding_amount_right)
+      total_padding_amount = padding_amount_left + padding_amount_right
       truncated = (height > target_height)
       (0...target_height).map do |subcell_index|
-        append_truncator = (truncated && (padding_amount != 0) && (subcell_index + 1 == target_height))
-        padded_subcell(subcell_index, padding_amount, append_truncator)
+        append_truncator = (truncated && (total_padding_amount != 0) && (subcell_index + 1 == target_height))
+        padded_subcell(subcell_index, padding_amount_left, padding_amount_right, append_truncator)
       end
     end
 
+    # @return [String] the content of the Cell, after applying the formatter for this Column (but
+    #   without applying any wrapping or the styler).
     def formatted_content
       @formatted_content ||= @formatter.call(@value)
     end
@@ -37,9 +46,14 @@ module Tabulo
       @subcells ||= calculate_subcells
     end
 
-    def padded_subcell(subcell_index, padding_amount, append_truncator)
-      lpad = @padding_character * padding_amount
-      rpad = append_truncator ? styled_truncation_indicator + padding(padding_amount - 1) : padding(padding_amount)
+    def padded_subcell(subcell_index, padding_amount_left, padding_amount_right, append_truncator)
+      lpad = @padding_character * padding_amount_left
+      rpad =
+        if append_truncator
+          styled_truncation_indicator + padding(padding_amount_right - 1)
+        else
+          padding(padding_amount_right)
+        end
       inner = subcell_index < height ? subcells[subcell_index] : padding(@width)
       "#{lpad}#{inner}#{rpad}"
     end

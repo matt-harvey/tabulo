@@ -13,12 +13,9 @@ describe Tabulo::Table do
       header_frequency: header_frequency,
       wrap_header_cells_to: wrap_header_cells_to,
       wrap_body_cells_to: wrap_body_cells_to,
-      horizontal_rule_character: horizontal_rule_character,
-      vertical_rule_character: vertical_rule_character,
-      intersection_character: intersection_character,
       truncation_indicator: truncation_indicator,
       column_padding: column_padding,
-      border_styler: border_styler
+      border: border,
     ) do |t|
       t.add_column("N") { |n| n }
       t.add_column("Doubled") { |n| n * 2 }
@@ -30,12 +27,9 @@ describe Tabulo::Table do
   let(:header_frequency) { :start }
   let(:wrap_header_cells_to) { nil }
   let(:wrap_body_cells_to) { nil }
-  let(:horizontal_rule_character) { nil }
-  let(:vertical_rule_character) { nil }
-  let(:intersection_character) { nil }
   let(:truncation_indicator) { nil }
   let(:column_padding) { nil }
-  let(:border_styler) { nil }
+  let(:border) { :ascii }
 
   it "is an Enumerable" do
     expect(table).to be_a(Enumerable)
@@ -45,7 +39,7 @@ describe Tabulo::Table do
   end
 
   describe "#initialize / #to_s" do
-    describe "`cols` param" do
+    describe "`columns` param" do
       it "accepts symbols corresponding to methods on the source objects" do
         expect(Tabulo::Table.new([1, 2, 3], :to_i, :to_f).to_s).to eq \
           %q(+--------------+--------------+
@@ -53,7 +47,8 @@ describe Tabulo::Table do
              +--------------+--------------+
              |            1 |          1.0 |
              |            2 |          2.0 |
-             |            3 |          3.0 |).gsub(/^ +/, "")
+             |            3 |          3.0 |
+             +--------------+--------------+).gsub(/^ +/, "")
       end
 
       it "raises Tabulo::InvalidColumnLabelError if symbols are not unique" do
@@ -65,30 +60,6 @@ describe Tabulo::Table do
         expect(Tabulo::Deprecation).not_to receive(:warn)
 
         Tabulo::Table.new([1, 2, 3], :to_i, :to_s)
-      end
-    end
-
-    describe "`columns` param" do
-      it "accepts symbols corresponding to methods on the source objects" do
-        expect(Tabulo::Table.new([1, 2, 3], columns: [:to_i, :to_f]).to_s).to eq \
-          %q(+--------------+--------------+
-             |     to_i     |     to_f     |
-             +--------------+--------------+
-             |            1 |          1.0 |
-             |            2 |          2.0 |
-             |            3 |          3.0 |).gsub(/^ +/, "")
-      end
-
-      it "raises Tabulo::InvalidColumnLabelError if symbols are not unique" do
-        expect { Tabulo::Table.new([1, 2, 3], columns: [:to_i, :to_i]) }.to \
-          raise_error(Tabulo::InvalidColumnLabelError)
-      end
-
-      it "issues a deprecation warning" do
-        expect(Tabulo::Deprecation).to receive(:warn).
-          with("`columns' option to Tabulo::Table#initialize", "the variable length parameter `cols'", 2)
-
-        Tabulo::Table.new([1, 2, 3], columns: [:to_i, :to_s])
       end
     end
 
@@ -106,7 +77,8 @@ describe Tabulo::Table do
                |            2 |            4 |
                |            3 |            6 |
                |            4 |            8 |
-               |            5 |           10 |).gsub(/^ +/, "")
+               |            5 |           10 |
+               +--------------+--------------+).gsub(/^ +/, "")
         end
       end
 
@@ -120,27 +92,30 @@ describe Tabulo::Table do
                |            2 |            4 |
                |            3 |            6 |
                |            4 |            8 |
-               |            5 |           10 |).gsub(/^ +/, "")
+               |            5 |           10 |
+               +--------------+--------------+).gsub(/^ +/, "")
         end
       end
 
       context "when table is initialized with `header_frequency: <N>`" do
         let(:header_frequency) { 3 }
+        let(:border) { :modern }
 
         it "initializes a table displaying the formatted table with header at start and then "\
           "before every Nth row thereafter" do
           expect(table.to_s).to eq \
-            %q(+--------------+--------------+
-               |       N      |    Doubled   |
-               +--------------+--------------+
-               |            1 |            2 |
-               |            2 |            4 |
-               |            3 |            6 |
-               +--------------+--------------+
-               |       N      |    Doubled   |
-               +--------------+--------------+
-               |            4 |            8 |
-               |            5 |           10 |).gsub(/^ +/, "")
+            %q(┌──────────────┬──────────────┐
+               │       N      │    Doubled   │
+               ├──────────────┼──────────────┤
+               │            1 │            2 │
+               │            2 │            4 │
+               │            3 │            6 │
+               ├──────────────┼──────────────┤
+               │       N      │    Doubled   │
+               ├──────────────┼──────────────┤
+               │            4 │            8 │
+               │            5 │           10 │
+               └──────────────┴──────────────┘).gsub(/^ +/, "")
         end
       end
 
@@ -169,7 +144,8 @@ describe Tabulo::Table do
                |            2 |            4 |            2 |
                |            3 |            6 |            3 |
                |            4 |            8 |            4 |
-               |            5 |           10 |            5 |).gsub(/^ +/, "")
+               |            5 |           10 |            5 |
+               +--------------+--------------+--------------+).gsub(/^ +/, "")
         end
       end
 
@@ -188,7 +164,8 @@ describe Tabulo::Table do
                  |            2 |            4 |            2 |
                  |            3 |            6 |            3 |
                  |            4 |            8 |            4 |
-                 |            5 |           10 |            5 |).gsub(/^ +/, "")
+                 |            5 |           10 |            5 |
+                 +--------------+--------------+--------------+).gsub(/^ +/, "")
           end
         end
 
@@ -207,7 +184,8 @@ describe Tabulo::Table do
                  |           2|           4|           2|
                  |           3|           6|           3|
                  |           4|           8|           4|
-                 |           5|          10|           5|).gsub(/^ +/, "")
+                 |           5|          10|           5|
+                 +------------+------------+------------+).gsub(/^ +/, "")
           end
         end
 
@@ -226,7 +204,8 @@ describe Tabulo::Table do
                  |             2  |             4  |             2  |
                  |             3  |             6  |             3  |
                  |             4  |             8  |             4  |
-                 |             5  |            10  |             5  |).gsub(/^ +/, "")
+                 |             5  |            10  |             5  |
+                 +----------------+----------------+----------------+).gsub(/^ +/, "")
           end
         end
 
@@ -244,7 +223,8 @@ describe Tabulo::Table do
                  |            2 |            4 |            2 |
                  |            3 |            6 |            3 |
                  |            4 |            8 |            4 |
-                 |            5 |           10 |            5 |).gsub(/^ +/, "")
+                 |            5 |           10 |            5 |
+                 +--------------+--------------+--------------+).gsub(/^ +/, "")
           end
         end
 
@@ -263,7 +243,8 @@ describe Tabulo::Table do
                  |            2 |            4 |            2 |
                  |            3 |            6 |            3 |
                  |            4 |            8 |            4 |
-                 |            5 |           10 |            5 |).gsub(/^ +/, "")
+                 |            5 |           10 |            5 |
+                 +--------------+--------------+--------------+).gsub(/^ +/, "")
           end
         end
       end
@@ -284,7 +265,8 @@ describe Tabulo::Table do
                |            1 |            2 |
                |            2 |            4 |
                | 500000000000 | 100000000000 |
-               |              |            0 |).gsub(/^ +/, "")
+               |              |            0 |
+               +--------------+--------------+).gsub(/^ +/, "")
         end
       end
 
@@ -299,7 +281,8 @@ describe Tabulo::Table do
                  +--------------+--------------+
                  |            1 |            2 |
                  |            2 |            4 |
-                 | 500000000000 | 100000000000~|).gsub(/^ +/, "")
+                 | 500000000000 | 100000000000~|
+                 +--------------+--------------+).gsub(/^ +/, "")
           end
         end
 
@@ -314,7 +297,8 @@ describe Tabulo::Table do
                  |            1 |            2 |
                  |            2 |            4 |
                  | 500000000000 | 100000000000 |
-                 |              |            0 |).gsub(/^ +/, "")
+                 |              |            0 |
+                 +--------------+--------------+).gsub(/^ +/, "")
           end
         end
 
@@ -330,7 +314,8 @@ describe Tabulo::Table do
                  |            1 |            2 |
                  |            2 |            4 |
                  | 500000000000 | 100000000000 |
-                 |              |            0 |).gsub(/^ +/, "")
+                 |              |            0 |
+                 +--------------+--------------+).gsub(/^ +/, "")
           end
         end
 
@@ -347,7 +332,8 @@ describe Tabulo::Table do
                  |             1  |             2  |
                  |             2  |             4  |
                  |  500000000000  |  100000000000  |
-                 |                |             0  |).gsub(/^ +/, "")
+                 |                |             0  |
+                 +----------------+----------------+).gsub(/^ +/, "")
           end
         end
       end
@@ -364,7 +350,8 @@ describe Tabulo::Table do
                |            2 |            4 |
                |            3 |            6 |
                |            4 |            8 |
-               |            5 |           10 |).gsub(/^ +/, "")
+               |            5 |           10 |
+               +--------------+--------------+).gsub(/^ +/, "")
         end
       end
 
@@ -382,7 +369,8 @@ describe Tabulo::Table do
                |         2 |         4 |  true |
                |         3 |         6 | false |
                |         4 |         8 |  true |
-               |         5 |        10 | false |).gsub(/^ +/, "")
+               |         5 |        10 | false |
+               +-----------+-----------+-------+).gsub(/^ +/, "")
         end
       end
     end
@@ -400,7 +388,8 @@ describe Tabulo::Table do
              +--------------+--------------+
              | 很酷的时候   |            2 |
              | 很酷的时候   |            4 |
-             | 很酷的时候   |            6 |).gsub(/^ +/, "")
+             | 很酷的时候   |            6 |
+             +--------------+--------------+).gsub(/^ +/, "")
       end
 
       it "wraps content correctly" do
@@ -418,7 +407,8 @@ describe Tabulo::Table do
              | 很酷的时候很 |            2 |
              | 酷的时候     |              |
              | 很酷的时候很 |            4 |
-             | 酷的时候     |              |).gsub(/^ +/, "")
+             | 酷的时候     |              |
+             +--------------+--------------+).gsub(/^ +/, "")
       end
     end
 
@@ -447,7 +437,8 @@ describe Tabulo::Table do
                | Multipl |           18 |     Multiple |
                | e       |              |          new |
                | new     |              |        lines |
-               | lines   |              |              |).gsub(/^ +/, "")
+               | lines   |              |              |
+               +---------+--------------+--------------+).gsub(/^ +/, "")
 
         end
       end
@@ -469,205 +460,8 @@ describe Tabulo::Table do
                | Two         ~|            9 |          Two~|
                |             ~|            8 |             ~|
                | Final       ~|            6 |        Final~|
-               | Multiple    ~|           18 |     Multiple~|).gsub(/^ +/, "")
-        end
-      end
-    end
-
-    describe "`horizontal_rule_character` param" do
-      context "when passed nil" do
-        let(:horizontal_rule_character) { nil }
-
-        it "determines the character used for all horizontal lines in the table (excluding corners), "\
-          "defaulting to '-'" do
-          expect(table.to_s).to eq \
-            %q(+--------------+--------------+
-               |       N      |    Doubled   |
-               +--------------+--------------+
-               |            1 |            2 |
-               |            2 |            4 |
-               |            3 |            6 |
-               |            4 |            8 |
-               |            5 |           10 |).gsub(/^ +/, "")
-        end
-      end
-
-      context "when passed a non-nil character" do
-        let(:horizontal_rule_character) { "!" }
-
-        it "causes the character used for all horizontal lines in the table (excluding corners), "\
-          "to be that character" do
-          expect(table.to_s).to eq \
-            %q(+!!!!!!!!!!!!!!+!!!!!!!!!!!!!!+
-               |       N      |    Doubled   |
-               +!!!!!!!!!!!!!!+!!!!!!!!!!!!!!+
-               |            1 |            2 |
-               |            2 |            4 |
-               |            3 |            6 |
-               |            4 |            8 |
-               |            5 |           10 |).gsub(/^ +/, "")
-        end
-      end
-
-      context "when passed something other than nil or a single-character String" do
-        subject do
-          Tabulo::Table.new(source, horizontal_rule_character: horizontal_rule_character)
-        end
-
-        context "when passed an empty string" do
-          let(:horizontal_rule_character) { "" }
-
-          it "raises a Tabulo::InvalidHorizontalRuleCharacterError" do
-            expect { subject }.to raise_error(Tabulo::InvalidHorizontalRuleCharacterError)
-          end
-        end
-
-        context "when passed an string longer than one character" do
-          let(:horizontal_rule_character) { "!!" }
-
-          it "raises a Tabulo::InvalidHorizontalRuleCharacterError" do
-            expect { subject }.to raise_error(Tabulo::InvalidHorizontalRuleCharacterError)
-          end
-        end
-
-        context "when passed something other than nil or a String" do
-          let(:horizontal_rule_character) { 1 }
-
-          it "raises a Tabulo::InvalidHorizontalRuleCharacterError" do
-            expect { subject }.to raise_error(Tabulo::InvalidHorizontalRuleCharacterError)
-          end
-        end
-      end
-    end
-
-    describe "`vertical_rule_character` param" do
-      context "when passed nil" do
-        let(:vertical_rule_character) { nil }
-
-        it "determines the character used for all vertical lines in the table (excluding corners), "\
-          "defaulting to '|'" do
-          expect(table.to_s).to eq \
-            %q(+--------------+--------------+
-               |       N      |    Doubled   |
-               +--------------+--------------+
-               |            1 |            2 |
-               |            2 |            4 |
-               |            3 |            6 |
-               |            4 |            8 |
-               |            5 |           10 |).gsub(/^ +/, "")
-        end
-      end
-
-      context "when passed a non-nil character" do
-        let(:vertical_rule_character) { "!" }
-
-        it "causes the character used for all vertical lines in the table (excluding corners), "\
-          "to be that character" do
-          expect(table.to_s).to eq \
-            %q(+--------------+--------------+
-               !       N      !    Doubled   !
-               +--------------+--------------+
-               !            1 !            2 !
-               !            2 !            4 !
-               !            3 !            6 !
-               !            4 !            8 !
-               !            5 !           10 !).gsub(/^ +/, "")
-        end
-      end
-
-      context "when passed something other than nil or a single-character String" do
-        subject do
-          Tabulo::Table.new(source, vertical_rule_character: vertical_rule_character)
-        end
-
-        context "when passed an empty string" do
-          let(:vertical_rule_character) { "" }
-
-          it "raises a Tabulo::InvalidVerticalRuleCharacterError" do
-            expect { subject }.to raise_error(Tabulo::InvalidVerticalRuleCharacterError)
-          end
-        end
-
-        context "when passed an string longer than one character" do
-          let(:vertical_rule_character) { "!!" }
-
-          it "raises a Tabulo::InvalidVerticalRuleCharacterError" do
-            expect { subject }.to raise_error(Tabulo::InvalidVerticalRuleCharacterError)
-          end
-        end
-
-        context "when passed something other than nil or a String" do
-          let(:vertical_rule_character) { 1 }
-
-          it "raises a Tabulo::InvalidVerticalRuleCharacterError" do
-            expect { subject }.to raise_error(Tabulo::InvalidVerticalRuleCharacterError)
-          end
-        end
-      end
-    end
-
-    describe "`intersection_character` param" do
-      context "when passed nil" do
-        let(:intersection_character) { nil }
-
-        it "determines the character used for all intersections and corners in the table, "\
-          "defaulting to '+'" do
-          expect(table.to_s).to eq \
-            %q(+--------------+--------------+
-               |       N      |    Doubled   |
-               +--------------+--------------+
-               |            1 |            2 |
-               |            2 |            4 |
-               |            3 |            6 |
-               |            4 |            8 |
-               |            5 |           10 |).gsub(/^ +/, "")
-        end
-      end
-
-      context "when passed a non-nil character" do
-        let(:intersection_character) { "*" }
-
-        it "causes the character used for all intersections and corners in the table to be that "\
-          "character" do
-          expect(table.to_s).to eq \
-            %q(*--------------*--------------*
-               |       N      |    Doubled   |
-               *--------------*--------------*
-               |            1 |            2 |
-               |            2 |            4 |
-               |            3 |            6 |
-               |            4 |            8 |
-               |            5 |           10 |).gsub(/^ +/, "")
-        end
-      end
-
-      context "when passed something other than nil or a single-character String" do
-        subject do
-          Tabulo::Table.new(source, intersection_character: intersection_character)
-        end
-
-        context "when passed an empty string" do
-          let(:intersection_character) { "" }
-
-          it "raises a Tabulo::InvalidIntersectionCharacterError" do
-            expect { subject }.to raise_error(Tabulo::InvalidIntersectionCharacterError)
-          end
-        end
-
-        context "when passed an string longer than one character" do
-          let(:intersection_character) { "!!" }
-
-          it "raises a Tabulo::InvalidIntersectionCharacterError" do
-            expect { subject }.to raise_error(Tabulo::InvalidIntersectionCharacterError)
-          end
-        end
-
-        context "when passed something other than nil or a String" do
-          let(:intersection_character) { 1 }
-
-          it "raises a Tabulo::InvalidIntersectionCharacterError" do
-            expect { subject }.to raise_error(Tabulo::InvalidIntersectionCharacterError)
-          end
+               | Multiple    ~|           18 |     Multiple~|
+               +--------------+--------------+--------------+).gsub(/^ +/, "")
         end
       end
     end
@@ -696,7 +490,8 @@ describe Tabulo::Table do
                |       N      | AAAAAAAAAAAA~|
                +--------------+--------------+
                | 400000000000~| 800000000000~|
-               | 400000000000~| 800000000000~|).gsub(/^ +/, "")
+               | 400000000000~| 800000000000~|
+               +--------------+--------------+).gsub(/^ +/, "")
         end
       end
 
@@ -710,7 +505,8 @@ describe Tabulo::Table do
                |       N      | AAAAAAAAAAAA*|
                +--------------+--------------+
                | 400000000000*| 800000000000*|
-               | 400000000000*| 800000000000*|).gsub(/^ +/, "")
+               | 400000000000*| 800000000000*|
+               +--------------+--------------+).gsub(/^ +/, "")
         end
       end
 
@@ -756,7 +552,8 @@ describe Tabulo::Table do
                |            2 |            4 |
                |            3 |            6 |
                |            4 |            8 |
-               |            5 |           10 |).gsub(/^ +/, "")
+               |            5 |           10 |
+               +--------------+--------------+).gsub(/^ +/, "")
         end
       end
 
@@ -772,7 +569,8 @@ describe Tabulo::Table do
                |             2  |             4  |
                |             3  |             6  |
                |             4  |             8  |
-               |             5  |            10  |).gsub(/^ +/, "")
+               |             5  |            10  |
+               +----------------+----------------+).gsub(/^ +/, "")
         end
       end
 
@@ -788,7 +586,25 @@ describe Tabulo::Table do
                |           2|           4|
                |           3|           6|
                |           4|           8|
-               |           5|          10|).gsub(/^ +/, "")
+               |           5|          10|
+               +------------+------------+).gsub(/^ +/, "")
+        end
+      end
+
+      context "when passed a two-element array" do
+        let(:column_padding) { [1, 2] }
+
+        it "configures the left and right padding with the first and second values of the array, respectively" do
+          expect(table.to_s).to eq \
+            %q(+---------------+---------------+
+               |       N       |    Doubled    |
+               +---------------+---------------+
+               |            1  |            2  |
+               |            2  |            4  |
+               |            3  |            6  |
+               |            4  |            8  |
+               |            5  |           10  |
+               +---------------+---------------+).gsub(/^ +/, "")
         end
       end
     end
@@ -801,12 +617,10 @@ describe Tabulo::Table do
           header_frequency: header_frequency,
           wrap_header_cells_to: wrap_header_cells_to,
           wrap_body_cells_to: wrap_body_cells_to,
-          horizontal_rule_character: horizontal_rule_character,
-          vertical_rule_character: vertical_rule_character,
-          intersection_character: intersection_character,
           truncation_indicator: truncation_indicator,
           column_padding: column_padding,
-          align_header: :left
+          align_header: :left,
+          border: border,
         ) do |t|
           t.add_column("N") { |n| n }
           t.add_column("Doubled") { |n| n * 2 }
@@ -822,7 +636,8 @@ describe Tabulo::Table do
              |            2 |            4 |
              |            3 |            6 |
              |            4 |            8 |
-             |            5 |           10 |).gsub(/^ +/, "")
+             |            5 |           10 |
+             +--------------+--------------+).gsub(/^ +/, "")
       end
 
       it "sets a default header alignment that can be overriden via #add_column" do
@@ -836,7 +651,8 @@ describe Tabulo::Table do
              |            2 |            4 |     true     |
              |            3 |            6 |     false    |
              |            4 |            8 |     true     |
-             |            5 |           10 |     false    |).gsub(/^ +/, "")
+             |            5 |           10 |     false    |
+             +--------------+--------------+--------------+).gsub(/^ +/, "")
       end
     end
 
@@ -848,12 +664,10 @@ describe Tabulo::Table do
           header_frequency: header_frequency,
           wrap_header_cells_to: wrap_header_cells_to,
           wrap_body_cells_to: wrap_body_cells_to,
-          horizontal_rule_character: horizontal_rule_character,
-          vertical_rule_character: vertical_rule_character,
-          intersection_character: intersection_character,
           truncation_indicator: truncation_indicator,
           column_padding: column_padding,
-          align_body: :left
+          align_body: :left,
+          border: border,
         ) do |t|
           t.add_column("N") { |n| n }
           t.add_column("Doubled") { |n| n * 2 }
@@ -869,7 +683,8 @@ describe Tabulo::Table do
              | 2            | 4            |
              | 3            | 6            |
              | 4            | 8            |
-             | 5            | 10           |).gsub(/^ +/, "")
+             | 5            | 10           |
+             +--------------+--------------+).gsub(/^ +/, "")
       end
 
       it "sets a default body cell alignment that can be overriden via #add_column" do
@@ -883,7 +698,106 @@ describe Tabulo::Table do
              | 2            | 4            |         true |
              | 3            | 6            |        false |
              | 4            | 8            |         true |
-             | 5            | 10           |        false |).gsub(/^ +/, "")
+             | 5            | 10           |        false |
+             +--------------+--------------+--------------+).gsub(/^ +/, "")
+      end
+    end
+
+    describe "`border` param" do
+      let(:table) { Tabulo::Table.new([1, 2, 3], :to_i, :to_f, border: border) }
+
+      context "when passed `nil`" do
+        let(:border) { nil }
+
+        it "produces a table with borders consisting of ASCII characters" do
+          expect(table.to_s).to eq \
+            %q(+--------------+--------------+
+               |     to_i     |     to_f     |
+               +--------------+--------------+
+               |            1 |          1.0 |
+               |            2 |          2.0 |
+               |            3 |          3.0 |
+               +--------------+--------------+).gsub(/^ +/, "")
+        end
+      end
+
+      context "when passed `:ascii`" do
+        let(:border) { :ascii }
+
+        it "produces a table with borders consisting of ASCII characters" do
+          expect(table.to_s).to eq \
+            %q(+--------------+--------------+
+               |     to_i     |     to_f     |
+               +--------------+--------------+
+               |            1 |          1.0 |
+               |            2 |          2.0 |
+               |            3 |          3.0 |
+               +--------------+--------------+).gsub(/^ +/, "")
+        end
+      end
+
+      context "when passed `:classic`" do
+        let(:border) { :classic }
+
+        it "produces a table with borders consisting of ASCII characters, with no bottom border" do
+          expect(table.to_s).to eq \
+            %q(+--------------+--------------+
+               |     to_i     |     to_f     |
+               +--------------+--------------+
+               |            1 |          1.0 |
+               |            2 |          2.0 |
+               |            3 |          3.0 |).gsub(/^ +/, "")
+        end
+      end
+
+      context "when passed `:markdown`" do
+        let(:border) { :markdown }
+
+        it "produces a Markdown table" do
+          expect(table.to_s).to eq \
+            %q(|     to_i     |     to_f     |
+               |--------------|--------------|
+               |            1 |          1.0 |
+               |            2 |          2.0 |
+               |            3 |          3.0 |).gsub(/^ +/, "")
+        end
+      end
+
+      context "when passed `:modern`" do
+        let(:border) { :modern }
+
+        it 'produces a table with smoothly joined "Unicode" borders' do
+          expect(table.to_s).to eq \
+            %q(┌──────────────┬──────────────┐
+               │     to_i     │     to_f     │
+               ├──────────────┼──────────────┤
+               │            1 │          1.0 │
+               │            2 │          2.0 │
+               │            3 │          3.0 │
+               └──────────────┴──────────────┘).gsub(/^ +/, "")
+        end
+      end
+
+      context "when passed `:blank`" do
+        let(:border) { :blank }
+
+        it "produces a table with no external or internal borders" do
+          # Using joined array of strings to work around editor auto-trimming trailing whitespace.
+          expect(table.to_s).to eq([
+            "     to_i          to_f     ",
+            "            1           1.0 ",
+            "            2           2.0 ",
+            "            3           3.0 "
+          ].join($/))
+        end
+      end
+
+      context "when passed an unrecognized value" do
+        let(:border) { :fence }
+
+        it "raises an InvalidBorderError" do
+          expect { table.to_s }.to raise_error(Tabulo::InvalidBorderError)
+        end
       end
     end
 
@@ -901,7 +815,8 @@ describe Tabulo::Table do
              \033[31m|\033[0m    itself    \033[31m|\033[0m     even?    \033[31m|\033[0m
              \033[31m+--------------+--------------+\033[0m
              \033[31m|\033[0m            1 \033[31m|\033[0m     false    \033[31m|\033[0m
-             \033[31m|\033[0m            2 \033[31m|\033[0m     true     \033[31m|\033[0m).gsub(/^ +/, "")
+             \033[31m|\033[0m            2 \033[31m|\033[0m     true     \033[31m|\033[0m
+             \033[31m+--------------+--------------+\033[0m).gsub(/^ +/, "")
 
       end
     end
@@ -923,7 +838,8 @@ describe Tabulo::Table do
              |            2 |            4 |     true     |
              |            3 |            6 |     false    |
              |            4 |            8 |     true     |
-             |            5 |           10 |     false    |).gsub(/^ +/, "")
+             |            5 |           10 |     false    |
+             +--------------+--------------+--------------+).gsub(/^ +/, "")
       end
     end
 
@@ -943,7 +859,8 @@ describe Tabulo::Table do
              |        2 |        4 | 2        |   true   |      2.0 |
              |        3 |        6 | 3        |   false  |      3.0 |
              |        4 |        8 | 4        |   true   |      4.0 |
-             |        5 |       10 | 5        |   false  |      5.0 |).gsub(/^ +/, "")
+             |        5 |       10 | 5        |   false  |      5.0 |
+             +----------+----------+----------+----------+----------+).gsub(/^ +/, "")
       end
 
       context "when passed `align_header` and `align_body` are passed :left, :center or :right" do
@@ -959,7 +876,8 @@ describe Tabulo::Table do
                |        2 |        4 |     2    |     true | 2.0      |
                |        3 |        6 |     3    |    false | 3.0      |
                |        4 |        8 |     4    |     true | 4.0      |
-               |        5 |       10 |     5    |    false | 5.0      |).gsub(/^ +/, "")
+               |        5 |       10 |     5    |    false | 5.0      |
+               +----------+----------+----------+----------+----------+).gsub(/^ +/, "")
         end
       end
     end
@@ -976,13 +894,13 @@ describe Tabulo::Table do
              |            2 |            4 |                6 |
              |            3 |            6 |                9 |
              |            4 |            8 |               12 |
-             |            5 |           10 |               15 |).gsub(/^ +/, "")
+             |            5 |           10 |               15 |
+             +--------------+--------------+------------------+).gsub(/^ +/, "")
       end
     end
 
     describe "`formatter` param" do
-      it "formats the cell value for display, without changing the underlying cell value or its "\
-        "default alignment" do
+      it "formats the cell value for display, without changing the underlying cell value or its default alignment" do
         table.add_column("Trebled", formatter: -> (val) { "%.2f" % val }) do |n|
           n * 3
         end
@@ -994,10 +912,11 @@ describe Tabulo::Table do
              |            2 |            4 |         6.00 |
              |            3 |            6 |         9.00 |
              |            4 |            8 |        12.00 |
-             |            5 |           10 |        15.00 |).gsub(/^ +/, "")
+             |            5 |           10 |        15.00 |
+             +--------------+--------------+--------------+).gsub(/^ +/, "")
         top_right_body_cell = table.first.to_a.last
-        expect(top_right_body_cell).to eq(3)
-        expect(top_right_body_cell).to be_a(Integer)
+        expect(top_right_body_cell.value).to eq(3)
+        expect(top_right_body_cell.value).to be_a(Integer)
       end
     end
 
@@ -1021,10 +940,11 @@ describe Tabulo::Table do
              |            2 |            4 |         \033[31;1;4m6.00\033[0m |
              |            3 |            6 |         9.00 |
              |            4 |            8 |        12.00 |
-             |            5 |           10 |        15.00 |).gsub(/^ +/, "")
+             |            5 |           10 |        15.00 |
+             +--------------+--------------+--------------+).gsub(/^ +/, "")
         top_right_body_cell = table.first.to_a.last
-        expect(top_right_body_cell).to eq(3)
-        expect(top_right_body_cell).to be_a(Integer)
+        expect(top_right_body_cell.value).to eq(3)
+        expect(top_right_body_cell.value).to be_a(Integer)
       end
 
       it "applies the same styling to the truncation indicator as to the cell content" do
@@ -1037,7 +957,8 @@ describe Tabulo::Table do
              | elf |
              +-----+
              | \033[31mhel\033[0m\033[31m~\033[0m|
-             | \033[31myes\033[0m |).gsub(/^ +/, "")
+             | \033[31myes\033[0m |
+             +-----+).gsub(/^ +/, "")
       end
 
       it "applies styling separately to each part of the wrapped cell content that's on its own line" do
@@ -1051,7 +972,8 @@ describe Tabulo::Table do
              +-----+
              | \033[31mhel\033[0m |
              | \033[31mlo\033[0m  |
-             | \033[31myes\033[0m |).gsub(/^ +/, "")
+             | \033[31myes\033[0m |
+             +-----+).gsub(/^ +/, "")
       end
     end
 
@@ -1074,10 +996,11 @@ describe Tabulo::Table do
              |            2 |            4 |         6.00 |
              |            3 |            6 |         9.00 |
              |            4 |            8 |        12.00 |
-             |            5 |           10 |        15.00 |).gsub(/^ +/, "")
+             |            5 |           10 |        15.00 |
+             +--------------+--------------+--------------+).gsub(/^ +/, "")
         top_right_body_cell = table.first.to_a.last
-        expect(top_right_body_cell).to eq(3)
-        expect(top_right_body_cell).to be_a(Integer)
+        expect(top_right_body_cell.value).to eq(3)
+        expect(top_right_body_cell.value).to be_a(Integer)
       end
 
       it "applies the same styling to the truncation indicator as to the cell content" do
@@ -1090,7 +1013,8 @@ describe Tabulo::Table do
              +-----+
              | hel |
              | lo  |
-             | yes |).gsub(/^ +/, "")
+             | yes |
+             +-----+).gsub(/^ +/, "")
       end
 
       it "applies styling separately to each part of the wrapped header cell content that's on its own line" do
@@ -1104,7 +1028,8 @@ describe Tabulo::Table do
              +-----+
              | hel |
              | lo  |
-             | yes |).gsub(/^ +/, "")
+             | yes |
+             +-----+).gsub(/^ +/, "")
       end
     end
 
@@ -1131,7 +1056,8 @@ describe Tabulo::Table do
                |            2 |            4 |            6 |            8 |           10 |
                |            3 |            6 |            9 |           12 |           15 |
                |            4 |            8 |           12 |           16 |           20 |
-               |            5 |           10 |           15 |           20 |           25 |).gsub(/^ +/, "")
+               |            5 |           10 |           15 |           20 |           25 |
+               +--------------+--------------+--------------+--------------+--------------+).gsub(/^ +/, "")
         end
       end
 
@@ -1151,7 +1077,8 @@ describe Tabulo::Table do
                |     true     |
                |     false    |
                |     true     |
-               |     false    |).gsub(/^ +/, "")
+               |     false    |
+               +--------------+).gsub(/^ +/, "")
         end
       end
     end
@@ -1189,14 +1116,20 @@ describe Tabulo::Table do
 
   describe "#formatted_header" do
     it "returns a string representing a header row for the table" do
-      expect(table.formatted_header).to eq("|       N      |    Doubled   |")
-    end
+      expect(table.formatted_header).to eq("|       N      |    Doubled   |") end
   end
 
   describe "#horizontal_rule" do
+    let(:border) { :modern }
+
     it "returns a horizontal line made up of the horizontal rule character, and appropriately placed "\
-      "corner characters, of an appropriate width for the table" do
-      expect(table.horizontal_rule).to eq("+--------------+--------------+")
+      "corner characters, of an appropriate width for the table, suitable for the printing at the passed position" do
+      aggregate_failures do
+        expect(table.horizontal_rule(:top)).to    eq("┌──────────────┬──────────────┐")
+        expect(table.horizontal_rule(:middle)).to eq("├──────────────┼──────────────┤")
+        expect(table.horizontal_rule(:bottom)).to eq("└──────────────┴──────────────┘")
+        expect(table.horizontal_rule).to          eq("└──────────────┴──────────────┘")
+      end
     end
   end
 
@@ -1240,7 +1173,8 @@ describe Tabulo::Table do
              |        4 |        8 | 4        |   true   |   4.0000 | wwwww |          |
              |          |          |          |          |          | www   |          |
              |        5 |       10 | 5        |   false  |  5.00000 | wwwww |          |
-             |          |          |          |          |          | wwwww |          |).gsub(/^ +/, "")
+             |          |          |          |          |          | wwwww |          |
+             +----------+----------+----------+----------+----------+-------+----------+).gsub(/^ +/, "")
 
         ).to(
           %q(+---+---------+------+-------+---------+------------+-------+
@@ -1252,7 +1186,8 @@ describe Tabulo::Table do
              | 3 |       6 | 3    | false |   3.000 | wwwwww     | two   |
              |   |         |      |       |         |            | lines |
              | 4 |       8 | 4    |  true |  4.0000 | wwwwwwww   |       |
-             | 5 |      10 | 5    | false | 5.00000 | wwwwwwwwww |       |).gsub(/^ +/, "")
+             | 5 |      10 | 5    | false | 5.00000 | wwwwwwwwww |       |
+             +---+---------+------+-------+---------+------------+-------+).gsub(/^ +/, "")
         )
 
         # Let's do a quick check to make sure that it will also expand the total table width if required.
@@ -1268,13 +1203,15 @@ describe Tabulo::Table do
              | lo  |
              | goo |
              | dby |
-             | e   |).gsub(/^ +/, "")
+             | e   |
+             +-----+).gsub(/^ +/, "")
         ).to(
           %q(+---------+
              |  itself |
              +---------+
              | hello   |
-             | goodbye |).gsub(/^ +/, "")
+             | goodbye |
+             +---------+).gsub(/^ +/, "")
         )
       end
     end
@@ -1299,7 +1236,8 @@ describe Tabulo::Table do
                |  3  |        6  |  3     |  false  |    3.000  |  wwwwww      |  two    |
                |     |           |        |         |           |              |  lines  |
                |  4  |        8  |  4     |   true  |   4.0000  |  wwwwwwww    |         |
-               |  5  |       10  |  5     |  false  |  5.00000  |  wwwwwwwwww  |         |).gsub(/^ +/, "")
+               |  5  |       10  |  5     |  false  |  5.00000  |  wwwwwwwwww  |         |
+               +-----+-----------+--------+---------+-----------+--------------+---------+).gsub(/^ +/, "")
           )
         end
       end
@@ -1323,7 +1261,8 @@ describe Tabulo::Table do
                |        4 |        8 | 4        |   true   |   4.0000 | wwwww |          |
                |          |          |          |          |          | www   |          |
                |        5 |       10 | 5        |   false  |  5.00000 | wwwww |          |
-               |          |          |          |          |          | wwwww |          |).gsub(/^ +/, "")
+               |          |          |          |          |          | wwwww |          |
+               +----------+----------+----------+----------+----------+-------+----------+).gsub(/^ +/, "")
 
           ).to(
             %q(+---+---------+------+-------+---------+------------+-------+
@@ -1335,7 +1274,8 @@ describe Tabulo::Table do
                | 3 |       6 | 3    | false |   3.000 | wwwwww     | two   |
                |   |         |      |       |         |            | lines |
                | 4 |       8 | 4    |  true |  4.0000 | wwwwwwww   |       |
-               | 5 |      10 | 5    | false | 5.00000 | wwwwwwwwww |       |).gsub(/^ +/, "")
+               | 5 |      10 | 5    | false | 5.00000 | wwwwwwwwww |       |
+               +---+---------+------+-------+---------+------------+-------+).gsub(/^ +/, "")
 
           )
         end
@@ -1359,7 +1299,8 @@ describe Tabulo::Table do
                |        4 |        8 | 4        |   true   |   4.0000 | wwwww |          |
                |          |          |          |          |          | www   |          |
                |        5 |       10 | 5        |   false  |  5.00000 | wwwww |          |
-               |          |          |          |          |          | wwwww |          |).gsub(/^ +/, "")
+               |          |          |          |          |          | wwwww |          |
+               +----------+----------+----------+----------+----------+-------+----------+).gsub(/^ +/, "")
           ).to(
             %q(+---+--------+------+-------+--------+--------+-------+
                | N | Double | to_s | Is it |   dec  |  word  |  cool |
@@ -1372,7 +1313,8 @@ describe Tabulo::Table do
                | 4 |      8 | 4    |  true | 4.0000 | wwwwww |       |
                |   |        |      |       |        | ww     |       |
                | 5 |     10 | 5    | false | 5.0000 | wwwwww |       |
-               |   |        |      |       |      0 | wwww   |       |).gsub(/^ +/, "")
+               |   |        |      |       |      0 | wwww   |       |
+               +---+--------+------+-------+--------+--------+-------+).gsub(/^ +/, "")
           )
         end
 
@@ -1397,7 +1339,8 @@ describe Tabulo::Table do
                  |         4  |         8  |  4         |    true    |    4.0000  |  wwwww  |            |
                  |            |            |            |            |            |  www    |            |
                  |         5  |        10  |  5         |    false   |   5.00000  |  wwwww  |            |
-                 |            |            |            |            |            |  wwwww  |            |).gsub(/^ +/, "")
+                 |            |            |            |            |            |  wwwww  |            |
+                 +------------+------------+------------+------------+------------+---------+------------+).gsub(/^ +/, "")
             ).to(
               %q(+-----+----------+--------+---------+----------+----------+---------+
                  |  N  |  Double  |  to_s  |  Is it  |    dec   |   word   |   cool  |
@@ -1410,7 +1353,8 @@ describe Tabulo::Table do
                  |  4  |       8  |  4     |   true  |  4.0000  |  wwwwww  |         |
                  |     |          |        |         |          |  ww      |         |
                  |  5  |      10  |  5     |  false  |  5.0000  |  wwwwww  |         |
-                 |     |          |        |         |       0  |  wwww    |         |).gsub(/^ +/, "")
+                 |     |          |        |         |       0  |  wwww    |         |
+                 +-----+----------+--------+---------+----------+----------+---------+).gsub(/^ +/, "")
             )
           end
         end
@@ -1436,7 +1380,8 @@ describe Tabulo::Table do
                  |       4|       8|4       |  true  |  4.0000|wwwww|        |
                  |        |        |        |        |        |www  |        |
                  |       5|      10|5       |  false | 5.00000|wwwww|        |
-                 |        |        |        |        |        |wwwww|        |).gsub(/^ +/, "")
+                 |        |        |        |        |        |wwwww|        |
+                 +--------+--------+--------+--------+--------+-----+--------+).gsub(/^ +/, "")
             ).to(
               %q(+-+------+----+-----+------+------+-----+
                  |N|Double|to_s|Is it|  dec | word | cool|
@@ -1449,7 +1394,8 @@ describe Tabulo::Table do
                  |4|     8|4   | true|4.0000|wwwwww|     |
                  | |      |    |     |      |ww    |     |
                  |5|    10|5   |false|5.0000|wwwwww|     |
-                 | |      |    |     |     0|wwww  |     |).gsub(/^ +/, "")
+                 | |      |    |     |     0|wwww  |     |
+                 +-+------+----+-----+------+------+-----+).gsub(/^ +/, "")
             )
           end
         end
@@ -1479,7 +1425,8 @@ describe Tabulo::Table do
                | h |   |
                | e |   |
                | r |   |
-               | e |   |).gsub(/^ +/, "")
+               | e |   |
+               +---+---+).gsub(/^ +/, "")
         end
       end
 
@@ -1495,7 +1442,8 @@ describe Tabulo::Table do
                +-----+-----+
                |   1 | 1.0 |
                |   2 | 2.0 |
-               |   3 | 3.0 |).gsub(/^ +/, "")
+               |   3 | 3.0 |
+               +-----+-----+).gsub(/^ +/, "")
         end
       end
     end
@@ -1503,7 +1451,6 @@ describe Tabulo::Table do
 
   describe "#transpose" do
     let(:source) { 1..3 }
-    let(:intersection_character) { "*" }
 
     it "returns another table" do
       result = table.transpose
@@ -1515,349 +1462,52 @@ describe Tabulo::Table do
       "inherited from the original table, other than for the left-most column's width and alignment, which are "\
       "determined automatically, and default to left-aligned, respectively" do
       expect(table.transpose(column_width: 3).to_s).to eq \
-        %q(*---------*-----*-----*-----*
+        %q(+---------+-----+-----+-----+
            |         |  1  |  2  |  3  |
-           *---------*-----*-----*-----*
+           +---------+-----+-----+-----+
            |       N |   1 |   2 |   3 |
-           | Doubled |   2 |   4 |   6 |).gsub(/^ +/, "")
+           | Doubled |   2 |   4 |   6 |
+           +---------+-----+-----+-----+).gsub(/^ +/, "")
     end
 
     it "accepts options for determining the header, width and alignment of the left-most column of the "\
       "transposed table" do
       expect(table.transpose(column_width: 3, field_names_width: 20, field_names_header: "FIELDS",
         field_names_header_alignment: :center, field_names_body_alignment: :left).to_s).to eq \
-        %q(*----------------------*-----*-----*-----*
+        %q(+----------------------+-----+-----+-----+
            |        FIELDS        |  1  |  2  |  3  |
-           *----------------------*-----*-----*-----*
+           +----------------------+-----+-----+-----+
            | N                    |   1 |   2 |   3 |
-           | Doubled              |   2 |   4 |   6 |).gsub(/^ +/, "")
+           | Doubled              |   2 |   4 |   6 |
+           +----------------------+-----+-----+-----+).gsub(/^ +/, "")
     end
 
     it "right-aligns the left-hand column of the new table by default" do
       expect(table.transpose(column_width: 3, field_names_width: 20, field_names_header: "FIELDS").to_s).to eq \
-        %q(*----------------------*-----*-----*-----*
+        %q(+----------------------+-----+-----+-----+
            |               FIELDS |  1  |  2  |  3  |
-           *----------------------*-----*-----*-----*
+           +----------------------+-----+-----+-----+
            |                    N |   1 |   2 |   3 |
-           |              Doubled |   2 |   4 |   6 |).gsub(/^ +/, "")
+           |              Doubled |   2 |   4 |   6 |
+           +----------------------+-----+-----+-----+).gsub(/^ +/, "")
     end
 
     it "accepts a :headers option, allowing the caller to customize the column headers, "\
       "(other than the left-most column)" do
       expect(table.transpose(column_width: 3, headers: -> (n) { n * 2 }).to_s).to eq \
-        %q(*---------*-----*-----*-----*
+        %q(+---------+-----+-----+-----+
            |         |  2  |  4  |  6  |
-           *---------*-----*-----*-----*
+           +---------+-----+-----+-----+
            |       N |   1 |   2 |   3 |
-           | Doubled |   2 |   4 |   6 |).gsub(/^ +/, "")
-    end
-  end
-
-  describe "#shrinkwrap" do
-    let(:column_width) { 8 }
-
-    before(:each) do
-      table.add_column(:to_s)
-      table.add_column("Is it\neven?") { |n| n.even? }
-      table.add_column("dec", formatter: -> (n) { "%.#{n}f" % n }) { |n| n }
-      table.add_column("word\nyep", width: 5) { |n| "w" * n * 2 }
-      table.add_column("cool") { |n| "two\nlines" if n == 3 }
-    end
-
-    it "returns the Table itself" do
-      expect(table.shrinkwrap!(max_table_width: [nil, 64, 47].sample)).to eq(table)
-    end
-
-    it "issues deprecation warning" do
-      expect(Tabulo::Deprecation).to receive(:warn).with("`Tabulo::Table#shrinkwrap!'", "`#pack'")
-
-      table.shrinkwrap!
-    end
-
-    context "when `max_table_width` is not provided" do
-      it "expands or contracts the column widths of the table as necessary so that they just "\
-        "accommodate their header and formatted body contents without wrapping (assuming "\
-        "source data is constant), except insofar as is required to honour newlines within "\
-        "the cell content", :aggregate_failures do
-
-        # Check that it adjusts column widths by shrinking
-        expect { table.shrinkwrap! }.to change(table, :to_s).from(
-          %q(+----------+----------+----------+----------+----------+-------+----------+
-             |     N    |  Doubled |   to_s   |   Is it  |    dec   |  word |   cool   |
-             |          |          |          |   even?  |          |  yep  |          |
-             +----------+----------+----------+----------+----------+-------+----------+
-             |        1 |        2 | 1        |   false  |      1.0 | ww    |          |
-             |        2 |        4 | 2        |   true   |     2.00 | wwww  |          |
-             |        3 |        6 | 3        |   false  |    3.000 | wwwww | two      |
-             |          |          |          |          |          | w     | lines    |
-             |        4 |        8 | 4        |   true   |   4.0000 | wwwww |          |
-             |          |          |          |          |          | www   |          |
-             |        5 |       10 | 5        |   false  |  5.00000 | wwwww |          |
-             |          |          |          |          |          | wwwww |          |).gsub(/^ +/, "")
-
-        ).to(
-          %q(+---+---------+------+-------+---------+------------+-------+
-             | N | Doubled | to_s | Is it |   dec   |    word    |  cool |
-             |   |         |      | even? |         |     yep    |       |
-             +---+---------+------+-------+---------+------------+-------+
-             | 1 |       2 | 1    | false |     1.0 | ww         |       |
-             | 2 |       4 | 2    |  true |    2.00 | wwww       |       |
-             | 3 |       6 | 3    | false |   3.000 | wwwwww     | two   |
-             |   |         |      |       |         |            | lines |
-             | 4 |       8 | 4    |  true |  4.0000 | wwwwwwww   |       |
-             | 5 |      10 | 5    | false | 5.00000 | wwwwwwwwww |       |).gsub(/^ +/, "")
-        )
-
-        # Let's do a quick check to make sure that it will also expand the total table width if required.
-        small_table = Tabulo::Table.new(%w(hello goodbye), column_width: 3) do |t|
-          t.add_column(:itself) { |s| s }
-        end
-        expect { small_table.shrinkwrap! }.to change(small_table, :to_s).from(
-          %q(+-----+
-             | its |
-             | elf |
-             +-----+
-             | hel |
-             | lo  |
-             | goo |
-             | dby |
-             | e   |).gsub(/^ +/, "")
-        ).to(
-          %q(+---------+
-             |  itself |
-             +---------+
-             | hello   |
-             | goodbye |).gsub(/^ +/, "")
-        )
-      end
-    end
-
-    context "when `max_table_width` is not provided" do
-      context "when column_padding is > 1" do
-        let(:column_padding) { 2 }
-
-        it "expands or contracts the column widths of the table as necessary so that they just "\
-          "accommodate their header and formatted body contents without wrapping (assuming "\
-          "source data is constant), inclusive of additional padding, except insofar as is "\
-          "required to honour newlines within the cell content" do
-
-          # Check that it adjusts column widths by shrinking
-          expect { table.shrinkwrap! }.to change(table, :to_s).to(
-            %q(+-----+-----------+--------+---------+-----------+--------------+---------+
-               |  N  |  Doubled  |  to_s  |  Is it  |    dec    |     word     |   cool  |
-               |     |           |        |  even?  |           |      yep     |         |
-               +-----+-----------+--------+---------+-----------+--------------+---------+
-               |  1  |        2  |  1     |  false  |      1.0  |  ww          |         |
-               |  2  |        4  |  2     |   true  |     2.00  |  wwww        |         |
-               |  3  |        6  |  3     |  false  |    3.000  |  wwwwww      |  two    |
-               |     |           |        |         |           |              |  lines  |
-               |  4  |        8  |  4     |   true  |   4.0000  |  wwwwwwww    |         |
-               |  5  |       10  |  5     |  false  |  5.00000  |  wwwwwwwwww  |         |).gsub(/^ +/, "")
-          )
-        end
-      end
-    end
-
-    context "when `max_table_width` is provided (assuming source data is constant)" do
-      context "when `max_table_width` is wider than the existing table width" do
-        it "amends the column widths of the table so that they just accommodate their header and "\
-          "formatted body contents without wrapping (assuming source data is constant), except "\
-          "insofar as is required to honour newlines within the cell content " do
-
-          expect { table.shrinkwrap!(max_table_width: 64) }.to change(table, :to_s).from(
-            %q(+----------+----------+----------+----------+----------+-------+----------+
-               |     N    |  Doubled |   to_s   |   Is it  |    dec   |  word |   cool   |
-               |          |          |          |   even?  |          |  yep  |          |
-               +----------+----------+----------+----------+----------+-------+----------+
-               |        1 |        2 | 1        |   false  |      1.0 | ww    |          |
-               |        2 |        4 | 2        |   true   |     2.00 | wwww  |          |
-               |        3 |        6 | 3        |   false  |    3.000 | wwwww | two      |
-               |          |          |          |          |          | w     | lines    |
-               |        4 |        8 | 4        |   true   |   4.0000 | wwwww |          |
-               |          |          |          |          |          | www   |          |
-               |        5 |       10 | 5        |   false  |  5.00000 | wwwww |          |
-               |          |          |          |          |          | wwwww |          |).gsub(/^ +/, "")
-
-          ).to(
-            %q(+---+---------+------+-------+---------+------------+-------+
-               | N | Doubled | to_s | Is it |   dec   |    word    |  cool |
-               |   |         |      | even? |         |     yep    |       |
-               +---+---------+------+-------+---------+------------+-------+
-               | 1 |       2 | 1    | false |     1.0 | ww         |       |
-               | 2 |       4 | 2    |  true |    2.00 | wwww       |       |
-               | 3 |       6 | 3    | false |   3.000 | wwwwww     | two   |
-               |   |         |      |       |         |            | lines |
-               | 4 |       8 | 4    |  true |  4.0000 | wwwwwwww   |       |
-               | 5 |      10 | 5    | false | 5.00000 | wwwwwwwwww |       |).gsub(/^ +/, "")
-
-          )
-        end
-      end
-
-      context "when `max_table_width` is too narrow to accommodate the shrinkwrapped columns" do
-        it "amends the column widths of the table so that they just accommodate their header and "\
-          "formatted body contents (assuming source data is constant) (except insofar as it required "\
-          "to honour newlines within existing cell content), except that width is progressively "\
-          "removed from the widest column until the table fits the passed width" do
-
-          expect { table.shrinkwrap!(max_table_width: 55) }.to change(table, :to_s).from(
-            %q(+----------+----------+----------+----------+----------+-------+----------+
-               |     N    |  Doubled |   to_s   |   Is it  |    dec   |  word |   cool   |
-               |          |          |          |   even?  |          |  yep  |          |
-               +----------+----------+----------+----------+----------+-------+----------+
-               |        1 |        2 | 1        |   false  |      1.0 | ww    |          |
-               |        2 |        4 | 2        |   true   |     2.00 | wwww  |          |
-               |        3 |        6 | 3        |   false  |    3.000 | wwwww | two      |
-               |          |          |          |          |          | w     | lines    |
-               |        4 |        8 | 4        |   true   |   4.0000 | wwwww |          |
-               |          |          |          |          |          | www   |          |
-               |        5 |       10 | 5        |   false  |  5.00000 | wwwww |          |
-               |          |          |          |          |          | wwwww |          |).gsub(/^ +/, "")
-          ).to(
-            %q(+---+--------+------+-------+--------+--------+-------+
-               | N | Double | to_s | Is it |   dec  |  word  |  cool |
-               |   |    d   |      | even? |        |   yep  |       |
-               +---+--------+------+-------+--------+--------+-------+
-               | 1 |      2 | 1    | false |    1.0 | ww     |       |
-               | 2 |      4 | 2    |  true |   2.00 | wwww   |       |
-               | 3 |      6 | 3    | false |  3.000 | wwwwww | two   |
-               |   |        |      |       |        |        | lines |
-               | 4 |      8 | 4    |  true | 4.0000 | wwwwww |       |
-               |   |        |      |       |        | ww     |       |
-               | 5 |     10 | 5    | false | 5.0000 | wwwwww |       |
-               |   |        |      |       |      0 | wwww   |       |).gsub(/^ +/, "")
-          )
-        end
-
-        context "when column_padding is > 1" do
-          let(:column_padding) { 2 }
-
-          it "amends the column widths of the table so that they just accommodate their header and "\
-            "formatted body contents (assuming source data is constant) (except insofar as it required "\
-            "to honour newlines within existing cell content), including additional padding, except "\
-            "that width is progressively removed from the widest column until the table fits the "\
-            "passed width" do
-
-            expect { table.shrinkwrap!(max_table_width: 69) }.to change(table, :to_s).from(
-              %q(+------------+------------+------------+------------+------------+---------+------------+
-                 |      N     |   Doubled  |    to_s    |    Is it   |     dec    |   word  |    cool    |
-                 |            |            |            |    even?   |            |   yep   |            |
-                 +------------+------------+------------+------------+------------+---------+------------+
-                 |         1  |         2  |  1         |    false   |       1.0  |  ww     |            |
-                 |         2  |         4  |  2         |    true    |      2.00  |  wwww   |            |
-                 |         3  |         6  |  3         |    false   |     3.000  |  wwwww  |  two       |
-                 |            |            |            |            |            |  w      |  lines     |
-                 |         4  |         8  |  4         |    true    |    4.0000  |  wwwww  |            |
-                 |            |            |            |            |            |  www    |            |
-                 |         5  |        10  |  5         |    false   |   5.00000  |  wwwww  |            |
-                 |            |            |            |            |            |  wwwww  |            |).gsub(/^ +/, "")
-            ).to(
-              %q(+-----+----------+--------+---------+----------+----------+---------+
-                 |  N  |  Double  |  to_s  |  Is it  |    dec   |   word   |   cool  |
-                 |     |     d    |        |  even?  |          |    yep   |         |
-                 +-----+----------+--------+---------+----------+----------+---------+
-                 |  1  |       2  |  1     |  false  |     1.0  |  ww      |         |
-                 |  2  |       4  |  2     |   true  |    2.00  |  wwww    |         |
-                 |  3  |       6  |  3     |  false  |   3.000  |  wwwwww  |  two    |
-                 |     |          |        |         |          |          |  lines  |
-                 |  4  |       8  |  4     |   true  |  4.0000  |  wwwwww  |         |
-                 |     |          |        |         |          |  ww      |         |
-                 |  5  |      10  |  5     |  false  |  5.0000  |  wwwwww  |         |
-                 |     |          |        |         |       0  |  wwww    |         |).gsub(/^ +/, "")
-            )
-          end
-        end
-
-        context "when column_padding is 0" do
-          let(:column_padding) { 0 }
-
-          it "amends the column widths of the table so that they just accommodate their header and "\
-            "formatted body contents (assuming source data is constant) (except insofar as it required "\
-            "to honour newlines within existing cell content), with no padding, except "\
-            "that width is progressively removed from the widest column until the table fits the "\
-            "passed width" do
-
-            expect { table.shrinkwrap!(max_table_width: 41) }.to change(table, :to_s).from(
-              %q(+--------+--------+--------+--------+--------+-----+--------+
-                 |    N   | Doubled|  to_s  |  Is it |   dec  | word|  cool  |
-                 |        |        |        |  even? |        | yep |        |
-                 +--------+--------+--------+--------+--------+-----+--------+
-                 |       1|       2|1       |  false |     1.0|ww   |        |
-                 |       2|       4|2       |  true  |    2.00|wwww |        |
-                 |       3|       6|3       |  false |   3.000|wwwww|two     |
-                 |        |        |        |        |        |w    |lines   |
-                 |       4|       8|4       |  true  |  4.0000|wwwww|        |
-                 |        |        |        |        |        |www  |        |
-                 |       5|      10|5       |  false | 5.00000|wwwww|        |
-                 |        |        |        |        |        |wwwww|        |).gsub(/^ +/, "")
-            ).to(
-              %q(+-+------+----+-----+------+------+-----+
-                 |N|Double|to_s|Is it|  dec | word | cool|
-                 | |   d  |    |even?|      |  yep |     |
-                 +-+------+----+-----+------+------+-----+
-                 |1|     2|1   |false|   1.0|ww    |     |
-                 |2|     4|2   | true|  2.00|wwww  |     |
-                 |3|     6|3   |false| 3.000|wwwwww|two  |
-                 | |      |    |     |      |      |lines|
-                 |4|     8|4   | true|4.0000|wwwwww|     |
-                 | |      |    |     |      |ww    |     |
-                 |5|    10|5   |false|5.0000|wwwwww|     |
-                 | |      |    |     |     0|wwww  |     |).gsub(/^ +/, "")
-            )
-          end
-        end
-      end
-
-      context "when `max_table_width` is very small" do
-        it "only reduces column widths to the extent that there is at least a character's width "\
-          "available in each column for content, plus one character of padding on either side" do
-          table = Tabulo::Table.new(%w(hi there)) do |t|
-            t.add_column(:itself) { |s| s }
-            t.add_column(:length)
-          end
-          table.shrinkwrap!(max_table_width: 3)
-
-          expect(table.to_s).to eq \
-            %q(+---+---+
-               | i | l |
-               | t | e |
-               | s | n |
-               | e | g |
-               | l | t |
-               | f | h |
-               +---+---+
-               | h | 2 |
-               | i |   |
-               | t | 5 |
-               | h |   |
-               | e |   |
-               | r |   |
-               | e |   |).gsub(/^ +/, "")
-        end
-      end
-
-      context "when `max_table_width` is passed :auto" do
-        it "caps the table width at the screen width, as returned by TTY::Screen.width" do
-          allow(TTY::Screen).to receive(:width).and_return(13)
-          table = Tabulo::Table.new(1..3, :to_i, :to_f)
-          table.shrinkwrap!(max_table_width: :auto)
-          expect(table.to_s).to eq \
-            %q(+-----+-----+
-               | to_ | to_ |
-               |  i  |  f  |
-               +-----+-----+
-               |   1 | 1.0 |
-               |   2 | 2.0 |
-               |   3 | 3.0 |).gsub(/^ +/, "")
-        end
-      end
+           | Doubled |   2 |   4 |   6 |
+           +---------+-----+-----+-----+).gsub(/^ +/, "")
     end
   end
 
   describe "#formatted_body_row" do
-    context "when passed `with_header: true`" do
+    context "when passed `header: true`" do
       it "returns a string representing a row in the body of the table, with a header" do
-        expect(table.formatted_body_row(3, with_header: true)).to eq \
+        expect(table.formatted_body_row(3, header: true)).to eq \
           %q(+--------------+--------------+
              |       N      |    Doubled   |
              +--------------+--------------+
@@ -1865,9 +1515,9 @@ describe Tabulo::Table do
       end
     end
 
-    context "when passed `with_header: false" do
+    context "when passed `header: false" do
       it "returns a string representing a row in the body of the table, without a header" do
-        expect(table.formatted_body_row(3, with_header: false)).to eq("|            3 |            6 |")
+        expect(table.formatted_body_row(3, header: false)).to eq("|            3 |            6 |")
       end
     end
   end

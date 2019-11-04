@@ -12,38 +12,17 @@ Tabulo is a terminal table generator for Ruby.
 It offers a DRY, "column-centric" interface, and is designed to make it very easy to produce highly
 readable tables, even from large and unwieldy data sets and streams.
 
-## Overview
-
-*Quick API:*
-
-```
-> puts Tabulo::Table.new(User.all, :id, :first_name, :last_name)
-+--------------+--------------+--------------+
-|      id      |  first_name  |   last_name  |
-+--------------+--------------+--------------+
-|            1 | John         | Citizen      |
-|            2 | Jane         | Doe          |
-```
-
-*Full API:*
-
-```ruby
-underyling_enumerable = [1, 2, 50000000]
-
-table = Tabulo::Table.new(underlying_enumerable) do |t|
-  t.add_column("N") { |n| n }
-  t.add_column("Doubled") { |n| n * 2 }
-end
-```
+Tabulo is both easy to use and feature rich, allowing you to quickly tabulate any enumerable
+collection, with options for automatic column sizing, a variety of border styles, and more.
 
 ```
-> puts table
-+--------------+--------------+
-|       N      |    Doubled   |
-+--------------+--------------+
-|            1 |            2 |
-|            2 |            4 |
-|      5000000 |     10000000 |
+> puts Tabulo::Table.new(User.all, :id, :first_name, :last_name, border: :modern).pack
+┌────┬────────────┬───────────┐
+│ id │ first_name │ last_name │
+├────┼────────────┼───────────┤
+│  1 │ John       │ Citizen   │
+│  2 │ Jane       │ Doe       │
+└────┴────────────┴───────────┘
 ```
 
 ## Features
@@ -62,10 +41,10 @@ end
   underlying cell values.
 * The header row can be [repeated](#repeating-headers) at arbitrary intervals.
 * Newlines within cell content are correctly handled.
-* Multibyte characters are correctly handled.
-* Apply [colours](#colours-and-styling) and other styling to table content without breaking the table.
+* Multibyte Unicode characters are correctly handled.
+* Apply [colours](#colours-and-styling) and other styling to table content and borders, without breaking the table.
 * Easily [transpose](#transposition) the table, so that rows are swapped with columns.
-* [Customize](#additional-configuration-options) border and divider characters.
+* Choose from multiple [border configurations](#borders), including Markdown, "ASCII", and smoothly joined Unicode border characters.
 * Use a [DRY initialization interface](#configuring-columns): by being "column based", it is
   designed to spare the developer the burden of syncing the ordering within the header row with that of the body rows.
 
@@ -93,8 +72,8 @@ Tabulo has also been ported to Crystal (with some modifications): see [Tablo](ht
      * [Accessing cell values](#accessing-cell-values)
      * [Accessing the underlying enumerable](#accessing-sources)
      * [Transposing rows and columns](#transposition)
-     * [Additional configuration options](#additional-configuration-options)
-  * [Motivation](#motivation)
+     * [Border configuration](#borders)
+  * [Comparison with other libraries](#motivation)
   * [Contributing](#contributing)
   * [License](#license)
 
@@ -162,6 +141,7 @@ table = Tabulo::Table.new([1, 2, 5], :itself, :even?, :odd?)
 |            1 |     false    |     true     |
 |            2 |     true     |     false    |
 |            5 |     false    |     true     |
++--------------+--------------+--------------+
 ```
 
 Columns can also be initialized using a callable to which each object will be passed to determine
@@ -184,6 +164,7 @@ end
 |            1 |            2 |     true     |
 |            2 |            4 |     false    |
 |            5 |           10 |     true     |
++--------------+--------------+--------------+
 ```
 
 <a name="cell-alignment"></a>
@@ -229,6 +210,7 @@ end
 +--------+-----------+
 |      1 |   false   |
 |      2 |    true   |
++--------+-----------+
 ```
 
 If you want to set the default column width for all columns of the table to something other
@@ -245,6 +227,7 @@ table = Tabulo::Table.new([1, 2], :itself, :even?, column_width: 6)
 +--------+--------+
 |      1 |  false |
 |      2 |  true  |
++--------+--------+
 ```
 
 Widths set for individual columns always override the default column width for the table.
@@ -253,8 +236,44 @@ Widths set for individual columns always override the default column width for t
 #### Configuring padding
 
 The single character of padding either side of each column is not counted in the column width.
-The amount of this padding can be configured for the table as a whole, using the `column_padding`
-option passed to `Table.new`.
+The amount of this extra padding can be configured for the table as a whole, using the `column_padding`
+option passed to `Table.new`&mdash;the default value of this option being `1`.
+
+Passing a single integer to this option causes the given amount of padding to be applied to each
+side of each column. For example:
+
+```ruby
+table = Tabulo::Table.new([1, 2, 5], :itself, :even?, :odd?, column_padding: 0)
+```
+
+```
+> puts table
++------------+------------+------------+
+|   itself   |    even?   |    odd?    |
++------------+------------+------------+
+|           1|    false   |    true    |
+|           2|    true    |    false   |
+|           5|    false   |    true    |
++------------+------------+------------+
+```
+
+Passing an array of _two_ integers to this option configures the left and right padding for each
+column, according to the first and second element of the array, respectively. For example:
+
+```ruby
+table = Tabulo::Table.new([1, 2, 5], :itself, :even?, :odd?, column_padding: [0, 2])
+```
+
+```
+> puts table
++--------------+--------------+--------------+
+|   itself     |    even?     |    odd?      |
++--------------+--------------+--------------+
+|           1  |    false     |    true      |
+|           2  |    true      |    false     |
+|           5  |    false     |    true      |
++--------------+--------------+--------------+
+```
 
 <a name="pack"></a>
 #### Automating column widths
@@ -275,6 +294,7 @@ table.pack
 +--------+-------+
 |      1 | false |
 |      2 |  true |
++--------+-------+
 ```
 
 The `pack` method returns the table itself, so you can "pack-and-print" in one go:
@@ -297,6 +317,7 @@ puts Tabulo::Table.new([1, 2], :itself, :even?).pack(max_table_width: 17)
 +-------+-------+
 |     1 | false |
 |     2 |  true |
++-------+-------+
 ```
 
 Or if you simply call `pack` with no arguments (or if you explicitly call
@@ -342,6 +363,7 @@ table = Tabulo::Table.new(
 | abcdefghijkl |           26 |
 | mnopqrstuvwx |              |
 | yz           |              |
++--------------+--------------+
 ```
 
 Wrapping behaviour is configured for the table as a whole using the `wrap_header_cells_to` option
@@ -365,6 +387,7 @@ table = Tabulo::Table.new(
 +--------------+--------------+
 | hello        |            5 |
 | abcdefghijkl~|           26 |
++--------------+--------------+
 ```
 
 <a name="formatting-cell-values"></a>
@@ -393,6 +416,7 @@ end
 |            1 |         1.00 |
 |            2 |         0.50 |
 |            3 |         0.33 |
++--------------+--------------+
 ```
 
 Note the numbers in the "Reciprocal" column in this example are still right-aligned, even though
@@ -493,6 +517,7 @@ table = Tabulo::Table.new(1..10, :itself, :even?, header_frequency: 5)
 |            8 |     true     |
 |            9 |     false    |
 |           10 |     true     |
++--------------+--------------+
 ```
 
 <a name="enumerator"></a>
@@ -526,16 +551,21 @@ calculated.)
 
 <a name="accessing-cell-values"></a>
 ### Accessing cell values
+
 Each `Tabulo::Table` is an `Enumerable` of which each element is a `Tabulo::Row`. Each `Tabulo::Row`
-is itself an `Enumerable` comprising the underlying values of each cell. A `Tabulo::Row` can also
+is itself an `Enumerable`, of `Tabulo::Cell`. The `Tabulo::Cell#value` method will return the
+underlying value of the cell; while `Tabulo::Cell#formatted_value` will return its formatted content
+as a string.
+
+A `Tabulo::Row` can also
 be converted to a `Hash` for keyed access. For example:
 
 ```ruby
 table = Tabulo::Table.new(1..5, :itself, :even?, :odd?)
 
 table.each do |row|
-  row.each { |cell| puts cell } # 1...2...3...4...5
-  puts row.to_h[:even?]         # false...true...false...true...false
+  row.each { |cell| puts cell.value } # 1...2...3...4...5
+  puts row.to_h[:even?].value         # false...true...false...true...false
 end
 ```
 
@@ -553,8 +583,8 @@ end
 
 table.each do |row|
   cells = row.to_h
-  puts cells[:Number]  # 1...2...3...4...5
-  puts cells[:doubled] # 2...4...6...8...10
+  puts cells[:Number].value  # 1...2...3...4...5
+  puts cells[:doubled].value # 2...4...6...8...10
 end
 ```
 
@@ -616,6 +646,7 @@ a new table in which the rows and columns are swapped:
 |  pred |           -2 |           -1 |            0 |
 |  succ |            0 |            1 |            2 |
 |   abs |            1 |            0 |            1 |
++-------+--------------+--------------+--------------+
 ```
 
 By default, a header row is added to the new table, showing the string value of the element
@@ -623,52 +654,87 @@ represented in that column. This can be configured, however, along with other as
 `transpose`'s behaviour. For details, see the
 [documentation](https://www.rubydoc.info/gems/tabulo/1.5.1/Tabulo/Table#transpose-instance_method).
 
-<a name="additional-configuration-options"></a>
-### Additional configuration options
+<a name="borders"></a>
+### Configuring borders
 
-The characters used for horizontal dividers, vertical dividers and corners, which default to `-`,
-`|` and `+` respectively, can be configured using the using the `horizontal_rule_character`,
-`vertical_rule_character` and `intersection_character` options passed to `Table.new`.
+You can configure the kind of border and divider characters that are used when the table is printed.
+This is done using the `border` option passed to `Table.new`. The options are as follows.
+
+`:ascii`&mdash;this is the default; the table is drawn entirely with characters in the ASCII set:
+
+```
+> puts Tabulo::Table.new(1...3, :itself, :even?, :odd?, border: :ascii)
++--------------+--------------+--------------+
+|    itself    |     even?    |     odd?     |
++--------------+--------------+--------------+
+|            1 |     false    |     true     |
+|            2 |     true     |     false    |
+|            3 |     false    |     true     |
++--------------+--------------+--------------+
+```
+
+`:modern`&mdash;uses smoothly joined Unicode characters:
+
+```
+> puts Tabulo::Table.new(1..3, :itself, :even?, :odd?, border: :modern)
+┌──────────────┬──────────────┬──────────────┐
+│    itself    │     even?    │     odd?     │
+├──────────────┼──────────────┼──────────────┤
+│            1 │     false    │     true     │
+│            2 │     true     │     false    │
+│            3 │     false    │     true     │
+└──────────────┴──────────────┴──────────────┘
+```
+
+`:markdown`&mdash;renders a GitHub flavoured Markdown table:
+
+```
+> puts Tabulo::Table.new(1..3, :itself, :even?, :odd?, border: :markdown)
+|    itself    |     even?    |     odd?     |
+|--------------|--------------|--------------|
+|            1 |     false    |     true     |
+|            2 |     true     |     false    |
+|            3 |     false    |     true     |
+```
+
+`:blank`&mdash;no border or divider characters are printed:
+
+```
+> puts Tabulo::Table.new(1...3, :itself, :even?, :odd?, border: :blank)
+    itself         even?         odd?     
+            1      false         true     
+            2      true          false    
+            3      false         true     
+```
+
+`:classic`&mdash;reproduces the default behaviour in Tabulo v1; this is like the `:ascii` option,
+but without a bottom border:
+
+```
+> puts Tabulo::Table.new(1...3, :itself, :even?, :odd?, border: :classic)
++--------------+--------------+--------------+
+|    itself    |     even?    |     odd?     |
++--------------+--------------+--------------+
+|            1 |     false    |     true     |
+|            2 |     true     |     false    |
+|            3 |     false    |     true     |
+```
+
+<a name="additional-configuration-options"></a>
+### Other configuration options
 
 The character used to indicate truncation, which defaults to `~`, can be configured using the
 `truncation_indicator` option passed to `Table.new`.
 
-A bottom border can be added to the table when printing, as follows:
-
-```ruby
-puts table
-puts table.horizontal_rule
-```
-
-This will output a bottom border that's appropriately sized for the table.
-
-This mechanism can also be used to output a horizontal divider after each row:
-
-```ruby
-table = Tabulo::Table.new(1..3, :itself, :even?)
-```
-
-```
-> table.each { |row| puts row ; puts table.horizontal_rule }
-+--------------+--------------+
-|    itself    |     even?    |
-+--------------+--------------+
-|            1 |     false    |
-+--------------+--------------+
-|            2 |     true     |
-+--------------+--------------+
-|            3 |     false    |
-+--------------+--------------+
-```
-
 <a name="motivation"></a>
-## Motivation
+## Comparison with other libraries
 
-There are other terminal table generators for Ruby. Popular among these are:
+There are other libraries for generating plain text tables in Ruby. Popular among these are:
 
 * [terminal-table](https://github.com/tj/terminal-table)
 * [tty-table](https://github.com/piotrmurach/tty-table)
 * [table\_print](https://github.com/arches/table_print)
+* [hirb](https://github.com/cldwalker/hirb)
 
 *DISCLAIMER: My comments regarding these other libraries are based only on my own, possibly flawed
 reading of the documentation for, and experimentation with, these libraries at the time of my
@@ -676,15 +742,15 @@ writing this. Their APIs, features or documentation may well change between when
 when you read it. Please consult the libraries' own documentation for yourself, rather than relying
 on these comments.*
 
-While these libraries have their strengths, I personally found that for the common use case of
+While these libraries have their strengths, I have personally found that, for the common use case of
 printing a table on the basis of some underlying enumerable collection (such as an ActiveRecord
-query result), using these libraries felt more cumbersome than it needed to be.
+query result), using these libraries feels more cumbersome than it could be.
 
 For example, suppose we have called `User.all` from the Rails console, and want to print
 a table showing the email, first name, last name and ID of each user,
 with column headings. Also, we want the ID column to be right-aligned, because it's a number.
 
-In `terminal-table`, we could achieve this as follows:
+In **terminal-table**, we could achieve this as follows:
 
 ```ruby
 rows = User.all.map { |u| [u.email, u.first_name, u.last_name, u.id] }
@@ -702,7 +768,7 @@ tables, but for tables that have many columns, or that are constructed
 dynamically based on user input or other runtime factors determining the columns
 to be included, this can be a hassle and a source of brittleness.
 
-`tty-table` has a somewhat different API to `terminal-table`. It offers both a
+**tty-table** has a somewhat different API to `terminal-table`. It offers both a
 "row-based" and a "column-based" method of initializing a table. The row-based method
 is similar to `terminal-table`'s in that it burdens the developer with syncing the
 column ordering across multiple code locations. The "column-based" API for `tty-table`, on
@@ -729,20 +795,20 @@ this, but if there is, it doesn't seem to be documented.) So it seems we still h
 `table.align_column(3, :right)`, which again burdens us with keeping the column index
 passed to `align_column` in sync.
 
-Finally, there is [table\_print](https://github.com/arches/table_print). This is a
-handy gem for quickly tabulating ActiveRecord collections from the Rails
-console. `table_print` is similar to `tabulo` in that it has a column-based API, so it doesn't
-suffer from the multiple-source-of-knowledge issue in regards to column orderings. However, as far
-as I can tell, it lacks certain other useful features, such as the ability to repeat headers every N
-rows, the automatic alignment of columns based on cell content (numbers right, strings left), and a
-quick and easy way to automatically resize columns to accommodate cell content without overflowing
-the terminal. Also, as of the time of writing, `table_print`'s last significant commit (ignoring a
-deprecation warning fix in April 2018) was in March 2016.
+As for **table\_print**, this is a handy gem for quickly tabulating ActiveRecord
+collections from the Rails console. `table_print` is similar to `tabulo` in that it has a
+column-based API, so it doesn't suffer from the multiple-source-of-knowledge issue in regards to
+column orderings. However, it lacks certain other useful features, such as the ability to repeat
+headers every N rows, the automatic alignment of columns based on cell content (numbers right,
+strings left), and a quick and easy way to automatically resize columns to accommodate cell content
+without overflowing the terminal. Also, as of the time of writing, `table_print`'s last significant
+commit (ignoring a deprecation warning fix in April 2018) was in March 2016.
 
-I don't mean to disparage any of these other projects&mdash;they each have their strengths&mdash;but
-rather to explain my motivation for developing and maintaining Tabulo despite their existence, and
-to provide reasons one might consider for using `tabulo` rather than another terminal table
-gem.
+Finally, it is worth mentioning the **hirb** library. This is similar to `table_print`, in that it's
+well suited to quickly displaying ActiveRecord collections from the Rails console. However, like
+`table_print`, there are certain useful features it's lacking; and using it outside the console
+environment seems cumbersome. Moreover, it seems no longer to be maintained. At the time of writing,
+its last commit was in March 2015.
 
 <a name="contributing"></a>
 ## Contributing

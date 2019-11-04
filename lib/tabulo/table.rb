@@ -10,19 +10,13 @@ module Tabulo
     include Enumerable
 
     # @!visibility public
+    DEFAULT_BORDER = :ascii
+
+    # @!visibility public
     DEFAULT_COLUMN_WIDTH = 12
 
     # @!visibility public
     DEFAULT_COLUMN_PADDING = 1
-
-    # @!visibility public
-    DEFAULT_HORIZONTAL_RULE_CHARACTER = "-"
-
-    # @!visibility public
-    DEFAULT_VERTICAL_RULE_CHARACTER = "|"
-
-    # @!visibility public
-    DEFAULT_INTERSECTION_CHARACTER = "+"
 
     # @!visibility public
     DEFAULT_TRUNCATION_INDICATOR = "~"
@@ -37,11 +31,10 @@ module Tabulo
     attr_accessor :sources
 
     # @param [Enumerable] sources the underlying Enumerable from which the table will derive its data
-    # @param [Array[Symbol]] cols Specifies the initial columns. The Symbols provided must
+    # @param [Array[Symbol]] columns Specifies the initial columns. The Symbols provided must
     #   be unique. Each element of the Array  will be used to create a column whose content is
     #   created by calling the corresponding method on each element of sources. Note
     #   the {#add_column} method is a much more flexible way to set up columns on the table.
-    # @param [Array[Symbol]] columns <b>DEPRECATED</b> Use <tt>cols</tt> instead.
     # @param [Integer, nil] column_width The default column width for columns in this
     #   table, not excluding padding. If <tt>nil</tt>, then {DEFAULT_COLUMN_WIDTH} will be used.
     # @param [:start, nil, Integer] header_frequency Controls the display of column headers.
@@ -59,24 +52,15 @@ module Tabulo
     #   headers), if their content is longer than the column's fixed width. If passed <tt>nil</tt>, content will
     #   be wrapped for as many rows as required to accommodate it. If passed an Integer N (> 0), content will be
     #   wrapped up to N rows and then truncated thereafter.
-    # @param [nil, String] horizontal_rule_character Determines the character used to draw
-    #   horizontal lines where required in the table. If omitted or passed <tt>nil</tt>, defaults to
-    #   {DEFAULT_HORIZONTAL_RULE_CHARACTER}. If passed something other than <tt>nil</tt> or a single-character
-    #   String, raises {InvalidHorizontalRuleCharacterError}.
-    # @param [nil, String] vertical_rule_character Determines the character used to draw
-    #   vertical lines where required in the table. If omitted or passed <tt>nil</tt>, defaults to
-    #   {DEFAULT_VERTICAL_RULE_CHARACTER}. If passed something other than <tt>nil</tt> or a single-character
-    #   String, raises {InvalidVerticalRuleCharacterError}.
-    # @param [nil, String] intersection_character Determines the character used to draw
-    #   line intersections and corners where required in the table. If omitted or passed <tt>nil</tt>,
-    #   defaults to {DEFAULT_INTERSECTION_CHARACTER}. If passed something other than <tt>nil</tt> or
-    #   a single-character String, raises {InvalidIntersectionCharacterError}.
     # @param [nil, String] truncation_indicator Determines the character used to indicate that a
     #   cell's content has been truncated. If omitted or passed <tt>nil</tt>,
     #   defaults to {DEFAULT_TRUNCATION_INDICATOR}. If passed something other than <tt>nil</tt> or
     #   a single-character String, raises {InvalidTruncationIndicatorError}.
-    # @param [nil, Integer] column_padding Determines the amount of blank space with which to pad either
-    #   of each column. Defaults to 1.
+    # @param [nil, Integer, Array] column_padding (1) Determines the amount of blank space with which to pad
+    #   either side of each column. If passed an Integer, then the given amount of padding is
+    #   applied to each side of each column. If passed a two-element Array, then the first element of the
+    #   Array indicates the amount of padding to apply to the left of each column, and the second
+    #   element indicates the amount to apply to the right.
     # @param [:left, :right, :center] align_header (:center) Determines the alignment of header text
     #   for columns in this Table. Can be overridden for individual columns using the
     #   <tt>align_header</tt> option passed to {#add_column}
@@ -85,9 +69,20 @@ module Tabulo
     #   using the <tt>align_body</tt> option passed to {#add_column}. If passed <tt>:auto</tt>,
     #   alignment is determined by cell content, with numbers aligned right, booleans
     #   center-aligned, and other values left-aligned.
+    # @param [:ascii, :markdown, :modern, :blank, nil] border (nil) Determines the characters used
+    #   for the Table border, including both the characters around the outside of table, and the lines drawn
+    #   within the table to separate columns from each other and the header row from the Table body.
+    #   Possible values are:
+    #   - `:ascii`     Uses ASCII characters only
+    #   - `:markdown`  Produces as a GitHub-flavoured Markdown table
+    #   - `:modern`    Uses non-ASCII Unicode characters to render a border with smooth continuous lines
+    #   - `:blank`     No border characters are rendered
+    #   - `:classic`   Like `:ascii`, but does not have a horizontal line at the bottom of the
+    #                  table. This reproduces the default behaviour in `tabulo` v1.
+    #   If <tt>nil</tt>, then {DEFAULT_BORDER} will be used.
     # @param [nil, #to_proc] border_styler (nil) A lambda or other callable object taking
     #   a single parameter, representing a section of the table's borders (which for this purpose
-    #   include any horizontal and vertical lines inside the table).
+    #   include any horizontal and vertical lines inside the table), and returning a string.
     #   If passed <tt>nil</tt>, then no additional styling will be applied to borders. If passed a
     #   callable, then that callable will be called for each border section, with the
     #   resulting string rendered in place of that border. The extra width of the string returned by the
@@ -96,38 +91,36 @@ module Tabulo
     #   for example, without breaking the table formatting.
     # @return [Table] a new {Table}
     # @raise [InvalidColumnLabelError] if non-unique Symbols are provided to columns.
-    # @raise [InvalidHorizontalRuleCharacterError] if invalid argument passed to horizontal_rule_character.
-    # @raise [InvalidVerticalRuleCharacterError] if invalid argument passed to vertical_rule_character.
-    def initialize(sources, *cols, columns: [], column_width: nil, column_padding: nil, header_frequency: :start,
-      wrap_header_cells_to: nil, wrap_body_cells_to: nil, horizontal_rule_character: nil,
-      vertical_rule_character: nil, intersection_character: nil, truncation_indicator: nil,
-      align_header: :center, align_body: :auto, border_styler: nil)
-
-      if columns.any?
-        Deprecation.warn("`columns' option to Tabulo::Table#initialize", "the variable length parameter `cols'", 2)
-      end
+    # @raise [InvalidBorderError] if invalid option passed to `border` parameter.
+    def initialize(sources, *columns, column_width: nil, column_padding: nil, header_frequency: :start,
+      wrap_header_cells_to: nil, wrap_body_cells_to: nil, truncation_indicator: nil, align_header: :center,
+      align_body: :auto, border: nil, border_styler: nil)
 
       @sources = sources
       @header_frequency = header_frequency
       @wrap_header_cells_to = wrap_header_cells_to
       @wrap_body_cells_to = wrap_body_cells_to
       @default_column_width = (column_width || DEFAULT_COLUMN_WIDTH)
-      @column_padding = (column_padding || DEFAULT_COLUMN_PADDING)
       @align_header = align_header
       @align_body = align_body
-      @border_styler = border_styler
 
-      @horizontal_rule_character = validate_character(horizontal_rule_character,
-        DEFAULT_HORIZONTAL_RULE_CHARACTER, InvalidHorizontalRuleCharacterError, "horizontal rule character")
-      @vertical_rule_character = validate_character(vertical_rule_character,
-        DEFAULT_VERTICAL_RULE_CHARACTER, InvalidVerticalRuleCharacterError, "vertical rule character")
-      @intersection_character = validate_character(intersection_character,
-        DEFAULT_INTERSECTION_CHARACTER, InvalidIntersectionCharacterError, "intersection character")
+      @column_padding = (column_padding || DEFAULT_COLUMN_PADDING)
+      @left_column_padding, @right_column_padding =
+        case @column_padding
+        when Array
+          @column_padding
+        else
+          [@column_padding, @column_padding]
+        end
+
+      @border = (border || DEFAULT_BORDER)
+      @border_styler = border_styler
+      @border_instance = Border.from(@border, @border_styler)
+
       @truncation_indicator = validate_character(truncation_indicator,
         DEFAULT_TRUNCATION_INDICATOR, InvalidTruncationIndicatorError, "truncation indicator")
 
       @column_registry = { }
-      cols.each { |item| add_column(item) }
       columns.each { |item| add_column(item) }
 
       yield self if block_given?
@@ -233,7 +226,9 @@ module Tabulo
     #   display in a fixed-width font.
     def to_s
       if column_registry.any?
-        join_lines(map(&:to_s))
+        bottom_edge = horizontal_rule(:bottom)
+        rows = map(&:to_s)
+        bottom_edge.empty? ? join_lines(rows) : join_lines(rows + [bottom_edge])
       else
         ""
       end
@@ -250,16 +245,20 @@ module Tabulo
     # were not disabled when the Table was initialized).
     def each
       @sources.each_with_index do |source, index|
-        include_header =
+        header =
           case @header_frequency
           when :start
-            index == 0
+            :top if index == 0
           when Integer
-            index % @header_frequency == 0
+            if index == 0
+              :top
+            elsif index % @header_frequency == 0
+              :middle
+            end
           else
             @header_frequency
           end
-        yield body_row(source, with_header: include_header)
+        yield body_row(source, header: header)
       end
     end
 
@@ -269,20 +268,26 @@ module Tabulo
       format_row(cells, @wrap_header_cells_to)
     end
 
+    # @param [:top, :middle, :bottom] align_body (:bottom) Specifies the position
+    #   for which the resulting horizontal dividing line is intended to be printed.
+    #   This determines the border characters that are used to construct the line.
     # @return [String] an "ASCII" graphical representation of a horizontal
-    #   dividing line suitable for printing at any point in the table.
-    # @example Print a horizontal divider after every row:
-    #   table.each do |row|
-    #     puts row
-    #     puts table.horizontal_rule
-    #   end
+    #   dividing line suitable for printing at the top, bottom or middle of the
+    #   table.
+    # @example Print a horizontal divider between each pair of rows, and again
+    #   at the bottom:
     #
-    def horizontal_rule
-      inner = column_registry.map do |_, column|
-        @horizontal_rule_character * (column.width + @column_padding * 2)
-      end
-
-      styled_border(surround_join(inner, @intersection_character))
+    #   table.each_with_index do |row, i|
+    #     puts table.horizontal_rule(:middle) unless i == 0
+    #     puts row
+    #   end
+    #   puts table.horizontal_rule(:bottom)
+    #
+    # It may be that `:top`, `:middle` and `:bottom` all look the same. Whether
+    # this is the case depends on the characters used for the table border.
+    def horizontal_rule(position = :bottom)
+      column_widths = column_registry.map { |_, column| column.width + total_column_padding }
+      @border_instance.horizontal_rule(column_widths, position)
     end
 
     # Reset all the column widths so that each column is *just* wide enough to accommodate
@@ -352,9 +357,8 @@ module Tabulo
     # @param [Hash] opts Options for configuring the new, transposed {Table}.
     #   The following options are the same as the keyword params for the {#initialize} method for
     #   {Table}: <tt>column_width</tt>, <tt>column_padding</tt>, <tt>header_frequency</tt>,
-    #   <tt>wrap_header_cells_to</tt>, <tt>wrap_body_cells_to</tt>, <tt>horizontal_rule_character</tt>,
-    #   <tt>vertical_rule_character</tt>, <tt>intersection_character</tt>, <tt>truncation_indicator</tt>,
-    #   <tt>align_header</tt>, <tt>align_body</tt>.
+    #   <tt>wrap_header_cells_to</tt>, <tt>wrap_body_cells_to</tt>, <tt>border</tt>,
+    #   <tt>border_styler</tt>, <tt>truncation_indicator</tt>, <tt>align_header</tt>, <tt>align_body</tt>.
     #   These are applied in the same way as documented for {#initialize}, when creating the
     #   new, transposed Table. Any options not specified explicitly in the call to {#transpose}
     #   will inherit their values from the original {Table} (with the exception of settings
@@ -376,12 +380,11 @@ module Tabulo
     #   new Table (other than the left-most column's header, which is determined as described
     #   above).
     # @return [Table] a new {Table}
-    # @raise [InvalidHorizontalRuleCharacterError] if invalid argument passed to horizontal_rule_character.
-    # @raise [InvalidVerticalRuleCharacterError] if invalid argument passed to vertical_rule_character.
+    # @raise [InvalidBorderError] if invalid argument passed to `border` parameter.
     def transpose(opts = {})
       default_opts = [:column_width, :column_padding, :header_frequency, :wrap_header_cells_to,
-        :wrap_body_cells_to, :horizontal_rule_character, :vertical_rule_character,
-        :intersection_character, :truncation_indicator, :align_header, :align_body].map do |sym|
+        :wrap_body_cells_to, :truncation_indicator, :align_header, :align_body, :border,
+        :border_styler].map do |sym|
         [sym, instance_variable_get("@#{sym}")]
       end.to_h
 
@@ -411,47 +414,17 @@ module Tabulo
       end
     end
 
-    # @deprecated Use {#pack} instead.
-    #
-    # Reset all the column widths so that each column is *just* wide enough to accommodate
-    # its header text as well as the formatted content of each its cells for the entire
-    # collection, together with a single character of padding on either side of the column,
-    # without any wrapping.
-    #
-    # Note that calling this method will cause the entire source Enumerable to
-    # be traversed and all the column extractors and formatters to be applied in order
-    # to calculate the required widths.
-    #
-    # Note also that this method causes column widths to be fixed as appropriate to the
-    # formatted cell contents given the state of the source Enumerable at the point it
-    # is called. If the source Enumerable changes between that point, and the point when
-    # the Table is printed, then columns will *not* be resized yet again on printing.
-    #
-    # @param [nil, Numeric] max_table_width (nil) If provided, stops the total table
-    #   width (including padding and borders) from expanding beyond this number of characters.
-    #   If passed <tt>:auto</tt>, the table width will automatically be capped at the current
-    #   terminal width.
-    #   Width is deducted from columns if required to achieve this, with one character progressively
-    #   deducted from the width of the widest column until the target is reached. When the
-    #   table is printed, wrapping or truncation will then occur in these columns as required
-    #   (depending on how they were configured).
-    #   Note that regardless of the value passed to max_table_width, the table will always be left wide
-    #   enough to accommodate at least 1 character's width of content, 1 character of left padding and
-    #   1 character of right padding in each column, together with border characters (1 on each side
-    #   of the table and 1 between adjacent columns). I.e. there is a certain width below width the
-    #   Table will refuse to shrink itself.
-    # @return [Table] the Table itself
-    def shrinkwrap!(max_table_width: nil)
-      Deprecation.warn("`Tabulo::Table#shrinkwrap!'", "`#pack'")
-      pack(max_table_width: max_table_width)
-    end
-
     # @!visibility private
-    def formatted_body_row(source, with_header: false)
+    def formatted_body_row(source, header: nil)
       cells = column_registry.map { |_, column| column.body_cell(source) }
       inner = format_row(cells, @wrap_body_cells_to)
-      if with_header
-        join_lines([horizontal_rule, formatted_header, horizontal_rule, inner])
+      if header
+        join_lines([
+          horizontal_rule(header == :top ? :top : :middle),
+          formatted_header,
+          horizontal_rule(:middle),
+          inner,
+        ].reject(&:empty?))
       else
         inner
       end
@@ -460,10 +433,15 @@ module Tabulo
     private
 
     # @!visibility private
+    def total_column_padding
+      @left_column_padding + @right_column_padding
+    end
+
+    # @!visibility private
     def shrink_to(max_table_width)
       columns = column_registry.values
       total_columns_width = columns.inject(0) { |sum, column| sum + column.width }
-      total_padding = column_registry.count * @column_padding * 2
+      total_padding = column_registry.count * total_column_padding
       total_borders = column_registry.count + 1
       unadjusted_table_width = total_columns_width + total_padding + total_borders
 
@@ -483,8 +461,8 @@ module Tabulo
     end
 
     # @!visibility private
-    def body_row(source, with_header: false)
-      Row.new(self, source, with_header: with_header)
+    def body_row(source, header: nil)
+      Row.new(self, source, header: header)
     end
 
     # @!visibility private
@@ -503,25 +481,14 @@ module Tabulo
     def format_row(cells, wrap_cells_to)
       max_cell_height = cells.map(&:height).max
       row_height = ([wrap_cells_to, max_cell_height].compact.min || 1)
-      vertical = styled_border(@vertical_rule_character)
-      subcell_stacks = cells.map { |cell| cell.padded_truncated_subcells(row_height, @column_padding) }
-      subrows = subcell_stacks.transpose.map { |subrow_components| surround_join(subrow_components, vertical) }
+      subcell_stacks = cells.map do |cell|
+        cell.padded_truncated_subcells(row_height, @left_column_padding, @right_column_padding)
+      end
+      subrows = subcell_stacks.transpose.map do |subrow_components|
+        @border_instance.join_cell_contents(subrow_components)
+      end
+
       join_lines(subrows)
-    end
-
-    # @!visibility private
-    def styled_border(str)
-      @border_styler ? @border_styler.call(str) : str
-    end
-
-    # @!visibility private
-    def surround(str, ch)
-      "#{ch}#{str}#{ch}"
-    end
-
-    # @!visibility private
-    def surround_join(arr, ch)
-      surround(arr.join(ch), ch)
     end
 
     # @!visibility private

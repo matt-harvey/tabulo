@@ -7,10 +7,10 @@ module Tabulo
     attr_reader :source
 
     # @!visibility private
-    def initialize(table, source, with_header: true)
+    def initialize(table, source, header: :top)
       @table = table
       @source = source
-      @with_header = with_header
+      @header = header
     end
 
     # Calls the given block once for each cell in the {Row}, passing that cell as parameter.
@@ -25,7 +25,7 @@ module Tabulo
     #   end
     def each
       @table.column_registry.each do |_, column|
-        yield column.body_cell_value(@source)
+        yield column.body_cell(@source)
       end
     end
 
@@ -34,20 +34,15 @@ module Tabulo
     #   in the {Table} and how the {Table} was configured with respect to header frequency).
     def to_s
       if @table.column_registry.any?
-        @table.formatted_body_row(@source, with_header: @with_header)
+        @table.formatted_body_row(@source, header: @header)
       else
         ""
       end
     end
 
-    # @return a Hash representation of the {Row}, with column labels acting
-    #   as keys and the calculated cell values (before formatting) providing the values.
-    # @example
-    #   table = Tabulo::Table.new([1, 10], columns: %i[itself even?])
-    #   row = table.first
-    #   row.to_h  # => { :itself => 1, :even? => false }
+    # @return a Hash representation of the {Row}, with column labels acting as keys and the {Cell}s the values.
     def to_h
-      @table.column_registry.map { |label, column| [label, column.body_cell_value(@source)] }.to_h
+      @table.column_registry.map { |label, column| [label, column.body_cell(@source)] }.to_h
     end
   end
 end
