@@ -4,11 +4,10 @@
 
 #### New features
 
-* New `border` option for `Tabulo::Table` initializer and `Tabulo::Table#transpose` method allows
-  for better customization of border and divider characters, using a preset list of options, viz.:
-  `:ascii`, `:modern`, `:markdown`, `:blank` and `:classic`. In particular, the `:modern` border
-  option uses smoothly drawn Unicode line characters; and the `:markdown` option renders a
-  GitHub-flavoured Markdown table.
+* New `border` option for `Tabulo::Table` initializer allows for better customization of border and
+  divider characters, using a preset list of options, viz.: `:ascii`, `:modern`, `:markdown`,
+  `:blank` and `:classic`. In particular, the `:modern` border option uses smoothly drawn Unicode
+  line characters; and the `:markdown` option renders a GitHub-flavoured Markdown table.
 * `Tabulo::Table#horizontal_rule` method accepts `:top`, `:bottom` and `:middle` options to allow
   the appropriate border characters to be used depending on its intended position in the table.
 * When iterating a `Tabulo::Row`, it's now possible to get the formatted string value of an individual
@@ -27,8 +26,8 @@
 * By default, table now has a border line at the bottom. Pass `:classic` to the `border` option of
   the `Tabulo::Table` initializer to get the old behaviour.
 * Removal of `horizontal_rule_character`, `vertical_rule_character` and `intersection` character
-  options from `Tabulo::Table` initializer, and from `Tabulo::Table#transpose` method; replaced
-  with `border` option.
+  options from `Tabulo::Table` initializer, and from `Tabulo::Table#transpose` method. Use the
+  `border` option instead.
 
 #### Other noteworthy changes
 
