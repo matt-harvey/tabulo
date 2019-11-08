@@ -52,7 +52,6 @@ Tabulo has also been ported to Crystal (with some modifications): see [Tablo](ht
 
 ## Contents
 
-  * [Overview](#overview)
   * [Features](#features)
   * [Table of contents](#table-of-contents)
   * [Installation](#installation)
