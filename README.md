@@ -706,6 +706,19 @@ This is done using the `border` option passed to `Table.new`. The options are as
             3      false         true     
 ```
 
+`:reduced_ascii`&mdash;similar to `:ascii`, but without vertical lines:
+
+```
+> puts Tabulo::Table.new(1...3, :itself, :even?, :odd?, border: :reduced_ascii)
+-------------- -------------- --------------
+    itself          even?          odd?     
+-------------- -------------- --------------
+            1       false          true     
+            2       true           false    
+            3       false          true     
+-------------- -------------- --------------
+```
+
 `:classic`&mdash;reproduces the default behaviour in Tabulo v1; this is like the `:ascii` option,
 but without a bottom border:
 

@@ -43,6 +43,14 @@ describe Tabulo::Border do
       end
     end
 
+    context "when passed `:reduced_ascii`" do
+      let(:initializer) { :reduced_ascii }
+
+      it "returns a new Border" do
+        expect(subject).to be_a(Tabulo::Border)
+      end
+    end
+
     context "when passed `:markdown`" do
       let(:initializer) { :markdown }
 

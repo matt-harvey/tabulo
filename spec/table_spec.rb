@@ -750,6 +750,22 @@ describe Tabulo::Table do
         end
       end
 
+      context "when passed `:reduced_ascii`" do
+        let(:border) { :reduced_ascii }
+
+        it "produces a table with borders consisting of ASCII characters, with no vertical lines" do
+          expect(table.to_s).to eq([
+              "-------------- --------------",
+              "     to_i           to_f     ",
+              "-------------- --------------",
+              "            1            1.0 ",
+              "            2            2.0 ",
+              "            3            3.0 ",
+              "-------------- --------------",
+          ].join($/))
+        end
+      end
+
       context "when passed `:markdown`" do
         let(:border) { :markdown }
 
