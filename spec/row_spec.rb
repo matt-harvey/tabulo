@@ -37,7 +37,7 @@ describe Tabulo::Row do
       expect(i).to eq(2)
     end
 
-    it "iterates over the results of calling the column's extractor on the source object",
+    it "iterates over Cells that wrap the value derived by calling the column's extractor on the source object",
       :aggregate_failures do
 
       row.each_with_index do |cell, i|

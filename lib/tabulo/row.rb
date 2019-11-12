@@ -13,15 +13,13 @@ module Tabulo
       @header = header
     end
 
-    # Calls the given block once for each cell in the {Row}, passing that cell as parameter.
-    # Each "cell" is just the calculated value for its column (pre-formatting) for this {Row}'s
-    # source item.
+    # Calls the given block once for each {Cell} in the {Row}, passing that {Cell} as parameter.
     #
     # @example
     #   table = Tabulo::Table.new([1, 10], columns: %i(itself even?))
     #   row = table.first
     #   row.each do |cell|
-    #     puts cell        # => 1,       => false
+    #     puts cell.value   # => 1,       => false
     #   end
     def each
       @table.column_registry.each do |_, column|

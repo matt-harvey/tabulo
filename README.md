@@ -389,6 +389,9 @@ table = Tabulo::Table.new(
 +--------------+--------------+
 ```
 
+The character used to indicate truncation, which defaults to `~`, can be configured using the
+`truncation_indicator` option passed to `Table.new`.
+
 <a name="formatting-cell-values"></a>
 ### Formatting cell values
 
@@ -421,9 +424,6 @@ end
 Note the numbers in the "Reciprocal" column in this example are still right-aligned, even though
 the callable passed to `formatter` returns a String. Default cell alignment is determined by the type
 of the underlying cell value, not the way it is formatted. This is usually the desired result.
-
-Note also that the item yielded to `.each` for each cell when enumerating over a `Tabulo::Row` is
-the underlying value of that cell, not its formatted value.
 
 <a name="colours-and-styling"></a>
 ### Colours and styling
@@ -553,7 +553,7 @@ calculated.)
 
 Each `Tabulo::Table` is an `Enumerable` of which each element is a `Tabulo::Row`. Each `Tabulo::Row`
 is itself an `Enumerable`, of `Tabulo::Cell`. The `Tabulo::Cell#value` method will return the
-underlying value of the cell; while `Tabulo::Cell#formatted_value` will return its formatted content
+underlying value of the cell; while `Tabulo::Cell#formatted_content` will return its formatted content
 as a string.
 
 A `Tabulo::Row` can also
@@ -718,12 +718,6 @@ but without a bottom border:
 |            2 |     true     |     false    |
 |            3 |     false    |     true     |
 ```
-
-<a name="additional-configuration-options"></a>
-### Other configuration options
-
-The character used to indicate truncation, which defaults to `~`, can be configured using the
-`truncation_indicator` option passed to `Table.new`.
 
 <a name="motivation"></a>
 ## Comparison with other libraries
