@@ -1,5 +1,9 @@
 # Changelog
 
+### v2.0.2
+
+* Minor documentation fixes
+
 ### v2.0.1
 
 * Minor documentation fix
