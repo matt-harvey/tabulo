@@ -560,11 +560,11 @@ A `Tabulo::Row` can also
 be converted to a `Hash` for keyed access. For example:
 
 ```ruby
-table = Tabulo::Table.new(1..5, :itself, :even?, :odd?)
+table = Tabulo::Table.new(1..3, :itself, :even?, :odd?)
 
 table.each do |row|
-  row.each { |cell| puts cell.value } # 1...2...3...4...5
-  puts row.to_h[:even?].value         # false...true...false...true...false
+  row.each { |cell| puts cell.value } # 1, false, true...2, true, false...3, false, true
+  puts row.to_h[:even?].value         # false...true...false
 end
 ```
 
@@ -575,15 +575,15 @@ the column; and it need not be the same as the column header. If we want the hea
 to the label, we can achieve this using the `header` option to `add_column`:
 
 ```ruby
-table = Tabulo::Table.new(1..5) do |t|
+table = Tabulo::Table.new(1..3) do |t|
   t.add_column("Number") { |n| n }
   t.add_column(:doubled, header: "Number X 2") { |n| n * 2 }
 end
 
 table.each do |row|
   cells = row.to_h
-  puts cells[:Number].value  # 1...2...3...4...5
-  puts cells[:doubled].value # 2...4...6...8...10
+  puts cells[:Number].value  # 1...2...3...
+  puts cells[:doubled].value # 2...4...6...
 end
 ```
 
