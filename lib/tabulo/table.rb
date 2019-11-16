@@ -74,14 +74,16 @@ module Tabulo
     #   within the table to separate columns from each other and the header row from the Table body.
     #   If <tt>nil</tt>, then the value of {DEFAULT_BORDER} will be used.
     #   Possible values are:
-    #   - `:ascii`         Uses ASCII characters only
-    #   - `:markdown`      Produces a GitHub-flavoured Markdown table
-    #   - `:modern`        Uses non-ASCII Unicode characters to render a border with smooth continuous lines
-    #   - `:blank`         No border characters are rendered
-    #   - `:reduced_ascii` Like `:ascii`, but without left or right borders, and with internal vertical
-    #                      borders and intersection characters consisting of whitespace only
-    #   - `:classic`       Like `:ascii`, but does not have a horizontal line at the bottom of the
-    #                      table. This reproduces the default behaviour in `tabulo` v1.
+    #   - `:ascii`          Uses ASCII characters only
+    #   - `:markdown`       Produces a GitHub-flavoured Markdown table
+    #   - `:modern`         Uses non-ASCII Unicode characters to render a border with smooth continuous lines
+    #   - `:blank`          No border characters are rendered
+    #   - `:reduced_ascii`  Like `:ascii`, but without left or right borders, and with internal vertical
+    #                       borders and intersection characters consisting of whitespace only
+    #   - `:reduced_modern` Like `:modern`, but without left or right borders, and with internal vertical
+    #                       borders and intersection characters consisting of whitespace only
+    #   - `:classic`        Like `:ascii`, but does not have a horizontal line at the bottom of the
+    #                       table. This reproduces the default behaviour in `tabulo` v1.
     # @param [nil, #to_proc] border_styler (nil) A lambda or other callable object taking
     #   a single parameter, representing a section of the table's borders (which for this purpose
     #   include any horizontal and vertical lines inside the table), and returning a string.
