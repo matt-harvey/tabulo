@@ -1151,6 +1151,19 @@ describe Tabulo::Table do
       expect(table.formatted_header).to eq("|       N      |    Doubled   |") end
   end
 
+  describe "#line" do
+    let(:border) { :modern }
+
+    it "returns a horizontal line made up of the horizontal rule character, and appropriately placed "\
+      "corner characters, of an appropriate width for the table, suitable for the printing at the passed position" do
+      aggregate_failures do
+        expect(table.line(:top)).to    eq("┌──────────────┬──────────────┐")
+        expect(table.line(:middle)).to eq("├──────────────┼──────────────┤")
+        expect(table.line(:bottom)).to eq("└──────────────┴──────────────┘")
+      end
+    end
+  end
+
   describe "#horizontal_rule" do
     let(:border) { :modern }
 
@@ -1162,6 +1175,12 @@ describe Tabulo::Table do
         expect(table.horizontal_rule(:bottom)).to eq("└──────────────┴──────────────┘")
         expect(table.horizontal_rule).to          eq("└──────────────┴──────────────┘")
       end
+    end
+
+    it "does not print a deprecation warning (even though it's deprecated)" do
+      expect(Tabulo::Deprecation).not_to receive(:warn)
+
+      table.horizontal_rule
     end
   end
 

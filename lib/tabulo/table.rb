@@ -230,7 +230,7 @@ module Tabulo
     #   display in a fixed-width font.
     def to_s
       if column_registry.any?
-        bottom_edge = horizontal_rule(:bottom)
+        bottom_edge = line(:bottom)
         rows = map(&:to_s)
         bottom_edge.empty? ? join_lines(rows) : join_lines(rows + [bottom_edge])
       else
@@ -272,6 +272,30 @@ module Tabulo
       format_row(cells, @wrap_header_cells_to)
     end
 
+    # @param [:top, :middle, :bottom] align_body Specifies the position for which
+    #   the resulting horizontal dividing line is intended to be printed.
+    #   This determines the border characters that are used to construct the line.
+    # @return [String] an "ASCII" graphical representation of a horizontal
+    #   dividing line suitable for printing at the top, bottom or middle of the
+    #   table.
+    # @example Print a horizontal divider between each pair of rows, and again
+    #   at the bottom:
+    #
+    #   table.each_with_index do |row, i|
+    #     puts table.line(:middle) unless i == 0
+    #     puts row
+    #   end
+    #   puts table.line(:bottom)
+    #
+    # It may be that `:top`, `:middle` and `:bottom` all look the same. Whether
+    # this is the case depends on the characters used for the table border.
+    def line(position)
+      column_widths = column_registry.map { |_, column| column.width + total_column_padding }
+      @border_instance.line(column_widths, position)
+    end
+
+    # @deprecated Use {#line} instead
+    #
     # @param [:top, :middle, :bottom] align_body (:bottom) Specifies the position
     #   for which the resulting horizontal dividing line is intended to be printed.
     #   This determines the border characters that are used to construct the line.
@@ -290,8 +314,10 @@ module Tabulo
     # It may be that `:top`, `:middle` and `:bottom` all look the same. Whether
     # this is the case depends on the characters used for the table border.
     def horizontal_rule(position = :bottom)
-      column_widths = column_registry.map { |_, column| column.width + total_column_padding }
-      @border_instance.horizontal_rule(column_widths, position)
+      # We don't print a deprecation warning here, as it would excessively "garble" existing
+      # tables that call this method between rows.
+      # Deprecation.warn("`Tabulo::Table#horizontal_rule'", "`#line'")
+      line(position)
     end
 
     # Reset all the column widths so that each column is *just* wide enough to accommodate
@@ -424,9 +450,9 @@ module Tabulo
       inner = format_row(cells, @wrap_body_cells_to)
       if header
         join_lines([
-          horizontal_rule(header == :top ? :top : :middle),
+          line(header == :top ? :top : :middle),
           formatted_header,
-          horizontal_rule(:middle),
+          line(:middle),
           inner,
         ].reject(&:empty?))
       else
