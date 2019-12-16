@@ -112,7 +112,7 @@ module Tabulo
     end
 
     # @!visibility private
-    def line(column_widths, position = :bottom)
+    def horizontal_rule(column_widths, position = :bottom)
       left, center, right, segment =
         case position
         when :top

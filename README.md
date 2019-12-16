@@ -71,9 +71,7 @@ Tabulo has also been ported to Crystal (with some modifications): see [Tablo](ht
      * [Accessing cell values](#accessing-cell-values)
      * [Accessing the underlying enumerable](#accessing-sources)
      * [Transposing rows and columns](#transposition)
-     * [Configuring borders](#borders)
-       * [Preset border options](#preset-borders)
-       * [Adding dividing lines between rows](#row-dividers)
+     * [Border configuration](#borders)
   * [Comparison with other libraries](#motivation)
   * [Contributing](#contributing)
   * [License](#license)
@@ -658,9 +656,6 @@ represented in that column. This can be configured, however, along with other as
 <a name="borders"></a>
 ### Configuring borders
 
-<a name="preset-borders"></a>
-#### Preset border options
-
 You can configure the kind of border and divider characters that are used when the table is printed.
 This is done using the `border` option passed to `Table.new`. The options are as follows.
 
@@ -749,51 +744,6 @@ but without a bottom border:
 |            2 |     true     |     false    |
 |            3 |     false    |     true     |
 ```
-
-<a name="row-dividers"></a>
-##### Adding dividing lines between rows
-
-The preset border options described above do not include dividing lines between rows in the table
-body. Rather, a method `#line` is provided, which can be called at any time while stepping through
-a table, to print a horizontal line at that point. This allows dividing lines to be placed between
-rows or groups of rows as desired. For example, if we wanted a horizontal line to appear after
-every three rows, we could achieve that as follows:
-
-```ruby
-table = Tabulo::Table.new(1..9, :itself, :even?, :odd?, border: :modern)
-
-table.each_with_index do |row, index|
-  if index != 0 && index % 3 == 0
-    puts table.line(:middle)
-  end
-
-  puts row
-end
-
-puts table.line(:bottom)
-```
-
-```
-┌──────────────┬──────────────┬──────────────┐
-│    itself    │     even?    │     odd?     │
-├──────────────┼──────────────┼──────────────┤
-│            1 │     false    │     true     │
-│            2 │     true     │     false    │
-│            3 │     false    │     true     │
-├──────────────┼──────────────┼──────────────┤
-│            4 │     true     │     false    │
-│            5 │     false    │     true     │
-│            6 │     true     │     false    │
-├──────────────┼──────────────┼──────────────┤
-│            7 │     false    │     true     │
-│            8 │     true     │     false    │
-│            9 │     false    │     true     │
-└──────────────┴──────────────┴──────────────┘
-```
-
-Note the `#line` method takes an argument, `:top`, `:middle` or `:bottom`, describing the position at
-which the line is intended to be printed. This ensures the correct characters will be used from the
-configured border option's character set.
 
 <a name="motivation"></a>
 ## Comparison with other libraries

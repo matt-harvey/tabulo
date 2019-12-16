@@ -102,15 +102,15 @@ describe Tabulo::Border do
     end
   end
 
-  describe "#line" do
+  describe "#horizontal_rule" do
     it "returns a horizontal line suitable for rendering within a table with the indicated column widths, "\
       "at the indicated position, with" do
       border = Tabulo::Border.from(:modern)
       column_widths = [3, 5, 12]
 
-      expect(border.line(column_widths, :top)).to eq("┌───┬─────┬────────────┐")
-      expect(border.line(column_widths, :middle)).to eq("├───┼─────┼────────────┤")
-      expect(border.line(column_widths, :bottom)).to eq("└───┴─────┴────────────┘")
+      expect(border.horizontal_rule(column_widths, :top)).to eq("┌───┬─────┬────────────┐")
+      expect(border.horizontal_rule(column_widths, :middle)).to eq("├───┼─────┼────────────┤")
+      expect(border.horizontal_rule(column_widths, :bottom)).to eq("└───┴─────┴────────────┘")
     end
   end
 
