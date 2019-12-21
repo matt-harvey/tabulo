@@ -1483,6 +1483,7 @@ describe Tabulo::Table do
 
   describe "#transpose" do
     let(:source) { 1..3 }
+    let(:column_width) { 9 }
 
     it "returns another table" do
       result = table.transpose
@@ -1493,13 +1494,23 @@ describe Tabulo::Table do
     it "returns a table that's transposed relative to the original one, with config options overridably "\
       "inherited from the original table, other than for the left-most column's width and alignment, which are "\
       "determined automatically, and default to left-aligned, respectively" do
-      expect(table.transpose(column_width: 3).to_s).to eq \
-        %q(+---------+-----+-----+-----+
-           |         |  1  |  2  |  3  |
-           +---------+-----+-----+-----+
-           |       N |   1 |   2 |   3 |
-           | Doubled |   2 |   4 |   6 |
-           +---------+-----+-----+-----+).gsub(/^ +/, "")
+      aggregate_failures do
+        expect(table.transpose.to_s).to eq \
+          %q(+---------+-----------+-----------+-----------+
+             |         |     1     |     2     |     3     |
+             +---------+-----------+-----------+-----------+
+             |       N |         1 |         2 |         3 |
+             | Doubled |         2 |         4 |         6 |
+             +---------+-----------+-----------+-----------+).gsub(/^ +/, "")
+
+        expect(table.transpose(column_width: 3).to_s).to eq \
+          %q(+---------+-----+-----+-----+
+             |         |  1  |  2  |  3  |
+             +---------+-----+-----+-----+
+             |       N |   1 |   2 |   3 |
+             | Doubled |   2 |   4 |   6 |
+             +---------+-----+-----+-----+).gsub(/^ +/, "")
+      end
     end
 
     it "accepts options for determining the header, width and alignment of the left-most column of the "\

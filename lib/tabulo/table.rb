@@ -104,7 +104,7 @@ module Tabulo
       @header_frequency = header_frequency
       @wrap_header_cells_to = wrap_header_cells_to
       @wrap_body_cells_to = wrap_body_cells_to
-      @default_column_width = (column_width || DEFAULT_COLUMN_WIDTH)
+      @column_width = (column_width || DEFAULT_COLUMN_WIDTH)
       @align_header = align_header
       @align_body = align_body
 
@@ -216,7 +216,7 @@ module Tabulo
           header: (header || label).to_s,
           align_header: align_header || @align_header,
           align_body: align_body || @align_body,
-          width: (width || @default_column_width),
+          width: (width || @column_width),
           formatter: formatter,
           extractor: (extractor || label.to_proc),
           styler: styler,
