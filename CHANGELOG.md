@@ -2,7 +2,9 @@
 
 ### v2.1.0
 
-* New border options
+* New `:reduced_ascii` and `:reduced_modern` border options
+* Fix `column_width` option not properly inherited from original table by the new table created
+  by calling #transpose.
 
 ### v2.0.2
 
