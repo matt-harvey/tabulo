@@ -148,23 +148,50 @@ describe Tabulo::Table do
         end
       end
 
-      context "when table is initialized with a integer passed to `divider_frequency`" do
+      context "when table is initialized with an integer passed to `divider_frequency`" do
         let(:divider_frequency) { 2 }
 
-        it "initializes a table displaying a horizontal divider after every N rows, where N is the integer passed" do
-          expect(table).to be_a(Tabulo::Table)
-          expect(table.to_s).to eq \
-            %q(+--------------+--------------+
-               |       N      |    Doubled   |
-               +--------------+--------------+
-               |            1 |            2 |
-               |            2 |            4 |
-               +--------------+--------------+
-               |            3 |            6 |
-               |            4 |            8 |
-               +--------------+--------------+
-               |            5 |           10 |
-               +--------------+--------------+).gsub(/^ +/, "")
+        context "when `header_frequency` is `:start`" do
+          let(:header_frequency) { :start }
+
+          it "initializes a table displaying a horizontal divider after every N rows, where N is the integer passed" do
+            expect(table).to be_a(Tabulo::Table)
+            expect(table.to_s).to eq \
+              %q(+--------------+--------------+
+                 |       N      |    Doubled   |
+                 +--------------+--------------+
+                 |            1 |            2 |
+                 |            2 |            4 |
+                 +--------------+--------------+
+                 |            3 |            6 |
+                 |            4 |            8 |
+                 +--------------+--------------+
+                 |            5 |           10 |
+                 +--------------+--------------+).gsub(/^ +/, "")
+          end
+        end
+
+        context "when `header_frequency` is passed an integer" do
+          let(:header_frequency) { 4 }
+
+          it "initializes a table displaying a horizontal divider after every N rows, where N is the integer "\
+            "passed, except when an header should be displayed, in which case the header is shown instead" do
+            expect(table).to be_a(Tabulo::Table)
+            expect(table.to_s).to eq \
+              %q(+--------------+--------------+
+                 |       N      |    Doubled   |
+                 +--------------+--------------+
+                 |            1 |            2 |
+                 |            2 |            4 |
+                 +--------------+--------------+
+                 |            3 |            6 |
+                 |            4 |            8 |
+                 +--------------+--------------+
+                 |       N      |    Doubled   |
+                 +--------------+--------------+
+                 |            5 |           10 |
+                 +--------------+--------------+).gsub(/^ +/, "")
+          end
         end
       end
     end
