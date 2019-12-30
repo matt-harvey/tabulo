@@ -752,13 +752,13 @@ These are configured via a separate option: see [below](#dividers).
 <a name="dividers"></a>
 ### Row dividers
 
-To add lines between rows in the table body, use the `divider_frequency` option when initializing
+To add lines between rows in the table body, use the `row_divider_frequency` option when initializing
 the table. The default value for this option is `nil`, meaning there are no dividing lines between
 rows. But if this option passed is a positive integer N, then a dividing line is inserted before
 every Nth row. For example:
 
 ```
-> puts Tabulo::Table.new(1..6, :itself, :even?, :odd?, divider_frequency: 2)
+> puts Tabulo::Table.new(1..6, :itself, :even?, :odd?, row_divider_frequency: 2)
 +--------------+--------------+--------------+
 |    itself    |     even?    |     odd?     |
 +--------------+--------------+--------------+
@@ -773,10 +773,10 @@ every Nth row. For example:
 +--------------+--------------+--------------+
 ```
 
-If you want a line before every row, pass `1` to `divider_frequency`. For example:
+If you want a line before every row, pass `1` to `row_divider_frequency`. For example:
 
 ```
-> puts Tabulo::Table.new(1..3, :itself, :even?, :odd?, border: :modern, divider_frequency: 1)
+> puts Tabulo::Table.new(1..3, :itself, :even?, :odd?, border: :modern, row_divider_frequency: 1)
 ┌──────────────┬──────────────┬──────────────┐
 │    itself    │     even?    │     odd?     │
 ├──────────────┼──────────────┼──────────────┤

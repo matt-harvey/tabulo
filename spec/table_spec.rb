@@ -11,7 +11,7 @@ describe Tabulo::Table do
       source,
       column_width: column_width,
       header_frequency: header_frequency,
-      divider_frequency: divider_frequency,
+      row_divider_frequency: row_divider_frequency,
       wrap_header_cells_to: wrap_header_cells_to,
       wrap_body_cells_to: wrap_body_cells_to,
       truncation_indicator: truncation_indicator,
@@ -26,7 +26,7 @@ describe Tabulo::Table do
   let(:source) { 1..5 }
   let(:column_width) { nil }
   let(:header_frequency) { :start }
-  let(:divider_frequency) { nil }
+  let(:row_divider_frequency) { nil }
   let(:wrap_header_cells_to) { nil }
   let(:wrap_body_cells_to) { nil }
   let(:truncation_indicator) { nil }
@@ -129,9 +129,9 @@ describe Tabulo::Table do
       end
     end
 
-    describe "`divider_frequency` param" do
-      context "when table is initialized with `divider_frequency: nil`" do
-        let(:divider_frequency) { nil }
+    describe "`row_divider_frequency` param" do
+      context "when table is initialized with `row_divider_frequency: nil`" do
+        let(:row_divider_frequency) { nil }
 
         it "initializes a table displaying the formatted table without row dividers in the table body" do
           expect(table).to be_a(Tabulo::Table)
@@ -148,8 +148,8 @@ describe Tabulo::Table do
         end
       end
 
-      context "when table is initialized with an integer passed to `divider_frequency`" do
-        let(:divider_frequency) { 2 }
+      context "when table is initialized with an integer passed to `row_divider_frequency`" do
+        let(:row_divider_frequency) { 2 }
 
         context "when `header_frequency` is `:start`" do
           let(:header_frequency) { :start }
