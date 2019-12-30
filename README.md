@@ -755,7 +755,7 @@ These are configured via a separate option: see [below](#dividers).
 To add lines between rows in the table body, use the `divider_frequency` option when initializing
 the table. The default value for this option is `nil`, meaning there are no dividing lines between
 rows. But if this option passed is a positive integer N, then a dividing line is inserted before
-every Nth row (other than the first one, which is proceeded by the header row). For example:
+every Nth row. For example:
 
 ```
 > puts Tabulo::Table.new(1..6, :itself, :even?, :odd?, divider_frequency: 2)
