@@ -7,10 +7,11 @@ module Tabulo
     attr_reader :source
 
     # @!visibility private
-    def initialize(table, source, header: :top)
+    def initialize(table, source, header: :top, divider: false)
       @table = table
       @source = source
       @header = header
+      @divider = divider
     end
 
     # Calls the given block once for each {Cell} in the {Row}, passing that {Cell} as parameter.
@@ -28,11 +29,12 @@ module Tabulo
     end
 
     # @return a String being an "ASCII" graphical representation of the {Row}, including
-    #   any column headers that appear just above it in the {Table} (depending on where this Row is
-    #   in the {Table} and how the {Table} was configured with respect to header frequency).
+    #   any column headers or row divider that appear just above it in the {Table} (depending on where
+    #   this Row is in the {Table}, and how the {Table} was configured with respect to header frequency
+    #   and divider frequency).
     def to_s
       if @table.column_registry.any?
-        @table.formatted_body_row(@source, header: @header)
+        @table.formatted_body_row(@source, header: @header, divider: @divider)
       else
         ""
       end

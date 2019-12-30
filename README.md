@@ -72,6 +72,7 @@ Tabulo has also been ported to Crystal (with some modifications): see [Tablo](ht
      * [Accessing the underlying enumerable](#accessing-sources)
      * [Transposing rows and columns](#transposition)
      * [Border configuration](#borders)
+     * [Row dividers](#dividers)
   * [Comparison with other libraries](#motivation)
   * [Contributing](#contributing)
   * [License](#license)
@@ -743,6 +744,48 @@ but without a bottom border:
 |            1 |     false    |     true     |
 |            2 |     true     |     false    |
 |            3 |     false    |     true     |
+```
+
+Note that, by default, none of the border options includes lines drawn _between_ rows in the body of the table.
+These are configured via a separate option: see [below](#dividers).
+
+<a name="dividers"></a>
+### Row dividers
+
+To add lines between rows in the table body, use the `divider_frequency` option when initializing
+the table. The default value for this option is `nil`, meaning there are no dividing lines between
+rows. But if this option passed is a positive integer N, then a dividing line is inserted before
+every Nth row (other than the first one, which is proceeded by the header row). For example:
+
+```
+> puts Tabulo::Table.new(1..6, :itself, :even?, :odd?, divider_frequency: 2)
++--------------+--------------+--------------+
+|    itself    |     even?    |     odd?     |
++--------------+--------------+--------------+
+|            1 |     false    |     true     |
+|            2 |     true     |     false    |
++--------------+--------------+--------------+
+|            3 |     false    |     true     |
+|            4 |     true     |     false    |
++--------------+--------------+--------------+
+|            5 |     false    |     true     |
+|            6 |     true     |     false    |
++--------------+--------------+--------------+
+```
+
+If you want a line before every row, pass `1` to `divider_frequency`. For example:
+
+```
+> puts Tabulo::Table.new(1..3, :itself, :even?, :odd?, border: :modern, divider_frequency: 1)
+┌──────────────┬──────────────┬──────────────┐
+│    itself    │     even?    │     odd?     │
+├──────────────┼──────────────┼──────────────┤
+│            1 │     false    │     true     │
+├──────────────┼──────────────┼──────────────┤
+│            2 │     true     │     false    │
+├──────────────┼──────────────┼──────────────┤
+│            3 │     false    │     true     │
+└──────────────┴──────────────┴──────────────┘
 ```
 
 <a name="motivation"></a>

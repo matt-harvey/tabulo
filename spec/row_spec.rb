@@ -10,10 +10,11 @@ describe Tabulo::Row do
   end
 
   let(:row) do
-    Tabulo::Row.new(table, 3, header: header)
+    Tabulo::Row.new(table, 3, header: header, divider: divider)
   end
 
   let(:header) { [true, false].sample }
+  let(:divider) { [true, false].sample }
 
   it "is an Enumerable" do
     expect(row).to be_a(Enumerable)
@@ -69,8 +70,22 @@ describe Tabulo::Row do
     context "when row was initialized with `header: false`" do
       let(:header) { false }
 
-      it "returns a string showing the row contents without the column headers" do
-        expect(row.to_s).to eq("|            3 |            6 |")
+      context "when row was initialized with `divider: false`" do
+        let(:divider) { false }
+
+        it "returns a string showing the row contents without the column headers or row divider" do
+          expect(row.to_s).to eq("|            3 |            6 |")
+        end
+      end
+
+      context "when row was initialized with `divider: true`" do
+        let(:divider) { true }
+
+        it "returns a string showing the row contents without the column headers but with row divider above" do
+          expect(row.to_s).to eq \
+            %q(+--------------+--------------+
+               |            3 |            6 |).gsub(/^ +/, "")
+        end
       end
     end
 

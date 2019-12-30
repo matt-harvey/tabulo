@@ -41,6 +41,11 @@ module Tabulo
     #   If passed <tt>:start</tt>, headers will be shown at the top of the table only. If passed <tt>nil</tt>,
     #   headers will not be shown. If passed an Integer N (> 0), headers will be shown at the top of the table,
     #   then repeated every N rows.
+    # @param [nil, Integer] divider_frequency Controls the display of horizontal row dividers within
+    #   the table body. If passed <tt>nil</tt>, dividers will not be shown. If passed an Integer N (> 0),
+    #   dividers will be shown after every N rows. The characters used to form the dividers are
+    #   determined by the `border` option, and are the same as those used to form the bottom edge of the
+    #   header row.
     # @param [nil, Integer] wrap_header_cells_to Controls wrapping behaviour for header
     #   cells if the content thereof is longer than the column's fixed width. If passed <tt>nil</tt> (default),
     #   content will be wrapped for as many rows as required to accommodate it. If passed an Integer N (> 0),
@@ -97,11 +102,12 @@ module Tabulo
     # @raise [InvalidColumnLabelError] if non-unique Symbols are provided to columns.
     # @raise [InvalidBorderError] if invalid option passed to `border` parameter.
     def initialize(sources, *columns, column_width: nil, column_padding: nil, header_frequency: :start,
-      wrap_header_cells_to: nil, wrap_body_cells_to: nil, truncation_indicator: nil, align_header: :center,
-      align_body: :auto, border: nil, border_styler: nil)
+      divider_frequency: nil, wrap_header_cells_to: nil, wrap_body_cells_to: nil, truncation_indicator: nil,
+      align_header: :center, align_body: :auto, border: nil, border_styler: nil)
 
       @sources = sources
       @header_frequency = header_frequency
+      @divider_frequency = divider_frequency
       @wrap_header_cells_to = wrap_header_cells_to
       @wrap_body_cells_to = wrap_body_cells_to
       @column_width = (column_width || DEFAULT_COLUMN_WIDTH)
@@ -262,7 +268,10 @@ module Tabulo
           else
             @header_frequency
           end
-        yield body_row(source, header: header)
+
+        show_divider = @divider_frequency && (index != 0) && (index % @divider_frequency == 0)
+
+        yield Row.new(self, source, header: header, divider: show_divider)
       end
     end
 
@@ -361,10 +370,10 @@ module Tabulo
     # @param [Hash] opts Options for configuring the new, transposed {Table}.
     #   The following options are the same as the keyword params for the {#initialize} method for
     #   {Table}: <tt>column_width</tt>, <tt>column_padding</tt>, <tt>header_frequency</tt>,
-    #   <tt>wrap_header_cells_to</tt>, <tt>wrap_body_cells_to</tt>, <tt>border</tt>,
-    #   <tt>border_styler</tt>, <tt>truncation_indicator</tt>, <tt>align_header</tt>, <tt>align_body</tt>.
-    #   These are applied in the same way as documented for {#initialize}, when creating the
-    #   new, transposed Table. Any options not specified explicitly in the call to {#transpose}
+    #   <tt>divider_frequency</tt>, <tt>wrap_header_cells_to</tt>, <tt>wrap_body_cells_to</tt>,
+    #   <tt>border</tt>, <tt>border_styler</tt>, <tt>truncation_indicator</tt>, <tt>align_header</tt>,
+    #   <tt>align_body</tt>. These are applied in the same way as documented for {#initialize}, when
+    #   creating the new, transposed Table. Any options not specified explicitly in the call to {#transpose}
     #   will inherit their values from the original {Table} (with the exception of settings
     #   for the left-most column, containing the field names, which are determined as described
     #   below). In addition, the following options also apply to {#transpose}:
@@ -386,9 +395,9 @@ module Tabulo
     # @return [Table] a new {Table}
     # @raise [InvalidBorderError] if invalid argument passed to `border` parameter.
     def transpose(opts = {})
-      default_opts = [:column_width, :column_padding, :header_frequency, :wrap_header_cells_to,
-        :wrap_body_cells_to, :truncation_indicator, :align_header, :align_body, :border,
-        :border_styler].map do |sym|
+      default_opts = [:column_width, :column_padding, :header_frequency, :divider_frequency,
+        :wrap_header_cells_to, :wrap_body_cells_to, :truncation_indicator, :align_header, :align_body,
+        :border, :border_styler].map do |sym|
         [sym, instance_variable_get("@#{sym}")]
       end.to_h
 
@@ -419,13 +428,19 @@ module Tabulo
     end
 
     # @!visibility private
-    def formatted_body_row(source, header: nil)
+    def formatted_body_row(source, header:, divider:)
       cells = column_registry.map { |_, column| column.body_cell(source) }
       inner = format_row(cells, @wrap_body_cells_to)
+
       if header
         join_lines([
           horizontal_rule(header == :top ? :top : :middle),
           formatted_header,
+          horizontal_rule(:middle),
+          inner,
+        ].reject(&:empty?))
+      elsif divider
+        join_lines([
           horizontal_rule(:middle),
           inner,
         ].reject(&:empty?))
@@ -462,11 +477,6 @@ module Tabulo
 
         widest_column.width -= 1
       end
-    end
-
-    # @!visibility private
-    def body_row(source, header: nil)
-      Row.new(self, source, header: header)
     end
 
     # @!visibility private
