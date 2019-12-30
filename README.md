@@ -662,7 +662,7 @@ This is done using the `border` option passed to `Table.new`. The options are as
 `:ascii`&mdash;this is the default; the table is drawn entirely with characters in the ASCII set:
 
 ```
-> puts Tabulo::Table.new(1...3, :itself, :even?, :odd?, border: :ascii)
+> puts Tabulo::Table.new(1..3, :itself, :even?, :odd?, border: :ascii)
 +--------------+--------------+--------------+
 |    itself    |     even?    |     odd?     |
 +--------------+--------------+--------------+
@@ -699,7 +699,7 @@ This is done using the `border` option passed to `Table.new`. The options are as
 `:blank`&mdash;no border or divider characters are printed:
 
 ```
-> puts Tabulo::Table.new(1...3, :itself, :even?, :odd?, border: :blank)
+> puts Tabulo::Table.new(1..3, :itself, :even?, :odd?, border: :blank)
     itself         even?         odd?     
             1      false         true     
             2      true          false    
@@ -709,7 +709,7 @@ This is done using the `border` option passed to `Table.new`. The options are as
 `:reduced_ascii`&mdash;similar to `:ascii`, but without vertical lines:
 
 ```
-> puts Tabulo::Table.new(1...3, :itself, :even?, :odd?, border: :reduced_modern)
+> puts Tabulo::Table.new(1..3, :itself, :even?, :odd?, border: :reduced_modern)
 -------------- -------------- --------------
     itself          even?          odd?     
 -------------- -------------- --------------
@@ -722,7 +722,7 @@ This is done using the `border` option passed to `Table.new`. The options are as
 `:reduced_modern`&mdash;similar to `:modern`, but without vertical lines:
 
 ```
-> puts Tabulo::Table.new(1...3, :itself, :even?, :odd?, border: :reduced_ascii)
+> puts Tabulo::Table.new(1..3, :itself, :even?, :odd?, border: :reduced_ascii)
 ────────────── ────────────── ──────────────
     itself          even?          odd?     
 ────────────── ────────────── ──────────────
@@ -736,7 +736,7 @@ This is done using the `border` option passed to `Table.new`. The options are as
 but without a bottom border:
 
 ```
-> puts Tabulo::Table.new(1...3, :itself, :even?, :odd?, border: :classic)
+> puts Tabulo::Table.new(1..3, :itself, :even?, :odd?, border: :classic)
 +--------------+--------------+--------------+
 |    itself    |     even?    |     odd?     |
 +--------------+--------------+--------------+
