@@ -4,6 +4,7 @@
 
 * Fix issue where blank lines appear in table when certain border types (e.g. `:classic`) are
   used with a non-nil `:border_styler`.
+* Minor documentation fix
 
 ### v2.1.0
 
