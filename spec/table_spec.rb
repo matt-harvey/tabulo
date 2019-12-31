@@ -904,11 +904,13 @@ describe Tabulo::Table do
 
     describe "`border_styler` param" do
       let(:table) do
-        Tabulo::Table.new(1..2, border_styler: -> (str) { "\033[31m#{str}\033[0m" }) do |t|
+        Tabulo::Table.new(1..2, border: border, border_styler: -> (str) { "\033[31m#{str}\033[0m" }) do |t|
           t.add_column(:itself) { |n| n }
           t.add_column(:even?)
         end
       end
+
+      let(:border) { :ascii }
 
       it "styles border, divider and intersection characters without affecting width calculations" do
         expect(table.to_s).to eq \
@@ -918,7 +920,19 @@ describe Tabulo::Table do
              \033[31m|\033[0m            1 \033[31m|\033[0m     false    \033[31m|\033[0m
              \033[31m|\033[0m            2 \033[31m|\033[0m     true     \033[31m|\033[0m
              \033[31m+--------------+--------------+\033[0m).gsub(/^ +/, "")
+      end
 
+      context "when the border type lacks some horizontal lines" do
+        let(:border) { :classic }
+
+        it "does not apply styling to missing lines" do
+          expect(table.to_s).to eq \
+            %Q(\033[31m+--------------+--------------+\033[0m
+               \033[31m|\033[0m    itself    \033[31m|\033[0m     even?    \033[31m|\033[0m
+               \033[31m+--------------+--------------+\033[0m
+               \033[31m|\033[0m            1 \033[31m|\033[0m     false    \033[31m|\033[0m
+               \033[31m|\033[0m            2 \033[31m|\033[0m     true     \033[31m|\033[0m).gsub(/^ +/, "")
+        end
       end
     end
   end

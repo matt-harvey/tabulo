@@ -1,5 +1,10 @@
 # Changelog
 
+### v2.1.1
+
+* Fix issue where blank lines appear in table when certain border types (e.g. `:classic`) are
+  used with a non-nil `:border_styler`.
+
 ### v2.1.0
 
 * New `:reduced_ascii` and `:reduced_modern` border options

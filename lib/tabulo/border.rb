@@ -194,7 +194,7 @@ module Tabulo
     end
 
     def style(s)
-      @styler ? @styler.call(s) : s
+      (@styler && !s.empty?) ? @styler.call(s) : s
     end
   end
 end
