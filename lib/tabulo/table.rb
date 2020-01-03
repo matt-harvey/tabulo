@@ -66,6 +66,8 @@ module Tabulo
     #   applied to each side of each column. If passed a two-element Array, then the first element of the
     #   Array indicates the amount of padding to apply to the left of each column, and the second
     #   element indicates the amount to apply to the right.
+    # @param [nil, #to_proc] formatter (:to_s.to_proc) The default value for the `formatter` option
+    #   when columns are added to this table via {#add_column}.
     # @param [:left, :right, :center] align_header (:center) Determines the alignment of header text
     #   for columns in this Table. Can be overridden for individual columns using the
     #   <tt>align_header</tt> option passed to {#add_column}
@@ -101,10 +103,9 @@ module Tabulo
     # @return [Table] a new {Table}
     # @raise [InvalidColumnLabelError] if non-unique Symbols are provided to columns.
     # @raise [InvalidBorderError] if invalid option passed to `border` parameter.
-    def initialize(sources, *columns, column_width: nil, column_padding: nil, header_frequency: :start,
-      row_divider_frequency: nil, wrap_header_cells_to: nil, wrap_body_cells_to: nil, truncation_indicator: nil,
-      align_header: :center, align_body: :auto, border: nil, border_styler: nil)
-
+    def initialize(sources, *columns, column_width: nil, column_padding: nil, formatter: :to_s.to_proc,
+      header_frequency: :start, row_divider_frequency: nil, wrap_header_cells_to: nil, wrap_body_cells_to: nil,
+      truncation_indicator: nil, align_header: :center, align_body: :auto, border: nil, border_styler: nil)
       @sources = sources
       @header_frequency = header_frequency
       @row_divider_frequency = row_divider_frequency
@@ -122,6 +123,8 @@ module Tabulo
         else
           [@column_padding, @column_padding]
         end
+
+      @formatter = formatter
 
       @border = (border || DEFAULT_BORDER)
       @border_styler = border_styler
@@ -161,12 +164,13 @@ module Tabulo
     # @param [Integer] width (nil) Specifies the width of the column, excluding padding. If
     #   nil, then the column will take the width provided by the `column_width` param
     #   with which the Table was initialized.
-    # @param [#to_proc] formatter (:to_s.to_proc) A lambda or other callable object that
+    # @param [#to_proc] formatter (nil) A lambda or other callable object that
     #   will be passed the calculated value of each cell to determine how it should be displayed. This
     #   is distinct from the extractor (see below). For example, if the extractor for this column
     #   generates a Date, then the formatter might format that Date in a particular way.
-    #   If no formatter is provided, then <tt>.to_s</tt> will be called on
-    #   the extracted value of each cell to determine its displayed content.
+    #   If no formatter is provided, then the callable that was passed to the `formatter` option
+    #   of the table itself on its creation (see {#initialize}) (which itself defaults to
+    #   `:to_s.to_proc`), will be used as the formatter for the column.
     # @param [nil, #to_proc] styler (nil) A lambda or other callable object that will be passed
     #   two arguments: the calculated value of the cell (prior to the {formatter} being applied);
     #   and a string representing a single formatted line within the cell. For example, if the
@@ -203,7 +207,7 @@ module Tabulo
     #   Table. (This is case-sensitive, but is insensitive to whether a String or Symbol is passed
     #   to the label parameter.)
     def add_column(label, header: nil, align_header: nil, align_body: nil,
-      width: nil, formatter: :to_s.to_proc, styler: nil, header_styler: nil, &extractor)
+      width: nil, formatter: nil, styler: nil, header_styler: nil, &extractor)
 
       column_label =
         case label
@@ -220,10 +224,10 @@ module Tabulo
       @column_registry[column_label] =
         Column.new(
           header: (header || label).to_s,
-          align_header: align_header || @align_header,
-          align_body: align_body || @align_body,
+          align_header: (align_header || @align_header),
+          align_body: (align_body || @align_body),
           width: (width || @column_width),
-          formatter: formatter,
+          formatter: (formatter || @formatter),
           extractor: (extractor || label.to_proc),
           styler: styler,
           header_styler: header_styler,
@@ -369,10 +373,11 @@ module Tabulo
     #
     # @param [Hash] opts Options for configuring the new, transposed {Table}.
     #   The following options are the same as the keyword params for the {#initialize} method for
-    #   {Table}: <tt>column_width</tt>, <tt>column_padding</tt>, <tt>header_frequency</tt>,
-    #   <tt>row_divider_frequency</tt>, <tt>wrap_header_cells_to</tt>, <tt>wrap_body_cells_to</tt>,
-    #   <tt>border</tt>, <tt>border_styler</tt>, <tt>truncation_indicator</tt>, <tt>align_header</tt>,
-    #   <tt>align_body</tt>. These are applied in the same way as documented for {#initialize}, when
+    #   {Table}: <tt>column_width</tt>, <tt>column_padding</tt>, <tt>formatter</tt>,
+    #   <tt>header_frequency</tt>, <tt>row_divider_frequency</tt>, <tt>wrap_header_cells_to</tt>,
+    #   <tt>wrap_body_cells_to</tt>, <tt>border</tt>, <tt>border_styler</tt>, <tt>truncation_indicator</tt>,
+    #   <tt>align_header</tt>, <tt>align_body</tt>.
+    #   These are applied in the same way as documented for {#initialize}, when
     #   creating the new, transposed Table. Any options not specified explicitly in the call to {#transpose}
     #   will inherit their values from the original {Table} (with the exception of settings
     #   for the left-most column, containing the field names, which are determined as described
@@ -395,9 +400,9 @@ module Tabulo
     # @return [Table] a new {Table}
     # @raise [InvalidBorderError] if invalid argument passed to `border` parameter.
     def transpose(opts = {})
-      default_opts = [:column_width, :column_padding, :header_frequency, :row_divider_frequency,
-        :wrap_header_cells_to, :wrap_body_cells_to, :truncation_indicator, :align_header, :align_body,
-        :border, :border_styler].map do |sym|
+      default_opts = [:column_width, :column_padding, :formatter, :header_frequency,
+        :row_divider_frequency, :wrap_header_cells_to, :wrap_body_cells_to, :truncation_indicator, :align_header,
+        :align_body, :border, :border_styler].map do |sym|
         [sym, instance_variable_get("@#{sym}")]
       end.to_h
 

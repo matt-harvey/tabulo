@@ -16,6 +16,7 @@ describe Tabulo::Table do
       wrap_body_cells_to: wrap_body_cells_to,
       truncation_indicator: truncation_indicator,
       column_padding: column_padding,
+      formatter: formatter,
       border: border,
     ) do |t|
       t.add_column("N") { |n| n }
@@ -31,6 +32,7 @@ describe Tabulo::Table do
   let(:wrap_body_cells_to) { nil }
   let(:truncation_indicator) { nil }
   let(:column_padding) { nil }
+  let(:formatter) { :to_s.to_proc }
   let(:border) { :ascii }
 
   it "is an Enumerable" do
@@ -675,6 +677,26 @@ describe Tabulo::Table do
                |            5  |           10  |
                +---------------+---------------+).gsub(/^ +/, "")
         end
+      end
+    end
+
+    describe "`formatter` param" do
+      let(:formatter) { -> (n) { "%.2f" % n } }
+
+      it "determines the formatter used on column values within the table body, unless overridden by the "\
+        "`formatter` option on #add_column" do
+        table.add_column("Halved", formatter: :to_s.to_proc) { |n| n / 2.0 }
+        table.add_column("Quartered") { |n| n / 4.0 }
+        expect(table.to_s).to eq \
+          %q(+--------------+--------------+--------------+--------------+
+             |       N      |    Doubled   |    Halved    |   Quartered  |
+             +--------------+--------------+--------------+--------------+
+             |         1.00 |         2.00 |          0.5 |         0.25 |
+             |         2.00 |         4.00 |          1.0 |         0.50 |
+             |         3.00 |         6.00 |          1.5 |         0.75 |
+             |         4.00 |         8.00 |          2.0 |         1.00 |
+             |         5.00 |        10.00 |          2.5 |         1.25 |
+             +--------------+--------------+--------------+--------------+).gsub(/^ +/, "")
       end
     end
 
