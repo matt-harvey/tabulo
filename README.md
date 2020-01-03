@@ -426,12 +426,12 @@ Note the numbers in the "Reciprocal" column in this example are still right-alig
 the callable passed to `formatter` returns a String. Default cell alignment is determined by the type
 of the underlying cell value, not the way it is formatted. This is usually the desired result.
 
-If you want the default formatter to be something other than `#to_s`, then you can achieve this using
-the `formatter` option on the table itself:
+If you want to set the default formatter for all columns of the table to something other than
+`#to_s`, use the `formatter` option when initializing the table:
 
 ```ruby
 table = Tabulo::Table.new(1..3, formatter: -> (n) { "%.2f" % n }) do |t|
-  t.add_column("N", formatter: :to_s.to_proc, &:itself)
+  t.add_column("N", &:itself)
   t.add_column("Reciprocal") { |n| 1.0 / n }
   t.add_column("Half") { |n| n / 2.0 }
 end
@@ -442,11 +442,14 @@ end
 +--------------+--------------+--------------+
 |       N      |  Reciprocal  |     Half     |
 +--------------+--------------+--------------+
-|            1 |         1.00 |         0.50 |
-|            2 |         0.50 |         1.00 |
-|            3 |         0.33 |         1.50 |
+|         1.00 |         1.00 |         0.50 |
+|         2.00 |         0.50 |         1.00 |
+|         3.00 |         0.33 |         1.50 |
 +--------------+--------------+--------------+
 ```
+
+Formatters set for individual columns on calling `#add_column` always override the default formatter for
+the table.
 
 <a name="colours-and-styling"></a>
 ### Colours and styling
