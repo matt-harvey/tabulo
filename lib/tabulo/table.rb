@@ -35,47 +35,14 @@ module Tabulo
     #   be unique. Each element of the Array  will be used to create a column whose content is
     #   created by calling the corresponding method on each element of sources. Note
     #   the {#add_column} method is a much more flexible way to set up columns on the table.
-    # @param [Integer, nil] column_width The default column width for columns in this
-    #   table, not excluding padding. If <tt>nil</tt>, then {DEFAULT_COLUMN_WIDTH} will be used.
-    # @param [:start, nil, Integer] header_frequency Controls the display of column headers.
-    #   If passed <tt>:start</tt>, headers will be shown at the top of the table only. If passed <tt>nil</tt>,
-    #   headers will not be shown. If passed an Integer N (> 0), headers will be shown at the top of the table,
-    #   then repeated every N rows.
-    # @param [nil, Integer] row_divider_frequency Controls the display of horizontal row dividers within
-    #   the table body. If passed <tt>nil</tt>, dividers will not be shown. If passed an Integer N (> 0),
-    #   dividers will be shown after every N rows. The characters used to form the dividers are
-    #   determined by the `border` option, and are the same as those used to form the bottom edge of the
-    #   header row.
-    # @param [nil, Integer] wrap_header_cells_to Controls wrapping behaviour for header
-    #   cells if the content thereof is longer than the column's fixed width. If passed <tt>nil</tt> (default),
-    #   content will be wrapped for as many rows as required to accommodate it. If passed an Integer N (> 0),
-    #   content will be wrapped up to N rows and then truncated thereafter.
-    # @param [nil, Integer] wrap_body_cells_to Controls wrapping behaviour for table cells (excluding
-    #   headers), if their content is longer than the column's fixed width. If passed <tt>nil</tt>, content will
-    #   be wrapped for as many rows as required to accommodate it. If passed an Integer N (> 0), content will be
-    #   wrapped up to N rows and then truncated thereafter.
-    #   headers), if their content is longer than the column's fixed width. If passed <tt>nil</tt>, content will
-    #   be wrapped for as many rows as required to accommodate it. If passed an Integer N (> 0), content will be
-    #   wrapped up to N rows and then truncated thereafter.
-    # @param [nil, String] truncation_indicator Determines the character used to indicate that a
-    #   cell's content has been truncated. If omitted or passed <tt>nil</tt>,
-    #   defaults to {DEFAULT_TRUNCATION_INDICATOR}. If passed something other than <tt>nil</tt> or
-    #   a single-character String, raises {InvalidTruncationIndicatorError}.
-    # @param [nil, Integer, Array] column_padding (1) Determines the amount of blank space with which to pad
-    #   either side of each column. If passed an Integer, then the given amount of padding is
-    #   applied to each side of each column. If passed a two-element Array, then the first element of the
-    #   Array indicates the amount of padding to apply to the left of each column, and the second
-    #   element indicates the amount to apply to the right.
-    # @param [nil, #to_proc] formatter (:to_s.to_proc) The default value for the `formatter` option
-    #   when columns are added to this table via {#add_column}.
-    # @param [:left, :right, :center] align_header (:center) Determines the alignment of header text
-    #   for columns in this Table. Can be overridden for individual columns using the
-    #   <tt>align_header</tt> option passed to {#add_column}
     # @param [:left, :right, :center, :auto] align_body (:auto) Determines the alignment of body cell
     #   (i.e. non-header) content within columns in this Table. Can be overridden for individual columns
     #   using the <tt>align_body</tt> option passed to {#add_column}. If passed <tt>:auto</tt>,
     #   alignment is determined by cell content, with numbers aligned right, booleans
     #   center-aligned, and other values left-aligned.
+    # @param [:left, :right, :center] align_header (:center) Determines the alignment of header text
+    #   for columns in this Table. Can be overridden for individual columns using the
+    #   <tt>align_header</tt> option passed to {#add_column}
     # @param [:ascii, :markdown, :modern, :blank, nil] border (nil) Determines the characters used
     #   for the Table border, including both the characters around the outside of table, and the lines drawn
     #   within the table to separate columns from each other and the header row from the Table body.
@@ -100,22 +67,67 @@ module Tabulo
     #   {border_styler} is not taken into consideration by the internal table rendering calculations
     #   Thus it can be used to apply ANSI escape codes to border characters, to colour the borders
     #   for example, without breaking the table formatting.
+    # @param [nil, Integer, Array] column_padding (1) Determines the amount of blank space with which to pad
+    #   either side of each column. If passed an Integer, then the given amount of padding is
+    #   applied to each side of each column. If passed a two-element Array, then the first element of the
+    #   Array indicates the amount of padding to apply to the left of each column, and the second
+    #   element indicates the amount to apply to the right.
+    # @param [Integer, nil] column_width The default column width for columns in this
+    #   table, not excluding padding. If <tt>nil</tt>, then {DEFAULT_COLUMN_WIDTH} will be used.
+    # @param [nil, #to_proc] formatter (:to_s.to_proc) The default value for the `formatter` option
+    #   when columns are added to this table via {#add_column}.
+    # @param [:start, nil, Integer] header_frequency (:start) Controls the display of column headers.
+    #   If passed <tt>:start</tt>, headers will be shown at the top of the table only. If passed <tt>nil</tt>,
+    #   headers will not be shown. If passed an Integer N (> 0), headers will be shown at the top of the table,
+    #   then repeated every N rows.
+    # @param [nil, Integer] row_divider_frequency (nil) Controls the display of horizontal row dividers within
+    #   the table body. If passed <tt>nil</tt>, dividers will not be shown. If passed an Integer N (> 0),
+    #   dividers will be shown after every N rows. The characters used to form the dividers are
+    #   determined by the `border` option, and are the same as those used to form the bottom edge of the
+    #   header row.
+    # @param [nil, String] truncation_indicator Determines the character used to indicate that a
+    #   cell's content has been truncated. If omitted or passed <tt>nil</tt>,
+    #   defaults to {DEFAULT_TRUNCATION_INDICATOR}. If passed something other than <tt>nil</tt> or
+    #   a single-character String, raises {InvalidTruncationIndicatorError}.
+    # @param [nil, Integer] wrap_body_cells_to Controls wrapping behaviour for table cells (excluding
+    #   headers), if their content is longer than the column's fixed width. If passed <tt>nil</tt>, content will
+    #   be wrapped for as many rows as required to accommodate it. If passed an Integer N (> 0), content will be
+    #   wrapped up to N rows and then truncated thereafter.
+    #   headers), if their content is longer than the column's fixed width. If passed <tt>nil</tt>, content will
+    #   be wrapped for as many rows as required to accommodate it. If passed an Integer N (> 0), content will be
+    #   wrapped up to N rows and then truncated thereafter.
+    # @param [nil, Integer] wrap_header_cells_to Controls wrapping behaviour for header
+    #   cells if the content thereof is longer than the column's fixed width. If passed <tt>nil</tt> (default),
+    #   content will be wrapped for as many rows as required to accommodate it. If passed an Integer N (> 0),
+    #   content will be wrapped up to N rows and then truncated thereafter.
     # @return [Table] a new {Table}
     # @raise [InvalidColumnLabelError] if non-unique Symbols are provided to columns.
     # @raise [InvalidBorderError] if invalid option passed to `border` parameter.
-    def initialize(sources, *columns, column_width: nil, column_padding: nil, formatter: :to_s.to_proc,
-      header_frequency: :start, row_divider_frequency: nil, wrap_header_cells_to: nil, wrap_body_cells_to: nil,
-      truncation_indicator: nil, align_header: :center, align_body: :auto, border: nil, border_styler: nil)
-      @sources = sources
-      @header_frequency = header_frequency
-      @row_divider_frequency = row_divider_frequency
-      @wrap_header_cells_to = wrap_header_cells_to
-      @wrap_body_cells_to = wrap_body_cells_to
-      @column_width = (column_width || DEFAULT_COLUMN_WIDTH)
-      @align_header = align_header
-      @align_body = align_body
+    def initialize(
+      sources,
+      *columns,
+      align_body:            :auto,
+      align_header:          :center,
+      border:                nil,
+      border_styler:         nil,
+      column_padding:        nil,
+      column_width:          nil,
+      formatter:             :to_s.to_proc,
+      header_frequency:      :start,
+      row_divider_frequency: nil,
+      truncation_indicator:  nil,
+      wrap_body_cells_to:    nil,
+      wrap_header_cells_to:  nil)
 
+      @sources = sources
+
+      @align_body = align_body
+      @align_header = align_header
+      @border = (border || DEFAULT_BORDER)
+      @border_styler = border_styler
+      @border_instance = Border.from(@border, @border_styler)
       @column_padding = (column_padding || DEFAULT_COLUMN_PADDING)
+
       @left_column_padding, @right_column_padding =
         case @column_padding
         when Array
@@ -124,14 +136,14 @@ module Tabulo
           [@column_padding, @column_padding]
         end
 
+      @column_width = (column_width || DEFAULT_COLUMN_WIDTH)
       @formatter = formatter
-
-      @border = (border || DEFAULT_BORDER)
-      @border_styler = border_styler
-      @border_instance = Border.from(@border, @border_styler)
-
+      @header_frequency = header_frequency
+      @row_divider_frequency = row_divider_frequency
       @truncation_indicator = validate_character(truncation_indicator,
         DEFAULT_TRUNCATION_INDICATOR, InvalidTruncationIndicatorError, "truncation indicator")
+      @wrap_body_cells_to = wrap_body_cells_to
+      @wrap_header_cells_to = wrap_header_cells_to
 
       @column_registry = { }
       columns.each { |item| add_column(item) }
@@ -147,13 +159,6 @@ module Tabulo
     #   a method to be called on each item in the table sources to provide the content
     #   for this column. If a String is passed as the label, then it will be converted to
     #   a Symbol for the purpose of serving as this label.
-    # @param [nil, #to_s] header (nil) Text to be displayed in the column header. If passed nil,
-    #   the column's label will also be used as its header text.
-    # @param [:left, :center, :right, nil] align_header (nil) Specifies how the header text
-    #   should be aligned. If <tt>nil</tt> is passed, then the alignment is determined
-    #   by the Table-level setting passed to the <tt>align_header</tt> (which itself defaults
-    #   to <tt>:center</tt>). Otherwise, this option determines the alignment of the header
-    #   content for this column.
     # @param [:left, :center, :right, :auto, nil] align_body (nil) Specifies how the cell body contents
     #   should be aligned. If <tt>nil</tt> is passed, then the alignment is determined
     #   by the Table-level setting passed to the <tt>align_body</tt> option on Table initialization
@@ -161,9 +166,11 @@ module Tabulo
     #   this column. If <tt>:auto</tt> is passed, the alignment is determined by the type of the cell
     #   value, with numbers aligned right, booleans center-aligned, and other values left-aligned.
     #   Note header text alignment is configured separately using the :align_header param.
-    # @param [Integer] width (nil) Specifies the width of the column, excluding padding. If
-    #   nil, then the column will take the width provided by the `column_width` param
-    #   with which the Table was initialized.
+    # @param [:left, :center, :right, nil] align_header (nil) Specifies how the header text
+    #   should be aligned. If <tt>nil</tt> is passed, then the alignment is determined
+    #   by the Table-level setting passed to the <tt>align_header</tt> (which itself defaults
+    #   to <tt>:center</tt>). Otherwise, this option determines the alignment of the header
+    #   content for this column.
     # @param [#to_proc] formatter (nil) A lambda or other callable object that
     #   will be passed the calculated value of each cell to determine how it should be displayed. This
     #   is distinct from the extractor (see below). For example, if the extractor for this column
@@ -171,6 +178,21 @@ module Tabulo
     #   If no formatter is provided, then the callable that was passed to the `formatter` option
     #   of the table itself on its creation (see {#initialize}) (which itself defaults to
     #   `:to_s.to_proc`), will be used as the formatter for the column.
+    # @param [nil, #to_s] header (nil) Text to be displayed in the column header. If passed nil,
+    #   the column's label will also be used as its header text.
+    # @param [nil, #to_proc] header_styler (nil) A lambda or other callable object taking
+    #   a single parameter, representing a single line of within the header content for
+    #   this column. For example, if the header cell content is wrapped over three lines, then
+    #   the {header_styler} will be called once for each line. If passed <tt>nil</tt>, then
+    #   no additional styling will be applied to the header cell content. If passed a callable,
+    #   then that callable will be called for each line of content within the header cell, and the
+    #   resulting string rendered in place of that line. The extra width of the string returned by the
+    #   {header_styler} is not taken into consideration by the internal table and
+    #   cell width calculations involved in rendering the table. Thus it can be used to apply
+    #   ANSI escape codes to header cell content, to colour the cell content for example, without
+    #   breaking the table formatting.
+    #   Note that if the header content is truncated, then any {header_styler} will be applied to the
+    #   truncation indicator character as well as to the truncated content.
     # @param [nil, #to_proc] styler (nil) A lambda or other callable object that will be passed
     #   two arguments: the calculated value of the cell (prior to the {formatter} being applied);
     #   and a string representing a single formatted line within the cell. For example, if the
@@ -186,19 +208,9 @@ module Tabulo
     #   breaking the table formatting.
     #   Note that if the content of a cell is truncated, then the whatever styling is applied by the
     #   {styler} to the cell content will also be applied to the truncation indicator character.
-    # @param [nil, #to_proc] header_styler (nil) A lambda or other callable object taking
-    #   a single parameter, representing a single line of within the header content for
-    #   this column. For example, if the header cell content is wrapped over three lines, then
-    #   the {header_styler} will be called once for each line. If passed <tt>nil</tt>, then
-    #   no additional styling will be applied to the header cell content. If passed a callable,
-    #   then that callable will be called for each line of content within the header cell, and the
-    #   resulting string rendered in place of that line. The extra width of the string returned by the
-    #   {header_styler} is not taken into consideration by the internal table and
-    #   cell width calculations involved in rendering the table. Thus it can be used to apply
-    #   ANSI escape codes to header cell content, to colour the cell content for example, without
-    #   breaking the table formatting.
-    #   Note that if the header content is truncated, then any {header_styler} will be applied to the
-    #   truncation indicator character as well as to the truncated content.
+    # @param [Integer] width (nil) Specifies the width of the column, excluding padding. If
+    #   nil, then the column will take the width provided by the `column_width` param
+    #   with which the Table was initialized.
     # @param [#to_proc] extractor A block or other callable
     #   that will be passed each of the Table sources to determine the value in each cell of this
     #   column. If this is not provided, then the column label will be treated as a method to be
@@ -206,8 +218,16 @@ module Tabulo
     # @raise [InvalidColumnLabelError] if label has already been used for another column in this
     #   Table. (This is case-sensitive, but is insensitive to whether a String or Symbol is passed
     #   to the label parameter.)
-    def add_column(label, header: nil, align_header: nil, align_body: nil,
-      width: nil, formatter: nil, styler: nil, header_styler: nil, &extractor)
+    def add_column(
+      label,
+      align_body:    nil,
+      align_header:  nil,
+      formatter:     nil,
+      header:        nil,
+      header_styler: nil,
+      styler:        nil,
+      width:         nil,
+      &extractor)
 
       column_label =
         case label
@@ -223,16 +243,16 @@ module Tabulo
 
       @column_registry[column_label] =
         Column.new(
+          align_body: align_body || @align_body,
+          align_header: align_header || @align_header,
+          extractor: extractor || label.to_proc,
+          formatter: formatter || @formatter,
           header: (header || label).to_s,
-          align_header: (align_header || @align_header),
-          align_body: (align_body || @align_body),
-          width: (width || @column_width),
-          formatter: (formatter || @formatter),
-          extractor: (extractor || label.to_proc),
-          styler: styler,
           header_styler: header_styler,
-          truncation_indicator: @truncation_indicator,
           padding_character: PADDING_CHARACTER,
+          styler: styler,
+          truncation_indicator: @truncation_indicator,
+          width: width || @column_width,
         )
     end
 
