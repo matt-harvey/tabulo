@@ -1,9 +1,16 @@
 # Changelog
 
+### v2.2.0
+
+* New `column_formatter` option on `Tabulo::Table` initializer, enabling the table's default column
+  formatter to be customized.
+* New `row_divider_frequency` option on `Tabulo::Table` initializer, to add a horizontal dividing line
+  after every N rows.
+
 ### v2.1.1
 
 * Fix issue where blank lines appear in table when certain border types (e.g. `:classic`) are
-  used with a non-nil `:border_styler`.
+  used with a non-nil `border_styler`.
 * Minor documentation fix
 
 ### v2.1.0
