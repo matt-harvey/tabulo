@@ -11,10 +11,12 @@ describe Tabulo::Table do
       source,
       column_width: column_width,
       header_frequency: header_frequency,
+      row_divider_frequency: row_divider_frequency,
       wrap_header_cells_to: wrap_header_cells_to,
       wrap_body_cells_to: wrap_body_cells_to,
       truncation_indicator: truncation_indicator,
       column_padding: column_padding,
+      formatter: formatter,
       border: border,
     ) do |t|
       t.add_column("N") { |n| n }
@@ -25,10 +27,12 @@ describe Tabulo::Table do
   let(:source) { 1..5 }
   let(:column_width) { nil }
   let(:header_frequency) { :start }
+  let(:row_divider_frequency) { nil }
   let(:wrap_header_cells_to) { nil }
   let(:wrap_body_cells_to) { nil }
   let(:truncation_indicator) { nil }
   let(:column_padding) { nil }
+  let(:formatter) { :to_s.to_proc }
   let(:border) { :ascii }
 
   it "is an Enumerable" do
@@ -123,6 +127,73 @@ describe Tabulo::Table do
         specify "#to_s returns an empty string" do
           table = Tabulo::Table.new(0..10)
           expect(table.to_s).to eq("")
+        end
+      end
+    end
+
+    describe "`row_divider_frequency` param" do
+      context "when table is initialized with `row_divider_frequency: nil`" do
+        let(:row_divider_frequency) { nil }
+
+        it "initializes a table displaying the formatted table without row dividers in the table body" do
+          expect(table).to be_a(Tabulo::Table)
+          expect(table.to_s).to eq \
+            %q(+--------------+--------------+
+               |       N      |    Doubled   |
+               +--------------+--------------+
+               |            1 |            2 |
+               |            2 |            4 |
+               |            3 |            6 |
+               |            4 |            8 |
+               |            5 |           10 |
+               +--------------+--------------+).gsub(/^ +/, "")
+        end
+      end
+
+      context "when table is initialized with an integer passed to `row_divider_frequency`" do
+        let(:row_divider_frequency) { 2 }
+
+        context "when `header_frequency` is `:start`" do
+          let(:header_frequency) { :start }
+
+          it "initializes a table displaying a horizontal divider after every N rows, where N is the integer passed" do
+            expect(table).to be_a(Tabulo::Table)
+            expect(table.to_s).to eq \
+              %q(+--------------+--------------+
+                 |       N      |    Doubled   |
+                 +--------------+--------------+
+                 |            1 |            2 |
+                 |            2 |            4 |
+                 +--------------+--------------+
+                 |            3 |            6 |
+                 |            4 |            8 |
+                 +--------------+--------------+
+                 |            5 |           10 |
+                 +--------------+--------------+).gsub(/^ +/, "")
+          end
+        end
+
+        context "when `header_frequency` is passed an integer" do
+          let(:header_frequency) { 4 }
+
+          it "initializes a table displaying a horizontal divider after every N rows, where N is the integer "\
+            "passed, except when an header should be displayed, in which case the header is shown instead" do
+            expect(table).to be_a(Tabulo::Table)
+            expect(table.to_s).to eq \
+              %q(+--------------+--------------+
+                 |       N      |    Doubled   |
+                 +--------------+--------------+
+                 |            1 |            2 |
+                 |            2 |            4 |
+                 +--------------+--------------+
+                 |            3 |            6 |
+                 |            4 |            8 |
+                 +--------------+--------------+
+                 |       N      |    Doubled   |
+                 +--------------+--------------+
+                 |            5 |           10 |
+                 +--------------+--------------+).gsub(/^ +/, "")
+          end
         end
       end
     end
@@ -606,6 +677,26 @@ describe Tabulo::Table do
                |            5  |           10  |
                +---------------+---------------+).gsub(/^ +/, "")
         end
+      end
+    end
+
+    describe "`formatter` param" do
+      let(:formatter) { -> (n) { "%.2f" % n } }
+
+      it "determines the formatter used on column values within the table body, unless overridden by the "\
+        "`formatter` option on #add_column" do
+        table.add_column("Halved", formatter: :to_s.to_proc) { |n| n / 2.0 }
+        table.add_column("Quartered") { |n| n / 4.0 }
+        expect(table.to_s).to eq \
+          %q(+--------------+--------------+--------------+--------------+
+             |       N      |    Doubled   |    Halved    |   Quartered  |
+             +--------------+--------------+--------------+--------------+
+             |         1.00 |         2.00 |          0.5 |         0.25 |
+             |         2.00 |         4.00 |          1.0 |         0.50 |
+             |         3.00 |         6.00 |          1.5 |         0.75 |
+             |         4.00 |         8.00 |          2.0 |         1.00 |
+             |         5.00 |        10.00 |          2.5 |         1.25 |
+             +--------------+--------------+--------------+--------------+).gsub(/^ +/, "")
       end
     end
 
@@ -1564,7 +1655,7 @@ describe Tabulo::Table do
   describe "#formatted_body_row" do
     context "when passed `header: true`" do
       it "returns a string representing a row in the body of the table, with a header" do
-        expect(table.formatted_body_row(3, header: true)).to eq \
+        expect(table.formatted_body_row(3, header: true, divider: false)).to eq \
           %q(+--------------+--------------+
              |       N      |    Doubled   |
              +--------------+--------------+
@@ -1573,8 +1664,19 @@ describe Tabulo::Table do
     end
 
     context "when passed `header: false" do
-      it "returns a string representing a row in the body of the table, without a header" do
-        expect(table.formatted_body_row(3, header: false)).to eq("|            3 |            6 |")
+      context "when passed `divider: false`" do
+        it "returns a string representing a row in the body of the table, without a header" do
+          expect(table.formatted_body_row(3, header: false, divider: false)).to \
+            eq("|            3 |            6 |")
+        end
+      end
+
+      context "when passed `divider: true`" do
+        it "returns a string representing a row in the body of the table, without a header" do
+          expect(table.formatted_body_row(3, header: false, divider: true)).to eq \
+            %q(+--------------+--------------+
+               |            3 |            6 |).gsub(/^ +/, "")
+        end
       end
     end
   end

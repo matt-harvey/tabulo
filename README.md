@@ -72,6 +72,7 @@ Tabulo has also been ported to Crystal (with some modifications): see [Tablo](ht
      * [Accessing the underlying enumerable](#accessing-sources)
      * [Transposing rows and columns](#transposition)
      * [Border configuration](#borders)
+     * [Row dividers](#dividers)
   * [Comparison with other libraries](#motivation)
   * [Contributing](#contributing)
   * [License](#license)
@@ -425,6 +426,31 @@ Note the numbers in the "Reciprocal" column in this example are still right-alig
 the callable passed to `formatter` returns a String. Default cell alignment is determined by the type
 of the underlying cell value, not the way it is formatted. This is usually the desired result.
 
+If you want to set the default formatter for all columns of the table to something other than
+`#to_s`, use the `formatter` option when initializing the table:
+
+```ruby
+table = Tabulo::Table.new(1..3, formatter: -> (n) { "%.2f" % n }) do |t|
+  t.add_column("N", &:itself)
+  t.add_column("Reciprocal") { |n| 1.0 / n }
+  t.add_column("Half") { |n| n / 2.0 }
+end
+```
+
+```
+> puts table
++--------------+--------------+--------------+
+|       N      |  Reciprocal  |     Half     |
++--------------+--------------+--------------+
+|         1.00 |         1.00 |         0.50 |
+|         2.00 |         0.50 |         1.00 |
+|         3.00 |         0.33 |         1.50 |
++--------------+--------------+--------------+
+```
+
+Formatters set for individual columns on calling `#add_column` always override the default formatter for
+the table.
+
 <a name="colours-and-styling"></a>
 ### Colours and styling
 
@@ -743,6 +769,48 @@ but without a bottom border:
 |            1 |     false    |     true     |
 |            2 |     true     |     false    |
 |            3 |     false    |     true     |
+```
+
+Note that, by default, none of the border options includes lines drawn _between_ rows in the body of the table.
+These are configured via a separate option: see [below](#dividers).
+
+<a name="dividers"></a>
+### Row dividers
+
+To add lines between rows in the table body, use the `row_divider_frequency` option when initializing
+the table. The default value for this option is `nil`, meaning there are no dividing lines between
+rows. But if this option passed is a positive integer N, then a dividing line is inserted before
+every Nth row. For example:
+
+```
+> puts Tabulo::Table.new(1..6, :itself, :even?, :odd?, row_divider_frequency: 2)
++--------------+--------------+--------------+
+|    itself    |     even?    |     odd?     |
++--------------+--------------+--------------+
+|            1 |     false    |     true     |
+|            2 |     true     |     false    |
++--------------+--------------+--------------+
+|            3 |     false    |     true     |
+|            4 |     true     |     false    |
++--------------+--------------+--------------+
+|            5 |     false    |     true     |
+|            6 |     true     |     false    |
++--------------+--------------+--------------+
+```
+
+If you want a line before every row, pass `1` to `row_divider_frequency`. For example:
+
+```
+> puts Tabulo::Table.new(1..3, :itself, :even?, :odd?, border: :modern, row_divider_frequency: 1)
+┌──────────────┬──────────────┬──────────────┐
+│    itself    │     even?    │     odd?     │
+├──────────────┼──────────────┼──────────────┤
+│            1 │     false    │     true     │
+├──────────────┼──────────────┼──────────────┤
+│            2 │     true     │     false    │
+├──────────────┼──────────────┼──────────────┤
+│            3 │     false    │     true     │
+└──────────────┴──────────────┴──────────────┘
 ```
 
 <a name="motivation"></a>
