@@ -256,6 +256,29 @@ module Tabulo
         )
     end
 
+    # Removes the column identifed by the passed label.
+    #
+    # @example
+    #   table = Table.new(1..10, :itself, :even?, :odd?)
+    #   table.add_column(:even2, header: "even?") { |n| n.even? }
+    #   table.remove_column(:even2)
+    #   table.remove_column(:odd?)
+    #
+    # @param [Symbol, String, Integer] label The unique identifier for the column to be removed,
+    #   corresponding to the label that was passed as the first parameter to {#add_column} (or was
+    #   used in the table initializer) when the column was originally added. For columns that were
+    #   originally added with a String or Symbol label, either a String or Symbol form of that label
+    #   can be passed to {#remove_column}, indifferently. For example, if the label passed to
+    #   {#add_column} had been `"height"`, then that column could be removed by passing either
+    #   `"height"` or `:height` to {#remove_column}. (However, if an Integer was originally passed
+    #   as the label to {#add_column}, then only that same Integer, as an Integer, can be passed to
+    #   {#remove_column} to remove that column.)
+    # @return [true, false] If the label identifies a column in the table, then the column will be
+    #   removed and true will be returned; otherwise no column will be removed, and false will be returned.
+    def remove_column(label)
+      !!column_registry.delete(Integer === label ? label : label.to_sym)
+    end
+
     # @return [String] a graphical "ASCII" representation of the Table, suitable for
     #   display in a fixed-width font.
     def to_s

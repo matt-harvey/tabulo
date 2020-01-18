@@ -167,6 +167,10 @@ end
 +--------------+--------------+--------------+
 ```
 
+There is also a `#remove_column` method, for deleting an existing column from a table; see the
+[documentation](https://www.rubydoc.info/gems/tabulo/2.2.0/Tabulo/Table#remove_column-instance_method)
+for details.
+
 <a name="cell-alignment"></a>
 ### Cell alignment
 

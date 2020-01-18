@@ -1235,6 +1235,199 @@ describe Tabulo::Table do
     end
   end
 
+  describe "#remove_column" do
+    subject { table.remove_column(label) }
+
+    let(:table) do
+      Tabulo::Table.new(1..3) do |t|
+        t.add_column(:N) { |n| n }
+        t.add_column("Doubled") { |n| n * 2 }
+        t.add_column(3) { |n| "three" }
+      end
+    end
+
+    context "when passed the label of an existing column that was initialized with a string label" do
+      context "when the passed label is a string that's equal to the label the column was initialized with" do
+        let(:label) { "Doubled" }
+
+        it { is_expected.to eq(true) }
+
+        it "removes that column from the table" do
+          expect { subject }.to change { table.to_s }.from(
+            %q(+--------------+--------------+--------------+
+               |       N      |    Doubled   |       3      |
+               +--------------+--------------+--------------+
+               |            1 |            2 | three        |
+               |            2 |            4 | three        |
+               |            3 |            6 | three        |
+               +--------------+--------------+--------------+).gsub(/^ +/, "")
+          ).to(
+            %q(+--------------+--------------+
+               |       N      |       3      |
+               +--------------+--------------+
+               |            1 | three        |
+               |            2 | three        |
+               |            3 | three        |
+               +--------------+--------------+).gsub(/^ +/, "")
+          )
+        end
+      end
+
+      context "when the passed is a Symbol version of the label the column was initialized with" do
+        let(:label) { :Doubled }
+
+        it { is_expected.to eq(true) }
+
+        it "removes that column from the table" do
+          expect { subject }.to change { table.to_s }.from(
+            %q(+--------------+--------------+--------------+
+               |       N      |    Doubled   |       3      |
+               +--------------+--------------+--------------+
+               |            1 |            2 | three        |
+               |            2 |            4 | three        |
+               |            3 |            6 | three        |
+               +--------------+--------------+--------------+).gsub(/^ +/, "")
+          ).to(
+            %q(+--------------+--------------+
+               |       N      |       3      |
+               +--------------+--------------+
+               |            1 | three        |
+               |            2 | three        |
+               |            3 | three        |
+               +--------------+--------------+).gsub(/^ +/, "")
+          )
+        end
+      end
+    end
+
+    context "when passed the label of an existing column that was initialized with a Symbol label" do
+      context "when the passed label is a Symbol that's equal to the label the column was initialized with" do
+        let(:label) { :N }
+
+        it { is_expected.to eq(true) }
+
+        it "removes that column from the table" do
+          expect { subject }.to change { table.to_s }.from(
+            %q(+--------------+--------------+--------------+
+               |       N      |    Doubled   |       3      |
+               +--------------+--------------+--------------+
+               |            1 |            2 | three        |
+               |            2 |            4 | three        |
+               |            3 |            6 | three        |
+               +--------------+--------------+--------------+).gsub(/^ +/, "")
+          ).to(
+            %q(+--------------+--------------+
+               |    Doubled   |       3      |
+               +--------------+--------------+
+               |            2 | three        |
+               |            4 | three        |
+               |            6 | three        |
+               +--------------+--------------+).gsub(/^ +/, "")
+          )
+        end
+      end
+
+      context "when the passed is a string version of the label the column was initialized with" do
+        let(:label) { "N" }
+
+        it { is_expected.to eq(true) }
+
+        it "removes that column from the table" do
+          expect { subject }.to change { table.to_s }.from(
+            %q(+--------------+--------------+--------------+
+               |       N      |    Doubled   |       3      |
+               +--------------+--------------+--------------+
+               |            1 |            2 | three        |
+               |            2 |            4 | three        |
+               |            3 |            6 | three        |
+               +--------------+--------------+--------------+).gsub(/^ +/, "")
+          ).to(
+            %q(+--------------+--------------+
+               |    Doubled   |       3      |
+               +--------------+--------------+
+               |            2 | three        |
+               |            4 | three        |
+               |            6 | three        |
+               +--------------+--------------+).gsub(/^ +/, "")
+          )
+        end
+      end
+    end
+
+    context "when passed the label of an existing column that was initalized with an integer label" do
+      context "when the passed label is an integer that's equal to the label the column was initialized with" do
+        let(:label) { 3 }
+
+        it { is_expected.to eq(true) }
+
+        it "removes that column from the table" do
+          expect { subject }.to change { table.to_s }.from(
+            %q(+--------------+--------------+--------------+
+               |       N      |    Doubled   |       3      |
+               +--------------+--------------+--------------+
+               |            1 |            2 | three        |
+               |            2 |            4 | three        |
+               |            3 |            6 | three        |
+               +--------------+--------------+--------------+).gsub(/^ +/, "")
+          ).to(
+            %q(+--------------+--------------+
+               |       N      |    Doubled   |
+               +--------------+--------------+
+               |            1 |            2 |
+               |            2 |            4 |
+               |            3 |            6 |
+               +--------------+--------------+).gsub(/^ +/, "")
+          )
+        end
+      end
+
+      context "when the passed label is a string version of the label the column was initialized with" do
+        let(:label) { "3" }
+
+        it { is_expected.to eq(false) }
+
+        it "does not removes the column from the table" do
+          expect { subject }.not_to change { table.to_s }
+        end
+      end
+    end
+
+    context "when passed a string label that doesn't correspond to any of the existing column's labels" do
+      let(:label) { "banana" }
+
+      it { is_expected.to eq(false) }
+
+      it "does not removes the column from the table" do
+        expect { subject }.not_to change { table.to_s }
+      end
+    end
+
+    context "when passed an integer label that doesn't correspond to any of the existing column's labels" do
+      let(:label) { 1 }
+
+      it { is_expected.to eq(false) }
+
+      it "does not removes the column from the table" do
+        expect { subject }.not_to change { table.to_s }
+      end
+    end
+
+    context "when it causes the only remaining column of the table to be removed" do
+      let(:table) do
+        Tabulo::Table.new(1..3) do |t|
+          t.add_column("Doubled") { |n| n * 2 }
+        end
+      end
+      let(:label) { "Doubled" }
+
+      it { is_expected.to be_truthy }
+
+      it "changes the table to an empty table that is rendered as a empty string" do
+        expect { subject }.to change { table.to_s }.to("")
+      end
+    end
+  end
+
   describe "#each" do
     it "iterates once for each row of the table's source data" do
       i = 0
