@@ -443,15 +443,15 @@ module Tabulo
     # @return [Table] a new {Table}
     # @raise [InvalidBorderError] if invalid argument passed to `border` parameter.
     def transpose(opts = {})
-      default_opts = [:column_width, :column_padding, :formatter, :header_frequency,
-        :row_divider_frequency, :wrap_header_cells_to, :wrap_body_cells_to, :truncation_indicator, :align_header,
-        :align_body, :border, :border_styler].map do |sym|
+      default_opts = [:align_body, :align_header, :border, :border_styler, :column_padding, :column_width,
+        :formatter, :header_frequency, :row_divider_frequency, :truncation_indicator, :wrap_body_cells_to,
+        :wrap_header_cells_to].map do |sym|
         [sym, instance_variable_get("@#{sym}")]
       end.to_h
 
       initializer_opts = default_opts.merge(Util.slice_hash(opts, *default_opts.keys))
-      default_extra_opts = { field_names_width: nil, field_names_header: "",
-        field_names_body_alignment: :right, field_names_header_alignment: :right, headers: :to_s.to_proc }
+      default_extra_opts = { field_names_body_alignment: :right, field_names_header: "",
+        field_names_header_alignment: :right, field_names_width: nil, headers: :to_s.to_proc }
       extra_opts = default_extra_opts.merge(Util.slice_hash(opts, *default_extra_opts.keys))
 
       # The underlying enumerable for the new table, is the columns of the original table.
@@ -463,8 +463,9 @@ module Tabulo
         width_opt = extra_opts[:field_names_width]
         field_names_width = (width_opt.nil? ? fields.map { |f| f.header.length }.max : width_opt)
 
-        t.add_column(:dummy, header: extra_opts[:field_names_header], width: field_names_width, align_header:
-          extra_opts[:field_names_header_alignment], align_body: extra_opts[:field_names_body_alignment], &:header)
+        t.add_column(:dummy, align_body: extra_opts[:field_names_body_alignment],
+          align_header: extra_opts[:field_names_header_alignment], header: extra_opts[:field_names_header],
+          width: field_names_width, &:header)
 
         # Add a column to the new table for each of the original table's sources
         sources.each_with_index do |source, i|

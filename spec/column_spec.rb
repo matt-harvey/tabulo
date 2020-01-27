@@ -3,16 +3,16 @@ require "spec_helper"
 describe Tabulo::Column do
   subject do
     Tabulo::Column.new(
-      header: "X10",
-      width: 10,
-      align_header: :left,
       align_body: :left,
-      formatter: -> (n) { "%.2f" % n },
+      align_header: :left,
       extractor: -> (n) { n * 10 },
-      styler: nil,
+      formatter: -> (n) { "%.2f" % n },
+      header: "X10",
       header_styler: nil,
+      padding_character: " ",
+      styler: nil,
       truncation_indicator: "~",
-      padding_character: " ")
+      width: 10)
   end
 
   describe "#initialize" do

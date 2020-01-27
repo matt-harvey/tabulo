@@ -9,15 +9,15 @@ describe Tabulo::Table do
   let(:table) do
     Tabulo::Table.new(
       source,
+      border: border,
+      column_padding: column_padding,
       column_width: column_width,
+      formatter: formatter,
       header_frequency: header_frequency,
       row_divider_frequency: row_divider_frequency,
-      wrap_header_cells_to: wrap_header_cells_to,
-      wrap_body_cells_to: wrap_body_cells_to,
       truncation_indicator: truncation_indicator,
-      column_padding: column_padding,
-      formatter: formatter,
-      border: border,
+      wrap_body_cells_to: wrap_body_cells_to,
+      wrap_header_cells_to: wrap_header_cells_to,
     ) do |t|
       t.add_column("N") { |n| n }
       t.add_column("Doubled") { |n| n * 2 }
@@ -25,15 +25,15 @@ describe Tabulo::Table do
   end
 
   let(:source) { 1..5 }
+  let(:border) { :ascii }
+  let(:column_padding) { nil }
   let(:column_width) { nil }
+  let(:formatter) { :to_s.to_proc }
   let(:header_frequency) { :start }
   let(:row_divider_frequency) { nil }
-  let(:wrap_header_cells_to) { nil }
-  let(:wrap_body_cells_to) { nil }
   let(:truncation_indicator) { nil }
-  let(:column_padding) { nil }
-  let(:formatter) { :to_s.to_proc }
-  let(:border) { :ascii }
+  let(:wrap_body_cells_to) { nil }
+  let(:wrap_header_cells_to) { nil }
 
   it "is an Enumerable" do
     expect(table).to be_a(Enumerable)
@@ -704,14 +704,14 @@ describe Tabulo::Table do
       let(:table) do
         Tabulo::Table.new(
           source,
-          column_width: column_width,
-          header_frequency: header_frequency,
-          wrap_header_cells_to: wrap_header_cells_to,
-          wrap_body_cells_to: wrap_body_cells_to,
-          truncation_indicator: truncation_indicator,
-          column_padding: column_padding,
           align_header: :left,
           border: border,
+          column_padding: column_padding,
+          column_width: column_width,
+          header_frequency: header_frequency,
+          truncation_indicator: truncation_indicator,
+          wrap_body_cells_to: wrap_body_cells_to,
+          wrap_header_cells_to: wrap_header_cells_to,
         ) do |t|
           t.add_column("N") { |n| n }
           t.add_column("Doubled") { |n| n * 2 }
@@ -751,14 +751,14 @@ describe Tabulo::Table do
       let(:table) do
         Tabulo::Table.new(
           source,
-          column_width: column_width,
-          header_frequency: header_frequency,
-          wrap_header_cells_to: wrap_header_cells_to,
-          wrap_body_cells_to: wrap_body_cells_to,
-          truncation_indicator: truncation_indicator,
-          column_padding: column_padding,
           align_body: :left,
           border: border,
+          column_padding: column_padding,
+          column_width: column_width,
+          header_frequency: header_frequency,
+          truncation_indicator: truncation_indicator,
+          wrap_body_cells_to: wrap_body_cells_to,
+          wrap_header_cells_to: wrap_header_cells_to,
         ) do |t|
           t.add_column("N") { |n| n }
           t.add_column("Doubled") { |n| n * 2 }

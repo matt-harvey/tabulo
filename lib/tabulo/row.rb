@@ -7,11 +7,11 @@ module Tabulo
     attr_reader :source
 
     # @!visibility private
-    def initialize(table, source, header: :top, divider: false)
+    def initialize(table, source, divider: false, header: :top)
       @table = table
       @source = source
-      @header = header
       @divider = divider
+      @header = header
     end
 
     # Calls the given block once for each {Cell} in the {Row}, passing that {Cell} as parameter.

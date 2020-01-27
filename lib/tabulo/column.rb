@@ -6,16 +6,23 @@ module Tabulo
     attr_accessor :width
     attr_reader :header
 
-    def initialize(header:, width:, align_header:, align_body:, formatter:, extractor:, styler:,
-      header_styler:, truncation_indicator:, padding_character:)
+    def initialize(
+      align_body:,
+      align_header:,
+      extractor:,
+      formatter:,
+      header:,
+      header_styler:,
+      padding_character:,
+      styler:,
+      truncation_indicator:,
+      width:)
 
-      @header = header
-      @width = width
-      @align_header = align_header
       @align_body = align_body
-      @formatter = formatter
+      @align_header = align_header
       @extractor = extractor
-      @styler = styler || -> (_, s) { s }
+      @formatter = formatter
+      @header = header
 
       @header_styler =
         if header_styler
@@ -24,31 +31,33 @@ module Tabulo
           -> (_, s) { s }
         end
 
-      @truncation_indicator = truncation_indicator
       @padding_character = padding_character
+      @styler = styler || -> (_, s) { s }
+      @truncation_indicator = truncation_indicator
+      @width = width
     end
 
     def header_cell
       Cell.new(
-        value: @header,
-        formatter: -> (s) { s },
         alignment: @align_header,
-        width: @width,
+        formatter: -> (s) { s },
+        padding_character: @padding_character,
         styler: @header_styler,
         truncation_indicator: @truncation_indicator,
-        padding_character: @padding_character,
+        value: @header,
+        width: @width,
       )
     end
 
     def body_cell(source)
       Cell.new(
-        value: body_cell_value(source),
-        formatter: @formatter,
         alignment: @align_body,
-        width: @width,
+        formatter: @formatter,
+        padding_character: @padding_character,
         styler: @styler,
         truncation_indicator: @truncation_indicator,
-        padding_character: @padding_character,
+        value: body_cell_value(source),
+        width: @width,
       )
     end
 

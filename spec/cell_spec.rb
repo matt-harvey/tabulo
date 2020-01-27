@@ -3,13 +3,13 @@ require "spec_helper"
 describe Tabulo::Cell do
   let(:cell) do
     Tabulo::Cell.new(
-      value: value,
-      formatter: formatter,
       alignment: :right,
-      width: width,
+      formatter: formatter,
+      padding_character: " ",
       styler: styler,
       truncation_indicator: ".",
-      padding_character: " ")
+      value: value,
+      width: width)
   end
 
   let(:value) { 30 }
