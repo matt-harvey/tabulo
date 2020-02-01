@@ -43,9 +43,12 @@ end
 
 ## Features
 
+* Presents a [DRY initialization interface](#configuring-columns): by being "column based", rather than
+  "row based" it spares the developer the burden of syncing the ordering within the header row
+  with that of the body rows.
 * Lets you set [fixed column widths](#fixed-column-widths), then either [wrap](#overflow-handling)
   or [truncate](#overflow-handling) the overflow.
-* Alternatively, ["pack"](#pack) the table so that each column is automatically just wide enough for
+* Alternatively, you can ["pack"](#pack) the table so that each column is automatically just wide enough for
   its contents, but [without overflowing the terminal horizontally](#max-table-width).
 * Alignment of cell content is [configurable](#cell-alignment), but has helpful content-based
   defaults (numbers right, strings left).
@@ -61,8 +64,6 @@ end
 * Apply [colours](#colours-and-styling) and other styling to table content and borders, without breaking the table.
 * Easily [transpose](#transposition) the table, so that rows are swapped with columns.
 * Choose from multiple [border configurations](#borders), including Markdown, "ASCII", and smoothly joined Unicode border characters.
-* Use a [DRY initialization interface](#configuring-columns): by being "column based", it is
-  designed to spare the developer the burden of syncing the ordering within the header row with that of the body rows.
 
 Tabulo has also been ported to Crystal (with some modifications): see [Tablo](https://github.com/hutou/tablo).
 
