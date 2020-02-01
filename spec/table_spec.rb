@@ -14,7 +14,9 @@ describe Tabulo::Table do
       column_width: column_width,
       formatter: formatter,
       header_frequency: header_frequency,
+      header_styler: header_styler,
       row_divider_frequency: row_divider_frequency,
+      styler: styler,
       truncation_indicator: truncation_indicator,
       wrap_body_cells_to: wrap_body_cells_to,
       wrap_header_cells_to: wrap_header_cells_to,
@@ -30,7 +32,9 @@ describe Tabulo::Table do
   let(:column_width) { nil }
   let(:formatter) { :to_s.to_proc }
   let(:header_frequency) { :start }
+  let(:header_styler) { nil }
   let(:row_divider_frequency) { nil }
+  let(:styler) { nil }
   let(:truncation_indicator) { nil }
   let(:wrap_body_cells_to) { nil }
   let(:wrap_header_cells_to) { nil }
@@ -127,6 +131,77 @@ describe Tabulo::Table do
         specify "#to_s returns an empty string" do
           table = Tabulo::Table.new(0..10)
           expect(table.to_s).to eq("")
+        end
+      end
+    end
+
+    describe "`header_styler` param" do
+      context "when passed `nil`" do
+        let(:header_styler) { nil }
+
+        it "does not apply any additional styling to the header text" do
+          expect(table.to_s).to eq \
+            %Q(+--------------+--------------+
+               |       N      |    Doubled   |
+               +--------------+--------------+
+               |            1 |            2 |
+               |            2 |            4 |
+               |            3 |            6 |
+               |            4 |            8 |
+               |            5 |           10 |
+               +--------------+--------------+).gsub(/^ +/, "")
+        end
+      end
+
+      context "when passed a callable" do
+        let(:header_styler) { -> (str) { "\033[31;1;4m#{str}\033[0m" } }
+
+        it "applies additional styling to the header text of every column, without affecting the width "\
+          "calculations" do
+          expect(table.to_s).to eq \
+            %Q(+--------------+--------------+
+               |       \033[31;1;4mN\033[0m      |    \033[31;1;4mDoubled\033[0m   |
+               +--------------+--------------+
+               |            1 |            2 |
+               |            2 |            4 |
+               |            3 |            6 |
+               |            4 |            8 |
+               |            5 |           10 |
+               +--------------+--------------+).gsub(/^ +/, "")
+        end
+
+        context "when a new column is added with `nil` passed to the `header_styler` option "\
+          "of #add_column" do
+          it "applies the same styling to the newly added column" do
+            table.add_column("Trebled", header_styler: nil) { |n| n * 3 }
+            expect(table.to_s).to eq \
+              %Q(+--------------+--------------+--------------+
+                 |       \033[31;1;4mN\033[0m      |    \033[31;1;4mDoubled\033[0m   |    \033[31;1;4mTrebled\033[0m   |
+                 +--------------+--------------+--------------+
+                 |            1 |            2 |            3 |
+                 |            2 |            4 |            6 |
+                 |            3 |            6 |            9 |
+                 |            4 |            8 |           12 |
+                 |            5 |           10 |           15 |
+                 +--------------+--------------+--------------+).gsub(/^ +/, "")
+          end
+        end
+
+        context "when a new column is added with a different callable passed to the `header_styler` option "\
+          "of #add_column" do
+          it "applies the different styling to the newly added column only" do
+            table.add_column( "Trebled", header_styler: -> (str) { "\033[32;4m#{str}\033[0m" }) { |n| n * 3 }
+            expect(table.to_s).to eq \
+              %Q(+--------------+--------------+--------------+
+                 |       \033[31;1;4mN\033[0m      |    \033[31;1;4mDoubled\033[0m   |    \033[32;4mTrebled\033[0m   |
+                 +--------------+--------------+--------------+
+                 |            1 |            2 |            3 |
+                 |            2 |            4 |            6 |
+                 |            3 |            6 |            9 |
+                 |            4 |            8 |           12 |
+                 |            5 |           10 |           15 |
+                 +--------------+--------------+--------------+).gsub(/^ +/, "")
+          end
         end
       end
     end
@@ -1182,27 +1257,18 @@ describe Tabulo::Table do
     describe "`header_styler` param" do
       it "styles the header cell content by calling the header_styler on the header text without "\
         "affecting width calculations" do
-        table.add_column(
-          "Trebled",
-          formatter: -> (val) { "%.2f" % val },
-          header_styler: -> (str) { "\033[31;1;4m#{str}\033[0m" }
-        ) do |n|
-          n * 3
-        end
+        table.add_column("Trebled", header_styler: -> (str) { "\033[31;1;4m#{str}\033[0m" }) { |n| n * 3 }
 
         expect(table.to_s).to eq \
           %Q(+--------------+--------------+--------------+
              |       N      |    Doubled   |    \033[31;1;4mTrebled\033[0m   |
              +--------------+--------------+--------------+
-             |            1 |            2 |         3.00 |
-             |            2 |            4 |         6.00 |
-             |            3 |            6 |         9.00 |
-             |            4 |            8 |        12.00 |
-             |            5 |           10 |        15.00 |
+             |            1 |            2 |            3 |
+             |            2 |            4 |            6 |
+             |            3 |            6 |            9 |
+             |            4 |            8 |           12 |
+             |            5 |           10 |           15 |
              +--------------+--------------+--------------+).gsub(/^ +/, "")
-        top_right_body_cell = table.first.to_a.last
-        expect(top_right_body_cell.value).to eq(3)
-        expect(top_right_body_cell.value).to be_a(Integer)
       end
 
       it "applies the same styling to the truncation indicator as to the cell content" do

@@ -65,7 +65,11 @@ Tabulo has also been ported to Crystal (with some modifications): see [Tablo](ht
         * [Automating column widths](#automating-column-widths)
         * [Overflow handling](#overflow-handling)
      * [Formatting cell values](#formatting-cell-values)
-     * [Colours and styling](#colours-and-styling)
+     * [Colours and other styling](#colours-and-styling)
+        * [Styling cell content](#styling-cell-content)
+        * [Styling column headers](#styling-column-headers)
+        * [Setting default styles](#default-styles)
+        * [Styling borders](#border-styling)
      * [Repeating headers](#repeating-headers)
      * [Using a Table Enumerator](#using-a-table-enumerator)
      * [Accessing cell values](#accessing-cell-values)
@@ -476,7 +480,10 @@ Formatters set for individual columns on calling `#add_column` always override t
 the table.
 
 <a name="colours-and-styling"></a>
-### Colours and styling
+### Colours and other styling
+
+<a name="styling-cell-content"></a>
+#### Styling cell content
 
 In most terminals, if you want to print text that is coloured, or has certain other styles such as
 underlining, you need to use ANSI escape sequences, either directly, or by means of a library such
@@ -517,6 +524,12 @@ If the content of a cell is wrapped over multiple lines, then the `styler` will 
 once per line, so that each line of the cell will have the escape sequence applied to it
 separately (ensuring the styling doesn't bleed into neighbouring cells).
 
+If the content of a cell has been [truncated](#overflow-handling), then whatever colours or other styling
+apply to the cell content will also be applied the truncation indicator character.
+
+<a name="styling-column-headers"></a>
+#### Styling column headers
+
 If you want to apply colours or other styling to the content of a column header, as opposed
 to cells in the table body, use the `header_styler` option, e.g.:
 
@@ -524,15 +537,31 @@ to cells in the table body, use the `header_styler` option, e.g.:
 table.add_column(:even?, header_styler: -> (s) { "\033[32m#{s}\033[0m" })
 ```
 
-To apply colours or other styling to the row divider, column divider, corner and border
-characters of the table, use the `border_styler` option when initializing the table, e.g.:
+<a name="default-styles"></a>
+#### Setting default styles
+
+By default, no styling is applied to the headers or body content of a column unless configured to do
+so via the `header_styler` or `styler` option when calling `add_column` for that particular column.
+It is possible to apply styling by default to _all_ columns in a table, however, as the table initializer
+also accepts both a `header_styler` and a `styler` option. For example, if you want all the header text
+in the table to be green, you could do:
+
+```ruby
+table = Tabulo::Table.new(1..5, :itself, :even?, :odd?, header_styler: -> (s) { "\033[32m#{s}\033[0m" })
+```
+
+Now, all columns in the table will have automatically have green header text, unless overridden
+by another header styler being passed to `#add_column`.
+
+<a name="border-styling"></a>
+#### Styling borders
+
+Styling can also be applied to borders and dividing lines, using the `border_styler` option when
+initializing the table, e.g.:
 
 ```ruby
 table = Tabulo::Table.new(1..5, :itself, :even?, :odd?, border_styler: -> (s) { "\033[32m#{s}\033[0m" })
 ```
-
-If the content of a cell has been [truncated](#overflow-handling), then whatever colours or other styling
-apply to the cell content will also be applied the truncation indicator character.
 
 <a name="repeating-headers"></a>
 ### Repeating headers

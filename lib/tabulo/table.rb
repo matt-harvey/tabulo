@@ -74,17 +74,21 @@ module Tabulo
     #   element indicates the amount to apply to the right.
     # @param [Integer, nil] column_width The default column width for columns in this
     #   table, not excluding padding. If <tt>nil</tt>, then {DEFAULT_COLUMN_WIDTH} will be used.
-    # @param [nil, #to_proc] formatter (:to_s.to_proc) The default value for the `formatter` option
-    #   when columns are added to this table via {#add_column}.
+    # @param [nil, #to_proc] formatter (:to_s.to_proc) The default formatter for columns in this
+    #   table. See `formatter` option of {#add_column} for details.
     # @param [:start, nil, Integer] header_frequency (:start) Controls the display of column headers.
     #   If passed <tt>:start</tt>, headers will be shown at the top of the table only. If passed <tt>nil</tt>,
     #   headers will not be shown. If passed an Integer N (> 0), headers will be shown at the top of the table,
     #   then repeated every N rows.
+    # @param [nil, #to_proc] header_styler (nil) The default header styler for columns in this
+    #   table. See `header_styler` option of {#add_column} for details.
     # @param [nil, Integer] row_divider_frequency (nil) Controls the display of horizontal row dividers within
     #   the table body. If passed <tt>nil</tt>, dividers will not be shown. If passed an Integer N (> 0),
     #   dividers will be shown after every N rows. The characters used to form the dividers are
     #   determined by the `border` option, and are the same as those used to form the bottom edge of the
     #   header row.
+    # @param [nil, #to_proc] styler (nil) The default styler for columns in this table. See `styler`
+    #   option of {#add_column} for details.
     # @param [nil, String] truncation_indicator Determines the character used to indicate that a
     #   cell's content has been truncated. If omitted or passed <tt>nil</tt>,
     #   defaults to {DEFAULT_TRUNCATION_INDICATOR}. If passed something other than <tt>nil</tt> or
@@ -114,7 +118,9 @@ module Tabulo
       column_width:          nil,
       formatter:             :to_s.to_proc,
       header_frequency:      :start,
+      header_styler:         nil,
       row_divider_frequency: nil,
+      styler:                nil,
       truncation_indicator:  nil,
       wrap_body_cells_to:    nil,
       wrap_header_cells_to:  nil)
@@ -139,6 +145,7 @@ module Tabulo
       @column_width = (column_width || DEFAULT_COLUMN_WIDTH)
       @formatter = formatter
       @header_frequency = header_frequency
+      @header_styler = header_styler
       @row_divider_frequency = row_divider_frequency
       @truncation_indicator = validate_character(truncation_indicator,
         DEFAULT_TRUNCATION_INDICATOR, InvalidTruncationIndicatorError, "truncation indicator")
@@ -253,9 +260,9 @@ module Tabulo
         extractor: extractor || label.to_proc,
         formatter: formatter || @formatter,
         header: (header || label).to_s,
-        header_styler: header_styler,
+        header_styler: header_styler || @header_styler,
         padding_character: PADDING_CHARACTER,
-        styler: styler,
+        styler: styler || @styler,
         truncation_indicator: @truncation_indicator,
         width: width || @column_width,
       )
