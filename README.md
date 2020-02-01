@@ -167,6 +167,26 @@ end
 +--------------+--------------+--------------+
 ```
 
+By default, each new column is added to the right of all the other columns so far added to the
+table. However, if you want to insert a new column into some other position, you can use the
+`before` option, passing the label of the column to the left of which you want the new column to be added:
+
+```ruby
+table = Table::Table.new([1, 2, 3], :itself, :odd?)
+table.add_column(:even?, before: :odd?)
+```
+
+```
+> puts table
++--------------+--------------+--------------+
+|    itself    |     even?    |     odd?     |
++--------------+--------------+--------------+
+|            1 |     false    |     true     |
+|            2 |     true     |     false    |
+|            5 |     false    |     true     |
++--------------+--------------+--------------+
+```
+
 There is also a `#remove_column` method, for deleting an existing column from a table; see the
 [documentation](https://www.rubydoc.info/gems/tabulo/2.2.0/Tabulo/Table#remove_column-instance_method)
 for details.

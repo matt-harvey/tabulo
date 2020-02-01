@@ -171,6 +171,11 @@ module Tabulo
     #   by the Table-level setting passed to the <tt>align_header</tt> (which itself defaults
     #   to <tt>:center</tt>). Otherwise, this option determines the alignment of the header
     #   content for this column.
+    # @param [Symbol, String, Integer, nil] before (nil) The label of the column before (i.e. to
+    #   the left of) which the new column should inserted. If <tt>nil</tt> is passed, it will be
+    #   inserted after all other columns. If there is no column with the given label, then an
+    #   {InvalidColumnLabelError} will be raised. A non-Integer labelled column can be identified
+    #   in either String or Symbol form for this purpose.
     # @param [#to_proc] formatter (nil) A lambda or other callable object that
     #   will be passed the calculated value of each cell to determine how it should be displayed. This
     #   is distinct from the extractor (see below). For example, if the extractor for this column
@@ -222,6 +227,7 @@ module Tabulo
       label,
       align_body:    nil,
       align_header:  nil,
+      before:        nil,
       formatter:     nil,
       header:        nil,
       header_styler: nil,
@@ -241,19 +247,20 @@ module Tabulo
         raise InvalidColumnLabelError, "Column label already used in this table."
       end
 
-      @column_registry[column_label] =
-        Column.new(
-          align_body: align_body || @align_body,
-          align_header: align_header || @align_header,
-          extractor: extractor || label.to_proc,
-          formatter: formatter || @formatter,
-          header: (header || label).to_s,
-          header_styler: header_styler,
-          padding_character: PADDING_CHARACTER,
-          styler: styler,
-          truncation_indicator: @truncation_indicator,
-          width: width || @column_width,
-        )
+      column = Column.new(
+        align_body: align_body || @align_body,
+        align_header: align_header || @align_header,
+        extractor: extractor || label.to_proc,
+        formatter: formatter || @formatter,
+        header: (header || label).to_s,
+        header_styler: header_styler,
+        padding_character: PADDING_CHARACTER,
+        styler: styler,
+        truncation_indicator: @truncation_indicator,
+        width: width || @column_width,
+      )
+
+      add_column_before(column, column_label, before)
     end
 
     # Removes the column identifed by the passed label.
@@ -499,6 +506,28 @@ module Tabulo
     end
 
     private
+
+    # @!visibility private
+    def add_column_before(column, label, before)
+      if before == nil
+        @column_registry[label] = column
+      else
+        old_column_entries = @column_registry.to_a
+        new_column_entries = []
+        found = false
+        old_column_entries.each do |entry|
+          if entry[0] == before
+            found = true
+            new_column_entries << [label, column]
+          end
+          new_column_entries << entry
+        end
+        unless found
+          raise InvalidColumnLabelError, "There is no column with label #{before}"
+        end
+        @column_registry = new_column_entries.to_h
+      end
+    end
 
     # @!visibility private
     def total_column_padding

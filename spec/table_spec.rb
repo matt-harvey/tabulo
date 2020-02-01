@@ -1019,6 +1019,71 @@ describe Tabulo::Table do
       end
     end
 
+    describe "`before` param" do
+      subject do
+        table.add_column("Trebled", before: before) { |n| n * 3 }
+      end
+
+      context "when passed `nil`" do
+        let(:before) { nil }
+
+        it "inserts a column to the right of all other columns" do
+          expect { subject }.to change(table, :to_s).to \
+            %q(+--------------+--------------+--------------+
+               |       N      |    Doubled   |    Trebled   |
+               +--------------+--------------+--------------+
+               |            1 |            2 |            3 |
+               |            2 |            4 |            6 |
+               |            3 |            6 |            9 |
+               |            4 |            8 |           12 |
+               |            5 |           10 |           15 |
+               +--------------+--------------+--------------+).gsub(/^ +/, "")
+        end
+      end
+
+      context "when passed a Symbol corresponding to the label of an existing column" do
+        let(:before) { :Doubled }
+
+        it "inserts a column to the left of the column with this label" do
+          expect { subject }.to change(table, :to_s).to \
+            %q(+--------------+--------------+--------------+
+               |       N      |    Trebled   |    Doubled   |
+               +--------------+--------------+--------------+
+               |            1 |            3 |            2 |
+               |            2 |            6 |            4 |
+               |            3 |            9 |            6 |
+               |            4 |           12 |            8 |
+               |            5 |           15 |           10 |
+               +--------------+--------------+--------------+).gsub(/^ +/, "")
+        end
+      end
+
+      context "when passed a String corresponding to the label of an existing column" do
+        let(:before) { :Doubled }
+
+        it "inserts a column to the left of the column with this label" do
+          expect { subject }.to change(table, :to_s).to \
+            %q(+--------------+--------------+--------------+
+               |       N      |    Trebled   |    Doubled   |
+               +--------------+--------------+--------------+
+               |            1 |            3 |            2 |
+               |            2 |            6 |            4 |
+               |            3 |            9 |            6 |
+               |            4 |           12 |            8 |
+               |            5 |           15 |           10 |
+               +--------------+--------------+--------------+).gsub(/^ +/, "")
+        end
+      end
+
+      context "when passed a Symbol not corresponding to the label of any existing column" do
+        let(:before) { :Quadrupled }
+
+        it "raises an InvalidColumnLabelError" do
+          expect { subject }.to raise_error(Tabulo::InvalidColumnLabelError)
+        end
+      end
+    end
+
     describe "`width` param" do
       it "fixes the column width at the passed value (not including padding), overriding the default "\
         "column width for the table" do
