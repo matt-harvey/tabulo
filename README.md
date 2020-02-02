@@ -43,13 +43,13 @@ end
 
 ## Features
 
-* Presents a [DRY initialization interface](#configuring-columns): by being "column based", rather than
-  "row based" it spares the developer the burden of syncing the ordering within the header row
+* Presents a [DRY initialization interface](#configuring-columns): by being &ldquo;column based&rdquo; rather than
+  &ldquo;row based&rdquo;, it spares the developer the burden of syncing the ordering within the header row
   with that of the body rows.
 * Lets you set [fixed column widths](#fixed-column-widths), then either [wrap](#overflow-handling)
   or [truncate](#overflow-handling) the overflow.
-* Alternatively, you can ["pack"](#pack) the table so that each column is automatically just wide enough for
-  its contents, but [without overflowing the terminal horizontally](#max-table-width).
+* Alternatively, you can [&ldquo;pack&rdquo;](#pack) the table so that each column is automatically just
+  wide enough for its contents, but [without overflowing the terminal horizontally](#max-table-width).
 * Alignment of cell content is [configurable](#cell-alignment), but has helpful content-based
   defaults (numbers right, strings left).
 * Tabulate any `Enumerable`: the underlying collection need not be an array.
@@ -63,7 +63,8 @@ end
 * Multibyte Unicode characters are correctly handled.
 * Apply [colours](#colours-and-styling) and other styling to table content and borders, without breaking the table.
 * Easily [transpose](#transposition) the table, so that rows are swapped with columns.
-* Choose from multiple [border configurations](#borders), including Markdown, "ASCII", and smoothly joined Unicode border characters.
+* Choose from multiple [border configurations](#borders), including Markdown, &ldquo;ASCII&rdquo;, and smoothly
+  joined Unicode border characters.
 
 Tabulo has also been ported to Crystal (with some modifications): see [Tablo](https://github.com/hutou/tablo).
 
@@ -100,7 +101,7 @@ Tabulo has also been ported to Crystal (with some modifications): see [Tablo](ht
 
 ## Installation
 
-Add this line to your application's Gemfile:
+Add this line to your application&#8217;s Gemfile:
 
 ```ruby
 gem 'tabulo'
@@ -147,7 +148,7 @@ table = Tabulo::Table.new([1, 2, 5]) do |t|
 end
 ```
 
-When the columns correspond to methods, you can also use the "quick API", by passing a symbol
+When the columns correspond to methods, you can also use the &ldquo;quick API&rdquo;, by passing a symbol
 directly to `new` for each column:
 
 ```ruby
@@ -323,7 +324,7 @@ table = Tabulo::Table.new([1, 2, 5], :itself, :even?, :odd?, column_padding: [0,
 <a name="pack"></a>
 #### Automating column widths
 
-Instead of setting column widths "manually", you can tell the table to sort out the widths
+Instead of setting column widths &ldquo;manually&rdquo;, you can tell the table to sort out the widths
 itself, so that each column is just wide enough for its header and contents (plus a character
 of padding):
 
@@ -342,7 +343,7 @@ table.pack
 +--------+-------+
 ```
 
-The `pack` method returns the table itself, so you can "pack-and-print" in one go:
+The `pack` method returns the table itself, so you can &ldquo;pack-and-print&rdquo; in one go:
 
 ```ruby
 puts Tabulo::Table.new([1, 2], :itself, :even?).pack
@@ -383,7 +384,7 @@ if the collection is very large. Note also the effect of `pack` is to fix the co
 as appropriate to the formatted cell contents given the state of the underlying collection
 _at the point of packing_. If the underlying collection changes between that point, and when
 the table is printed, then the columns will _not_ be resized yet again on printing. This is a
-consequence of the table always being essentially a "live view" on the underlying collection:
+consequence of the table always being essentially a &ldquo;live view&rdquo; on the underlying collection:
 formatted contents are never cached within the table itself.
 
 <a name="overflow-handling"></a>
@@ -442,10 +443,10 @@ The character used to indicate truncation, which defaults to `~`, can be configu
 ### Formatting cell values
 
 While the callable passed to `add_column` determines the underyling, calculated value in each
-cell of the column, there is a separate concept, of a "formatter", that determines how that value will
-be visually displayed. By default, `.to_s` is called on the underlying cell value to "format"
-it; however, you can format it differently by passing another callable to the `formatter` option
-of `add_column`:
+cell of the column, there is a separate concept, of a &ldquo;formatter&rdquo;, that determines how
+that value will be visually displayed. By default, `.to_s` is called on the underlying cell value to
+&ldquo;format&rdquo; it; however, you can format it differently by passing another callable to the
+`formatter` option of `add_column`:
 
 ```ruby
 table = Tabulo::Table.new(1..3) do |t|
@@ -467,7 +468,7 @@ end
 +--------------+--------------+
 ```
 
-Note the numbers in the "Reciprocal" column in this example are still right-aligned, even though
+Note the numbers in the &ldquo;Reciprocal&rdquo; column in this example are still right-aligned, even though
 the callable passed to `formatter` returns a String. Default cell alignment is determined by the type
 of the underlying cell value, not the way it is formatted. This is usually the desired result.
 
@@ -538,7 +539,7 @@ the underlying value of the cell (in this case a boolean indicating whether the 
 and the second represents the formatted string value of that cell, i.e. the cell content after
 any processing by the [formatter](#formatting-cell-values). If the content of a cell is wrapped
 over multiple lines, then the `styler` will be called once per line, so that each line of the
-cell will have the escape sequence applied to it separately (ensuring the styling doesn't bleed
+cell will have the escape sequence applied to it separately (ensuring the styling doesn&#8217;t bleed
 into neighbouring cells).
 
 If the content of a cell has been [truncated](#overflow-handling), then whatever colours or other styling
@@ -585,8 +586,8 @@ table = Tabulo::Table.new(1..5, :itself, :even?, :odd?, border_styler: -> (s) { 
 
 By default, headers are only shown once, at the top of the table (`header_frequency: :start`). If
 `header_frequency` is passed `nil`, headers are not shown at all; or, if passed an `Integer` N,
-headers are shown at the top and then repeated every N rows. This can be handy when you're looking
-at table that's taller than your terminal.
+headers are shown at the top and then repeated every N rows. This can be handy when you&#8217;re looking
+at table that&#8217;s taller than your terminal.
 
 E.g.:
 
@@ -618,7 +619,7 @@ table = Tabulo::Table.new(1..10, :itself, :even?, header_frequency: 5)
 <a name="enumerator"></a>
 ### Using a Table Enumerator
 
-Because it's an `Enumerable`, a `Tabulo::Table` can also give you an `Enumerator`,
+Because it&#8217;s an `Enumerable`, a `Tabulo::Table` can also give you an `Enumerator`,
 which is useful when you want to step through rows one at a time. In a Rails console,
 for example, you might do this:
 
@@ -666,8 +667,8 @@ end
 
 The first argument to `add_column` always provides the key for the purpose of accessing the `Hash`
 form of a `Tabulo::Row`. (If the provided argument was a `String`, it will be converted to a
-`Symbol` for purposes of accessing this `Hash`.) This key serves as a sort of "logical label" for
-the column; and it need not be the same as the column header. If we want the header to be different
+`Symbol` for purposes of accessing this `Hash`.) This key serves as a sort of &ldquo;logical label&rdquo;
+for the column; and it need not be the same as the column header. If we want the header to be different
 to the label, we can achieve this using the `header` option to `add_column`:
 
 ```ruby
@@ -746,7 +747,7 @@ a new table in which the rows and columns are swapped:
 
 By default, a header row is added to the new table, showing the string value of the element
 represented in that column. This can be configured, however, along with other aspects of
-`transpose`'s behaviour. For details, see the
+`transpose`&#8217;s behaviour. For details, see the
 [documentation](https://www.rubydoc.info/gems/tabulo/2.2.0/Tabulo/Table#transpose-instance_method).
 
 <a name="borders"></a>
@@ -896,7 +897,7 @@ There are other libraries for generating plain text tables in Ruby. Popular amon
 *DISCLAIMER: My comments regarding these other libraries are based only on my own, possibly flawed
 reading of the documentation for, and experimentation with, these libraries at the time of my
 writing this. Their APIs, features or documentation may well change between when I write this, and
-when you read it. Please consult the libraries' own documentation for yourself, rather than relying
+when you read it. Please consult the libraries&#8217; own documentation for yourself, rather than relying
 on these comments.*
 
 While these libraries have their strengths, I have personally found that, for the common use case of
@@ -905,7 +906,7 @@ query result), using these libraries feels more cumbersome than it could be.
 
 For example, suppose we have called `User.all` from the Rails console, and want to print
 a table showing the email, first name, last name and ID of each user,
-with column headings. Also, we want the ID column to be right-aligned, because it's a number.
+with column headings. Also, we want the ID column to be right-aligned, because it&#8217;s a number.
 
 In **terminal-table**, we could achieve this as follows:
 
@@ -918,7 +919,7 @@ puts table
 ```
 
 The problem here is that there is no single source of knowledge about which columns
-appear, and in which order. If we want to add another column to the left of "email",
+appear, and in which order. If we want to add another column to the left of &ldquo;email&rdquo;,
 we need to amend the rows array, and the headings array, and the index passed to `align_column`.
 We bear the burden of keeping these three in sync. This is not be a big deal for small one-off
 tables, but for tables that have many columns, or that are constructed
@@ -926,9 +927,9 @@ dynamically based on user input or other runtime factors determining the columns
 to be included, this can be a hassle and a source of brittleness.
 
 **tty-table** has a somewhat different API to `terminal-table`. It offers both a
-"row-based" and a "column-based" method of initializing a table. The row-based method
-is similar to `terminal-table`'s in that it burdens the developer with syncing the
-column ordering across multiple code locations. The "column-based" API for `tty-table`, on
+&ldquo;row-based&rdquo; and a &ldquo;column-based&rdquo; method of initializing a table. The row-based method
+is similar to `terminal-table`&#8217;s in that it burdens the developer with syncing the
+column ordering across multiple code locations. The &ldquo;column-based&rdquo; API for `tty-table`, on
 the other hand, seems to avoid this problem. One way of using it is like this:
 
 ```ruby
@@ -944,26 +945,27 @@ table = TTY::Table.new [
 puts table
 ```
 
-While this doesn't seem too bad, it does mean that the underlying collection (`users`) has to
+While this doesn&#8217;t seem too bad, it does mean that the underlying collection (`users`) has to
 be traversed multiple times, once for each column, which is inefficient, particularly
-if the underlying collection is large. In addition, it's not clear how to pass separate
+if the underlying collection is large. In addition, it&#8217;s not clear how to pass separate
 formatting information for each column when initializing in this way. (Perhaps there is a way to do
-this, but if there is, it doesn't seem to be documented.) So it seems we still have to use
+this, but if there is, it doesn&#8217;t seem to be documented.) So it seems we still have to use
 `table.align_column(3, :right)`, which again burdens us with keeping the column index
 passed to `align_column` in sync.
 
 As for **table\_print**, this is a handy gem for quickly tabulating ActiveRecord
 collections from the Rails console. `table_print` is similar to `tabulo` in that it has a
-column-based API, so it doesn't suffer from the multiple-source-of-knowledge issue in regards to
+column-based API, so it doesn&#8217;t suffer from the multiple-source-of-knowledge issue in regards to
 column orderings. However, it lacks certain other useful features, such as the ability to repeat
 headers every N rows, the automatic alignment of columns based on cell content (numbers right,
 strings left), and a quick and easy way to automatically resize columns to accommodate cell content
-without overflowing the terminal. Also, as of the time of writing, `table_print`'s last significant
+without overflowing the terminal. Also, as of the time of writing, `table_print`&#8217;s last significant
 commit (ignoring a deprecation warning fix in April 2018) was in March 2016.
 
-Finally, it is worth mentioning the **hirb** library. This is similar to `table_print`, in that it's
+Finally, it is worth mentioning the **hirb** library. This is similar to `table_print`, in that
+it&#8217;s
 well suited to quickly displaying ActiveRecord collections from the Rails console. However, like
-`table_print`, there are certain useful features it's lacking; and using it outside the console
+`table_print`, there are certain useful features it&#8217;s lacking; and using it outside the console
 environment seems cumbersome. Moreover, it seems no longer to be maintained. At the time of writing,
 its last commit was in March 2015.
 
