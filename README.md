@@ -95,6 +95,7 @@ Tabulo has also been ported to Crystal (with some modifications): see [Tablo](ht
      * [Transposing rows and columns](#transposition)
      * [Border configuration](#borders)
      * [Row dividers](#dividers)
+     * [Using a table as a snapshot rather than as a dynamic view](#freezing-a-table)
   * [Comparison with other libraries](#motivation)
   * [Contributing](#contributing)
   * [License](#license)
@@ -380,12 +381,15 @@ the table will fit.
 
 Note that `pack`ing the table necessarily involves traversing the entire collection up front as
 the maximum cell width needs to be calculated for each column. You may not want to do this
-if the collection is very large. Note also the effect of `pack` is to fix the column widths
-as appropriate to the formatted cell contents given the state of the underlying collection
-_at the point of packing_. If the underlying collection changes between that point, and when
-the table is printed, then the columns will _not_ be resized yet again on printing. This is a
-consequence of the table always being essentially a &ldquo;live view&rdquo; on the underlying collection:
-formatted contents are never cached within the table itself.
+if the collection is very large.
+
+Note also the effect of `pack` is to fix the column widths as appropriate to the formatted cell
+contents given the state of the underlying collection _at the point of packing_. If the underlying
+collection changes between that point, and when the table is printed, then the columns will _not_ be
+resized yet again on printing. This is a consequence of the table always being essentially a
+&ldquo;live view&rdquo; on the underlying collection: formatted contents are never cached within the
+table itself. There are [ways around this](#freezing-a-table), however, if this is not the desired
+behaviour&mdash;see [below](#freezing-a-table).
 
 <a name="overflow-handling"></a>
 #### Overflow handling
@@ -882,6 +886,76 @@ If you want a line before every row, pass `1` to `row_divider_frequency`. For ex
 ├──────────────┼──────────────┼──────────────┤
 │            3 │     false    │     true     │
 └──────────────┴──────────────┴──────────────┘
+```
+
+<a name="freezing-a-table"></a>
+### Using a table as a snapshot rather than as a dynamic view
+
+The nature of a `Tabulo::Table` is that of a dynamic view onto the underlying `sources` enumerable
+from which it was initialized (or which was subsequently assigned to its `sources` attribute). That
+is, if the contents of the `sources` enumerable change subsequent to initialization of or assignment to
+`sources`, then the table when printed will show the `sources` as they are at the time of printing,
+not as they were at the time of initialization or assignment. For example:
+
+```ruby
+arr = [1, 2]
+table = Tabulo::Table.new(arr, :itself, :even?, :odd?)
+```
+
+```
+> puts table
++--------------+--------------+--------------+
+|    itself    |     even?    |     odd?     |
++--------------+--------------+--------------+
+|            1 |     false    |     true     |
+|            2 |     true     |     false    |
++--------------+--------------+--------------+
+```
+
+```ruby
+arr << 3
+```
+
+```
+> puts table
++--------------+--------------+--------------+
+|    itself    |     even?    |     odd?     |
++--------------+--------------+--------------+
+|            1 |     false    |     true     |
+|            2 |     true     |     false    |
+|            3 |     false    |     true     |
++--------------+--------------+--------------+
+```
+
+In this example, even though no direct mutations have been made to `table`, the result
+of calling `puts table` has changed, in virtue of a mutation on the underyling enumerable `arr`.
+
+A similar behaviour can be seen when `sources` is an ActiveRecord query, and there
+are changes to the relevant database table(s) such that the result of the query changes. This is
+worth bearing in mind when calling [`pack`](#pack) on a table, since if the `sources` enumerable
+changes between `pack`ing and printing, then the column widths calculated by the `pack` method
+may no longer be &ldquo;just right&rdquo; given the changed `sources`.
+
+If this is not the desired behaviour, there are ways around this. For example, if dealing with an
+ActiveRecord relation, you can convert the query to a plain array before initializing the table:
+
+```ruby
+sources = User.all.to_a
+table = Tabulo::Table.new(sources, :id, :first_name, :last_name)
+table.pack
+puts table
+```
+
+Passing an `Array` rather than the ActiveRecord query directly means that if there are changes to
+the content of the `users` database table, these will not be reflected in the rendered content of
+the `Tabulo::Table` (unless some of the `Tabulo::Table` columns are based on callables that perform
+further database queries when called&hellip;).
+
+Note that it is also possible simply to store the string value of a table for later use,
+rather than the table itself:
+
+```ruby
+rendered_table = Tabulo::Table.new(1..10, :itself, :even?, :odd?).pack.to_s
 ```
 
 <a name="motivation"></a>
