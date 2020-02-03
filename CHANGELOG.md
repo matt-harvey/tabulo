@@ -1,5 +1,13 @@
 # Changelog
 
+### v2.3.0
+
+* Provide `#remove_column` method.
+* Provide `before` option to `#add_column`, to allow insertion of column into non-final position.
+* Provide `styler` and `header_styler` options in table initializer, to enable default stylers
+  to be set for all columns.
+* Documentation improvements and code tidy-ups.
+
 ### v2.2.0
 
 * New `column_formatter` option on `Tabulo::Table` initializer, enabling the table's default column
@@ -15,7 +23,7 @@
 
 ### v2.1.0
 
-* New `:reduced_ascii` and `:reduced_modern` border options
+* New `reduced_ascii` and `reduced_modern` border options
 * Fix `column_width` option not properly inherited from original table by the new table created
   by calling #transpose.
 
