@@ -126,6 +126,8 @@ require 'tabulo'
 
 ### Configuring columns
 
+#### Adding columns
+
 You instantiate a `Tabulo::Table` by passing it an underlying `Enumerable` and then telling it
 the columns you want to generate.
 
@@ -149,6 +151,8 @@ table = Tabulo::Table.new([1, 2, 5]) do |t|
 end
 ```
 
+#### Quick API
+
 When the columns correspond to methods, you can also use the &ldquo;quick API&rdquo;, by passing a symbol
 directly to `new` for each column:
 
@@ -166,6 +170,8 @@ table = Tabulo::Table.new([1, 2, 5], :itself, :even?, :odd?)
 |            5 |     false    |     true     |
 +--------------+--------------+--------------+
 ```
+
+#### Column headers and callables
 
 Columns can also be initialized using a callable to which each object will be passed to determine
 the value to be displayed in the table. In this case, the first argument to `add_column` provides
@@ -190,6 +196,8 @@ end
 +--------------+--------------+--------------+
 ```
 
+#### Column labels _vs_ headers
+
 The first argument to `add_column` is the called the _label_ for that column. It serves as the
 column&#8217;s unique identifier: only one column may have a given label per table.
 (`String`s and `Symbol`s are interchangeable for this purpose.) The label also forms the header shown
@@ -197,9 +205,11 @@ at the top of the column, unless a `header:` argument is explicitly passed:
 
 ```ruby
 table.add_column(:itself, header: "N")
-table.add_column(:itself2, header: "N", &:itself) # header need not be unique
-# table.add_column(:itself, header: "N")          # label not unique; raises Tabulo::InvalidColumnLabelError
+table.add_column(:itself2, header: "N", &:itself)  # header need not be unique
+# table.add_column(:itself)  # would raise Tabulo::InvalidColumnLabelError, as label not unique
 ```
+
+#### Column positioning
 
 By default, each new column is added to the right of all the other columns so far added to the
 table. However, if you want to insert a new column into some other position, you can use the
@@ -220,6 +230,8 @@ table.add_column(:even?, before: :odd?)
 |            5 |     false    |     true     |
 +--------------+--------------+--------------+
 ```
+
+#### Removing columns
 
 There is also a `#remove_column` method, for deleting an existing column from a table. Pass it
 the label of the column you want to remove:
