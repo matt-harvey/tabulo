@@ -43,7 +43,7 @@ end
 
 ## Features
 
-* Presents a [DRY initialization interface](#configuring-columns): by being &ldquo;column based&rdquo; rather than
+* Presents a [DRY initialization interface](#adding-columns): by being &ldquo;column based&rdquo; rather than
   &ldquo;row based&rdquo;, it spares the developer the burden of syncing the ordering within the header row
   with that of the body rows.
 * Lets you set [fixed column widths](#fixed-column-widths), then either [wrap](#overflow-handling)
@@ -75,7 +75,12 @@ Tabulo has also been ported to Crystal (with some modifications): see [Tablo](ht
   * [Installation](#installation)
   * [Detailed usage](#detailed-usage)
      * [Requiring the gem](#requiring-the-gem)
-     * [Configuring columns](#configuring-columns)
+     * [Adding columns](#adding-columns)
+        * [Quick API](#quick-api)
+        * [Full API](#quick-api)
+        * [Column labels _vs_ headers](#labels-headers)
+        * [Positioning added columns](#column-positioning)
+     * [Removing columns](#removing-columns)
      * [Cell alignment](#cell-alignment)
      * [Column width, wrapping and truncation](#column-width-wrapping-and-truncation)
         * [Configuring fixed widths](#configuring-fixed-widths)
@@ -124,15 +129,39 @@ Or install it yourself:
 require 'tabulo'
 ```
 
-### Configuring columns
+<a name="adding-columns"></a>
+### Adding columns
 
-#### Adding columns
+<a name="quick-api"></a>
+#### Quick API
 
 You instantiate a `Tabulo::Table` by passing it an underlying `Enumerable` and then telling it
 the columns you want to generate.
 
-A simple case involves initializing columns from symbols corresponding to methods on members of the
-underlying `Enumerable`. In this case the symbol also provides the header for each column:
+When the columns correspond to methods on the underlying enumerable, you can use
+the &ldquo;quick API&rdquo;, by passing a symbol directly to `Tabulo::Table.new` for each column.
+This symbol also provides the column header:
+
+```ruby
+table = Tabulo::Table.new([1, 2, 5], :itself, :even?, :odd?)
+```
+
+```
+> puts table
++--------------+--------------+--------------+
+|    itself    |     even?    |     odd?     |
++--------------+--------------+--------------+
+|            1 |     false    |     true     |
+|            2 |     true     |     false    |
+|            5 |     false    |     true     |
++--------------+--------------+--------------+
+```
+
+<a name="full-api"></a>
+#### Full API
+
+Columns can also be added to the table one-by-one using `add_column`. This &ldquo;full API&rdquo; is
+more verbose, but provides greater configurability:
 
 ```ruby
 table = Tabulo::Table.new([1, 2, 5])
@@ -151,31 +180,9 @@ table = Tabulo::Table.new([1, 2, 5]) do |t|
 end
 ```
 
-#### Quick API
-
-When the columns correspond to methods, you can also use the &ldquo;quick API&rdquo;, by passing a symbol
-directly to `new` for each column:
-
-```ruby
-table = Tabulo::Table.new([1, 2, 5], :itself, :even?, :odd?)
-```
-
-```
-> puts table
-+--------------+--------------+--------------+
-|    itself    |     even?    |     odd?     |
-+--------------+--------------+--------------+
-|            1 |     false    |     true     |
-|            2 |     true     |     false    |
-|            5 |     false    |     true     |
-+--------------+--------------+--------------+
-```
-
-#### Column headers and callables
-
-Columns can also be initialized using a callable to which each object will be passed to determine
-the value to be displayed in the table. In this case, the first argument to `add_column` provides
-the header text:
+With the full API, columns can also be initialized using a callable to which each object will be
+passed to determine the value to be displayed in the table. In this case, the first argument to
+`add_column` provides the header text:
 
 ```ruby
 table = Tabulo::Table.new([1, 2, 5]) do |t|
@@ -196,6 +203,7 @@ end
 +--------------+--------------+--------------+
 ```
 
+<a name="labels-headers"></a>
 #### Column labels _vs_ headers
 
 The first argument to `add_column` is the called the _label_ for that column. It serves as the
@@ -209,7 +217,8 @@ table.add_column(:itself2, header: "N", &:itself)  # header need not be unique
 # table.add_column(:itself)  # would raise Tabulo::InvalidColumnLabelError, as label not unique
 ```
 
-#### Column positioning
+<a name="column-positioning"></a>
+#### Positioning added columns
 
 By default, each new column is added to the right of all the other columns so far added to the
 table. However, if you want to insert a new column into some other position, you can use the
@@ -231,7 +240,8 @@ table.add_column(:even?, before: :odd?)
 +--------------+--------------+--------------+
 ```
 
-#### Removing columns
+<a name="removing-columns"></a>
+### Removing columns
 
 There is also a `#remove_column` method, for deleting an existing column from a table. Pass it
 the label of the column you want to remove:
