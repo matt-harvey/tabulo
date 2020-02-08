@@ -75,6 +75,7 @@ Tabulo has also been ported to Crystal (with some modifications): see [Tablo](ht
   * [Installation](#installation)
   * [Detailed usage](#detailed-usage)
      * [Requiring the gem](#requiring-the-gem)
+     * [Creating a table](#table-initialization)
      * [Adding columns](#adding-columns)
         * [Quick API](#quick-api)
         * [Full API](#quick-api)
@@ -129,14 +130,26 @@ Or install it yourself:
 require 'tabulo'
 ```
 
+<a name="table-initialization"></a>
+### Creating a table
+
+You instantiate a `Tabulo::Table` by passing it an underlying `Enumerable`, being the collection of
+things that you want to tabulate. Each member of this collection will end up
+corresponding to a row of the table. The collection can be any `Enumerable`, for example a Ruby
+`Array`, or an ActiveRecord relation:
+
+```ruby
+table = Tabulo::Table.new([1, 2, 5])
+other_table = Tabulo::Table.new(User.all)
+```
+
+For the table to be useful, however, it must also contain columns&hellip;
+
 <a name="adding-columns"></a>
 ### Adding columns
 
 <a name="quick-api"></a>
 #### Quick API
-
-You instantiate a `Tabulo::Table` by passing it an underlying `Enumerable` and then telling it
-the columns you want to generate.
 
 When the columns correspond to methods on the underlying enumerable, you can use
 the &ldquo;quick API&rdquo;, by passing a symbol directly to `Tabulo::Table.new` for each column.
