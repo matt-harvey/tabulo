@@ -85,8 +85,8 @@ Tabulo has also been ported to Crystal (with some modifications): see [Tablo](ht
      * [Cell alignment](#cell-alignment)
      * [Column width, wrapping and truncation](#column-width-wrapping-and-truncation)
         * [Configuring fixed widths](#configuring-fixed-widths)
-        * [Configuring padding](#configuring-padding)
         * [Automating column widths](#automating-column-widths)
+        * [Configuring padding](#configuring-padding)
         * [Overflow handling](#overflow-handling)
      * [Formatting cell values](#formatting-cell-values)
      * [Colours and other styling](#colours-and-styling)
@@ -328,55 +328,12 @@ table = Tabulo::Table.new([1, 2], :itself, :even?, column_width: 6)
 
 Widths set for individual columns always override the default column width for the table.
 
-<a name="configuring-padding"></a>
-#### Configuring padding
-
-The single character of padding either side of each column is not counted in the column width.
-The amount of this extra padding can be configured for the table as a whole, using the `column_padding`
-option passed to `Table.new`&mdash;the default value of this option being `1`.
-
-Passing a single integer to this option causes the given amount of padding to be applied to each
-side of each column. For example:
-
-```ruby
-table = Tabulo::Table.new([1, 2, 5], :itself, :even?, :odd?, column_padding: 0)
-```
-
-```
-> puts table
-+------------+------------+------------+
-|   itself   |    even?   |    odd?    |
-+------------+------------+------------+
-|           1|    false   |    true    |
-|           2|    true    |    false   |
-|           5|    false   |    true    |
-+------------+------------+------------+
-```
-
-Passing an array of _two_ integers to this option configures the left and right padding for each
-column, according to the first and second element of the array, respectively. For example:
-
-```ruby
-table = Tabulo::Table.new([1, 2, 5], :itself, :even?, :odd?, column_padding: [0, 2])
-```
-
-```
-> puts table
-+--------------+--------------+--------------+
-|   itself     |    even?     |    odd?      |
-+--------------+--------------+--------------+
-|           1  |    false     |    true      |
-|           2  |    true      |    false     |
-|           5  |    false     |    true      |
-+--------------+--------------+--------------+
-```
-
 <a name="pack"></a>
 #### Automating column widths
 
 Instead of setting column widths &ldquo;manually&rdquo;, you can tell the table to sort out the widths
 itself, so that each column is just wide enough for its header and contents (plus a character
-of padding):
+of padding on either side):
 
 ```ruby
 table = Tabulo::Table.new([1, 2], :itself, :even?)
@@ -439,6 +396,49 @@ resized yet again on printing. This is a consequence of the table always being e
 &ldquo;live view&rdquo; on the underlying collection: formatted contents are never cached within the
 table itself. There are [ways around this](#freezing-a-table), however, if this is not the desired
 behaviour&mdash;see [below](#freezing-a-table).
+
+<a name="configuring-padding"></a>
+#### Configuring padding
+
+The single character of padding either side of each column is not counted in the column width.
+The amount of this extra padding can be configured for the table as a whole, using the `column_padding`
+option passed to `Table.new`&mdash;the default value of this option being `1`.
+
+Passing a single integer to this option causes the given amount of padding to be applied to each
+side of each column. For example:
+
+```ruby
+table = Tabulo::Table.new([1, 2, 5], :itself, :even?, :odd?, column_padding: 0)
+```
+
+```
+> puts table
++------------+------------+------------+
+|   itself   |    even?   |    odd?    |
++------------+------------+------------+
+|           1|    false   |    true    |
+|           2|    true    |    false   |
+|           5|    false   |    true    |
++------------+------------+------------+
+```
+
+Passing an array of _two_ integers to this option configures the left and right padding for each
+column, according to the first and second element of the array, respectively. For example:
+
+```ruby
+table = Tabulo::Table.new([1, 2, 5], :itself, :even?, :odd?, column_padding: [0, 2])
+```
+
+```
+> puts table
++--------------+--------------+--------------+
+|   itself     |    even?     |    odd?      |
++--------------+--------------+--------------+
+|           1  |    false     |    true      |
+|           2  |    true      |    false     |
+|           5  |    false     |    true      |
++--------------+--------------+--------------+
+```
 
 <a name="overflow-handling"></a>
 #### Overflow handling
