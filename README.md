@@ -80,7 +80,7 @@ Tabulo has also been ported to Crystal (with some modifications): see [Tablo](ht
         * [Quick API](#quick-api)
         * [Full API](#quick-api)
         * [Column labels _vs_ headers](#labels-headers)
-        * [Positioning added columns](#column-positioning)
+        * [Positioning columns](#column-positioning)
      * [Removing columns](#removing-columns)
      * [Cell alignment](#cell-alignment)
      * [Column width, wrapping and truncation](#column-width-wrapping-and-truncation)
@@ -151,7 +151,7 @@ For the table to be useful, however, it must also contain columns&hellip;
 <a name="quick-api"></a>
 #### Quick API
 
-When the columns correspond to methods on the underlying enumerable, you can use
+When the columns correspond to methods on members of the underlying enumerable, you can use
 the &ldquo;quick API&rdquo;, by passing a symbol directly to `Tabulo::Table.new` for each column.
 This symbol also provides the column header:
 
@@ -222,16 +222,16 @@ end
 The first argument to `add_column` is the called the _label_ for that column. It serves as the
 column&#8217;s unique identifier: only one column may have a given label per table.
 (`String`s and `Symbol`s are interchangeable for this purpose.) The label also forms the header shown
-at the top of the column, unless a `header:` argument is explicitly passed:
+at the top of the column, unless a separate `header:` argument is explicitly passed:
 
 ```ruby
 table.add_column(:itself, header: "N")
 table.add_column(:itself2, header: "N", &:itself)  # header need not be unique
-# table.add_column(:itself)  # would raise Tabulo::InvalidColumnLabelError, as label not unique
+# table.add_column(:itself)  # would raise Tabulo::InvalidColumnLabelError, as label must be unique
 ```
 
 <a name="column-positioning"></a>
-#### Positioning added columns
+#### Positioning columns
 
 By default, each new column is added to the right of all the other columns so far added to the
 table. However, if you want to insert a new column into some other position, you can use the
