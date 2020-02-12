@@ -107,23 +107,10 @@ module Tabulo
     # @return [Table] a new {Table}
     # @raise [InvalidColumnLabelError] if non-unique Symbols are provided to columns.
     # @raise [InvalidBorderError] if invalid option passed to `border` parameter.
-    def initialize(
-      sources,
-      *columns,
-      align_body:            :auto,
-      align_header:          :center,
-      border:                nil,
-      border_styler:         nil,
-      column_padding:        nil,
-      column_width:          nil,
-      formatter:             :to_s.to_proc,
-      header_frequency:      :start,
-      header_styler:         nil,
-      row_divider_frequency: nil,
-      styler:                nil,
-      truncation_indicator:  nil,
-      wrap_body_cells_to:    nil,
-      wrap_header_cells_to:  nil)
+    def initialize(sources, *columns, align_body: :auto, align_header: :center, border: nil,
+      border_styler: nil, column_padding: nil, column_width: nil, formatter: :to_s.to_proc,
+      header_frequency: :start, header_styler: nil, row_divider_frequency: nil, styler: nil,
+      truncation_indicator: nil, wrap_body_cells_to: nil, wrap_header_cells_to: nil)
 
       @sources = sources
 
@@ -230,17 +217,8 @@ module Tabulo
     # @raise [InvalidColumnLabelError] if label has already been used for another column in this
     #   Table. (This is case-sensitive, but is insensitive to whether a String or Symbol is passed
     #   to the label parameter.)
-    def add_column(
-      label,
-      align_body:    nil,
-      align_header:  nil,
-      before:        nil,
-      formatter:     nil,
-      header:        nil,
-      header_styler: nil,
-      styler:        nil,
-      width:         nil,
-      &extractor)
+    def add_column(label, align_body: nil, align_header: nil, before: nil, formatter: nil,
+      header: nil, header_styler: nil, styler: nil, width: nil, &extractor)
 
       column_label =
         case label
