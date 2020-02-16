@@ -122,12 +122,7 @@ module Tabulo
       @column_padding = (column_padding || DEFAULT_COLUMN_PADDING)
 
       @left_column_padding, @right_column_padding =
-        case @column_padding
-        when Array
-          @column_padding
-        else
-          [@column_padding, @column_padding]
-        end
+        Array === @column_padding ? @column_padding : [@column_padding, @column_padding]
 
       @column_width = (column_width || DEFAULT_COLUMN_WIDTH)
       @formatter = formatter
@@ -245,7 +240,11 @@ module Tabulo
         width: width || @column_width,
       )
 
-      add_column_before(column, column_label, before)
+      if before === nil
+        add_column_final(column, column_label)
+      else
+        add_column_before(column, column_label, before)
+      end
     end
 
     # Removes the column identifed by the passed label.
@@ -494,24 +493,23 @@ module Tabulo
 
     # @!visibility private
     def add_column_before(column, label, before)
-      if before == nil
-        @column_registry[label] = column
-      else
-        old_column_entries = @column_registry.to_a
-        new_column_entries = []
-        found = false
-        old_column_entries.each do |entry|
-          if entry[0] == before
-            found = true
-            new_column_entries << [label, column]
-          end
-          new_column_entries << entry
-        end
-        unless found
-          raise InvalidColumnLabelError, "There is no column with label #{before}"
-        end
-        @column_registry = new_column_entries.to_h
+      old_column_entries = @column_registry.to_a
+      new_column_entries = []
+
+      old_column_entries.each do |entry|
+        new_column_entries << [label, column] if entry[0] == before
+        new_column_entries << entry
       end
+
+      found = (new_column_entries.size == old_column_entries.size + 1)
+      raise InvalidColumnLabelError, "There is no column with label #{before}" unless found
+
+      @column_registry = new_column_entries.to_h
+    end
+
+    # @!visibility private
+    def add_column_final(column, label)
+      @column_registry[label] = column
     end
 
     # @!visibility private
