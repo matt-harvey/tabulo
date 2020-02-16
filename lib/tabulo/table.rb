@@ -215,13 +215,7 @@ module Tabulo
     def add_column(label, align_body: nil, align_header: nil, before: nil, formatter: nil,
       header: nil, header_styler: nil, styler: nil, width: nil, &extractor)
 
-      column_label =
-        case label
-        when Integer, Symbol
-          label
-        when String
-          label.to_sym
-        end
+      column_label = normalize_column_label(label)
 
       if column_registry.include?(column_label)
         raise InvalidColumnLabelError, "Column label already used in this table."
@@ -240,7 +234,7 @@ module Tabulo
         width: width || @column_width,
       )
 
-      if before === nil
+      if before == nil
         add_column_final(column, column_label)
       else
         add_column_before(column, column_label, before)
@@ -490,6 +484,16 @@ module Tabulo
     end
 
     private
+
+    # @!visibility private
+    def normalize_column_label(label)
+      case label
+      when Integer, Symbol
+        label
+      when String
+        label.to_sym
+      end
+    end
 
     # @!visibility private
     def add_column_before(column, label, before)
