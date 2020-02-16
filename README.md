@@ -336,41 +336,41 @@ itself, so that each column is just wide enough for its header and contents (plu
 of padding on either side):
 
 ```ruby
-table = Tabulo::Table.new([1, 2], :itself, :even?)
+table = Tabulo::Table.new(["short", "here is a longer phrase"], :itself, :size)
 table.pack
 ```
 
 ```
 > puts table
-+--------+-------+
-| itself | even? |
-+--------+-------+
-|      1 | false |
-|      2 |  true |
-+--------+-------+
++-------------------------+------+
+|          itself         | size |
++-------------------------+------+
+| short                   |    5 |
+| here is a longer phrase |   23 |
++-------------------------+------+
 ```
 
 The `pack` method returns the table itself, so you can &ldquo;pack-and-print&rdquo; in one go:
 
 ```ruby
-puts Tabulo::Table.new([1, 2], :itself, :even?).pack
+puts Tabulo::Table.new(["short", "here is a longer phrase"], :itself, :size).pack
 ```
 
 <a name="max-table-width"></a>
 You can manually place an upper limit on the total width of the table when packing:
 
 ```ruby
-puts Tabulo::Table.new([1, 2], :itself, :even?).pack(max_table_width: 17)
+puts Tabulo::Table.new(["short", "here is a longer phrase"], :itself, :size).pack(max_table_width: 24)
 ```
 
 ```
-+-------+-------+
-| itsel | even? |
-| f     |       |
-+-------+-------+
-|     1 | false |
-|     2 |  true |
-+-------+-------+
++---------------+------+
+|     itself    | size |
++---------------+------+
+| short         |    5 |
+| here is a lon |   23 |
+| ger phrase    |      |
++---------------+------+
 ```
 
 Or if you simply call `pack` with no arguments (or if you explicitly call
