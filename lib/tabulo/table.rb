@@ -309,7 +309,7 @@ module Tabulo
 
     # @return [String] an "ASCII" graphical representation of the Table column headers.
     def formatted_header
-      cells = column_registry.map { |_, column| column.header_cell }
+      cells = get_columns.map(&:header_cell)
       format_row(cells, @wrap_header_cells_to)
     end
 
@@ -331,7 +331,7 @@ module Tabulo
     # It may be that `:top`, `:middle` and `:bottom` all look the same. Whether
     # this is the case depends on the characters used for the table border.
     def horizontal_rule(position = :bottom)
-      column_widths = column_registry.map { |_, column| column.width + total_column_padding }
+      column_widths = get_columns.map { |column| column.width + total_column_padding }
       @border_instance.horizontal_rule(column_widths, position)
     end
 
@@ -364,15 +364,12 @@ module Tabulo
     #   Table will refuse to shrink itself.
     # @return [Table] the Table itself
     def pack(max_table_width: :auto)
-      return self if column_registry.none?
-      columns = column_registry.values
-
-      columns.each { |column| column.width = wrapped_width(column.header) }
+      get_columns.each { |column| column.width = wrapped_width(column.header) }
 
       @sources.each do |source|
-        columns.each do |column|
+        get_columns.each do |column|
           width = wrapped_width(column.body_cell(source).formatted_content)
-          column.width = width if width > column.width
+          column.width = [width, column.width].max
         end
       end
 
@@ -463,20 +460,27 @@ module Tabulo
 
     # @!visibility private
     def formatted_body_row(source, header:, divider:)
-      cells = column_registry.map { |_, column| column.body_cell(source) }
+      cells = get_columns.map { |column| column.body_cell(source) }
       inner = format_row(cells, @wrap_body_cells_to)
 
-      if header
+      if header == :top
         join_lines([
-          horizontal_rule(header == :top ? :top : :middle),
+          horizontal_rule(:top),
           formatted_header,
           horizontal_rule(:middle),
-          inner,
+          inner
+        ].reject(&:empty?))
+      elsif header
+        join_lines([
+          horizontal_rule(:middle),
+          formatted_header,
+          horizontal_rule(:middle),
+          inner
         ].reject(&:empty?))
       elsif divider
         join_lines([
           horizontal_rule(:middle),
-          inner,
+          inner
         ].reject(&:empty?))
       else
         inner
@@ -486,13 +490,8 @@ module Tabulo
     private
 
     # @!visibility private
-    def normalize_column_label(label)
-      case label
-      when Integer, Symbol
-        label
-      when String
-        label.to_sym
-      end
+    def get_columns
+      column_registry.values
     end
 
     # @!visibility private
@@ -517,16 +516,22 @@ module Tabulo
     end
 
     # @!visibility private
-    def total_column_padding
-      @left_column_padding + @right_column_padding
+    def normalize_column_label(label)
+      case label
+      when Integer, Symbol
+        label
+      when String
+        label.to_sym
+      end
     end
 
     # @!visibility private
     def shrink_to(max_table_width)
-      columns = column_registry.values
+      columns = get_columns
+      num_columns = columns.count
       total_columns_width = columns.inject(0) { |sum, column| sum + column.width }
-      total_padding = column_registry.count * total_column_padding
-      total_borders = column_registry.count + 1
+      total_padding = num_columns * total_column_padding
+      total_borders = num_columns + 1
       unadjusted_table_width = total_columns_width + total_padding + total_borders
 
       # Ensure max table width is at least wide enough to accommodate table borders and padding
@@ -542,6 +547,11 @@ module Tabulo
 
         widest_column.width -= 1
       end
+    end
+
+    # @!visibility private
+    def total_column_padding
+      @left_column_padding + @right_column_padding
     end
 
     # @!visibility private
@@ -595,8 +605,7 @@ module Tabulo
     def wrapped_width(str)
       segments = str.split($/)
       segments.inject(1) do |longest_length_so_far, segment|
-        length = Unicode::DisplayWidth.of(segment)
-        longest_length_so_far > length ? longest_length_so_far : length
+        [longest_length_so_far, Unicode::DisplayWidth.of(segment)].max
       end
     end
   end
