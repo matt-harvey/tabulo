@@ -1,5 +1,9 @@
 # Changelog
 
+### v2.3.2
+
+* Update Rake version to address vulnerability CVE-2020-8130
+
 ### v2.3.1
 
 * Documentation improvements
