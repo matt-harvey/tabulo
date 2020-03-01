@@ -1,5 +1,12 @@
 # Changelog
 
+### v2.3.1
+
+* Documentation improvements
+* Update dependency versions
+* Minor refactoring
+* Update Ruby gem description and summary
+
 ### v2.3.0
 
 * Provide `#remove_column` method.
