@@ -292,11 +292,11 @@ module Tabulo
         header =
           if is_first_row && (@header_frequency == :start || header_frequency_is_integer)
             :top
-          elsif header_frequency_is_integer && (index % @header_frequency == 0)
+          elsif header_frequency_is_integer && Util.divides?(@header_frequency, index)
             :middle
           end
 
-        show_divider = @row_divider_frequency && !is_first_row && (index % @row_divider_frequency == 0)
+        show_divider = @row_divider_frequency && !is_first_row && Util.divides?(@row_divider_frequency, index)
 
         yield Row.new(self, source, header: header, divider: show_divider)
       end

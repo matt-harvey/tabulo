@@ -4,6 +4,11 @@ module Tabulo
   module Util
 
     # @!visibility private
+    def self.divides?(smaller, larger)
+      larger % smaller == 0
+    end
+
+    # @!visibility private
     def self.slice_hash(hash, *keys)
       new_hash = {}
       keys.each { |k| new_hash[k] = hash[k] if hash.include?(k) }
