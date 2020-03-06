@@ -364,7 +364,7 @@ module Tabulo
       @sources.each do |source|
         get_columns.each do |column|
           width = wrapped_width(column.body_cell(source).formatted_content)
-          column.width = [width, column.width].max
+          column.width = width if width > column.width
         end
       end
 
