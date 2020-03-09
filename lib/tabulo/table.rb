@@ -286,17 +286,15 @@ module Tabulo
     # Note that when printed, the first row will visually include the headers (assuming these
     # were not disabled when the Table was initialized).
     def each
-      header_frequency_is_integer = (Integer === @header_frequency)
       @sources.each_with_index do |source, index|
-        is_first_row = (index == 0)
         header =
-          if is_first_row && (@header_frequency == :start || header_frequency_is_integer)
+          if (index == 0) && @header_frequency
             :top
-          elsif header_frequency_is_integer && Util.divides?(@header_frequency, index)
+          elsif (Integer === @header_frequency) && Util.divides?(@header_frequency, index)
             :middle
           end
 
-        show_divider = @row_divider_frequency && !is_first_row && Util.divides?(@row_divider_frequency, index)
+        show_divider = @row_divider_frequency && (index != 0) && Util.divides?(@row_divider_frequency, index)
 
         yield Row.new(self, source, header: header, divider: show_divider)
       end

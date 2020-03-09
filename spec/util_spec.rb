@@ -6,6 +6,7 @@ describe Tabulo::Util do
       aggregate_failures do
         expect(Tabulo::Util.divides?(3, 9)).to be_truthy
         expect(Tabulo::Util.divides?(3, 10)).to be_falsey
+        expect(Tabulo::Util.divides?(3, 0)).to be_truthy
         expect(Tabulo::Util.divides?(3, 11)).to be_falsey
         expect(Tabulo::Util.divides?(3, 12)).to be_truthy
         expect(Tabulo::Util.divides?(1, 12)).to be_truthy
