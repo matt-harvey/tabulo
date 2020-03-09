@@ -363,14 +363,13 @@ module Tabulo
 
       @sources.each do |source|
         get_columns.each do |column|
-          width = wrapped_width(column.body_cell(source).formatted_content)
-          column.width = width if width > column.width
+          cell_width = wrapped_width(column.body_cell(source).formatted_content)
+          column.width = Util.max(column.width, cell_width)
         end
       end
 
       if max_table_width
-        max_table_width = TTY::Screen.width if max_table_width == :auto
-        shrink_to(max_table_width)
+        shrink_to(max_table_width == :auto ? TTY::Screen.width : max_table_width)
       end
 
       self
@@ -532,8 +531,8 @@ module Tabulo
       # Ensure max table width is at least wide enough to accommodate table borders and padding
       # and one character of content.
       min_table_width = total_padding + total_borders + column_registry.count
-      max_table_width = min_table_width if min_table_width > max_table_width
-      required_reduction = [unadjusted_table_width - max_table_width, 0].max
+      max_table_width = Util.max(min_table_width, max_table_width)
+      required_reduction = Util.max(unadjusted_table_width - max_table_width, 0)
 
       required_reduction.times do
         widest_column = columns.inject(columns.first) do |widest, column|
@@ -600,7 +599,7 @@ module Tabulo
     def wrapped_width(str)
       segments = str.split($/)
       segments.inject(1) do |longest_length_so_far, segment|
-        [longest_length_so_far, Unicode::DisplayWidth.of(segment)].max
+        Util.max(longest_length_so_far, Unicode::DisplayWidth.of(segment))
       end
     end
   end

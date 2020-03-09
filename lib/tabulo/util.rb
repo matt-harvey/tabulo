@@ -9,6 +9,11 @@ module Tabulo
     end
 
     # @!visibility private
+    def self.max(x, y)
+      x > y ? x : y
+    end
+
+    # @!visibility private
     def self.slice_hash(hash, *keys)
       new_hash = {}
       keys.each { |k| new_hash[k] = hash[k] if hash.include?(k) }

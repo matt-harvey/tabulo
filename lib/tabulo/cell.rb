@@ -87,7 +87,7 @@ module Tabulo
     end
 
     def style_and_align_cell_content(content)
-      padding = [@width - Unicode::DisplayWidth.of(content), 0].max
+      padding = Util.max(@width - Unicode::DisplayWidth.of(content), 0)
       left_padding, right_padding =
         case real_alignment
         when :center
