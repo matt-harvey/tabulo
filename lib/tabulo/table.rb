@@ -129,6 +129,7 @@ module Tabulo
       @header_frequency = header_frequency
       @header_styler = header_styler
       @row_divider_frequency = row_divider_frequency
+      @styler = styler
       @truncation_indicator = validate_character(truncation_indicator,
         DEFAULT_TRUNCATION_INDICATOR, InvalidTruncationIndicatorError, "truncation indicator")
       @wrap_body_cells_to = wrap_body_cells_to

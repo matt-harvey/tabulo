@@ -206,6 +206,77 @@ describe Tabulo::Table do
       end
     end
 
+    describe "`styler` param" do
+      context "when passed `nil`" do
+        let(:styler) { nil }
+
+        it "does not apply any additional styling to the table body content" do
+          expect(table.to_s).to eq \
+            %Q(+--------------+--------------+
+               |       N      |    Doubled   |
+               +--------------+--------------+
+               |            1 |            2 |
+               |            2 |            4 |
+               |            3 |            6 |
+               |            4 |            8 |
+               |            5 |           10 |
+               +--------------+--------------+).gsub(/^ +/, "")
+        end
+      end
+
+      context "when passed a callable" do
+        let(:styler) { -> (cell_value, str) { "\033[31;1;4m#{str}\033[0m" } }
+
+        it "applies additional styling to the content of every cell, without affecting the width "\
+          "calculations" do
+          expect(table.to_s).to eq \
+            %Q(+--------------+--------------+
+               |       N      |    Doubled   |
+               +--------------+--------------+
+               |            \033[31;1;4m1\033[0m |            \033[31;1;4m2\033[0m |
+               |            \033[31;1;4m2\033[0m |            \033[31;1;4m4\033[0m |
+               |            \033[31;1;4m3\033[0m |            \033[31;1;4m6\033[0m |
+               |            \033[31;1;4m4\033[0m |            \033[31;1;4m8\033[0m |
+               |            \033[31;1;4m5\033[0m |           \033[31;1;4m10\033[0m |
+               +--------------+--------------+).gsub(/^ +/, "")
+        end
+
+        context "when a new column is added with `nil` passed to the `styler` option "\
+          "of #add_column" do
+          it "applies the same styling to the newly added column" do
+            table.add_column("Trebled", styler: nil) { |n| n * 3 }
+            expect(table.to_s).to eq \
+              %Q(+--------------+--------------+--------------+
+                 |       N      |    Doubled   |    Trebled   |
+                 +--------------+--------------+--------------+
+                 |            \033[31;1;4m1\033[0m |            \033[31;1;4m2\033[0m |            \033[31;1;4m3\033[0m |
+                 |            \033[31;1;4m2\033[0m |            \033[31;1;4m4\033[0m |            \033[31;1;4m6\033[0m |
+                 |            \033[31;1;4m3\033[0m |            \033[31;1;4m6\033[0m |            \033[31;1;4m9\033[0m |
+                 |            \033[31;1;4m4\033[0m |            \033[31;1;4m8\033[0m |           \033[31;1;4m12\033[0m |
+                 |            \033[31;1;4m5\033[0m |           \033[31;1;4m10\033[0m |           \033[31;1;4m15\033[0m |
+                 +--------------+--------------+--------------+).gsub(/^ +/, "")
+          end
+        end
+
+        context "when a new column is added with a different callable passed to the `styler` option "\
+          "of #add_column" do
+          it "applies the different styling to the newly added column only" do
+            table.add_column( "Trebled", styler: -> (cell_value, str) { "\033[32;4m#{str}\033[0m" }) { |n| n * 3 }
+            expect(table.to_s).to eq \
+              %Q(+--------------+--------------+--------------+
+                 |       N      |    Doubled   |    Trebled   |
+                 +--------------+--------------+--------------+
+                 |            \033[31;1;4m1\033[0m |            \033[31;1;4m2\033[0m |            \033[32;4m3\033[0m |
+                 |            \033[31;1;4m2\033[0m |            \033[31;1;4m4\033[0m |            \033[32;4m6\033[0m |
+                 |            \033[31;1;4m3\033[0m |            \033[31;1;4m6\033[0m |            \033[32;4m9\033[0m |
+                 |            \033[31;1;4m4\033[0m |            \033[31;1;4m8\033[0m |           \033[32;4m12\033[0m |
+                 |            \033[31;1;4m5\033[0m |           \033[31;1;4m10\033[0m |           \033[32;4m15\033[0m |
+                 +--------------+--------------+--------------+).gsub(/^ +/, "")
+          end
+        end
+      end
+    end
+
     describe "`row_divider_frequency` param" do
       context "when table is initialized with `row_divider_frequency: nil`" do
         let(:row_divider_frequency) { nil }
