@@ -1,5 +1,9 @@
 # Changelog
 
+### v2.3.3
+
+* Fix styler option on Table initializer, which had no effect
+
 ### v2.3.2
 
 * Update Rake version to address vulnerability CVE-2020-8130
