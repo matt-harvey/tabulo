@@ -2,8 +2,9 @@ require "spec_helper"
 
 describe Tabulo::Cell do
   let(:cell) do
-    Tabulo::Cell.new(
+    described_class.new(
       alignment: :right,
+      cell_data: cell_data,
       formatter: formatter,
       padding_character: " ",
       styler: styler,
@@ -12,10 +13,14 @@ describe Tabulo::Cell do
       width: width)
   end
 
-  let(:value) { 30 }
+  let(:column_index) { 3 }
   let(:formatter) { -> (source) { source.to_s } }
-  let(:width) { 6 }
+  let(:row_index) { 5 }
+  let(:source) { "hi" }
   let(:styler) { -> (source, str) { str } }
+  let(:value) { 30 }
+  let(:width) { 6 }
+  let(:cell_data) { Tabulo::CellData.new(source, row_index, column_index) }
 
   describe "#height" do
     subject { cell.height }

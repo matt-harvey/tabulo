@@ -10,11 +10,12 @@ describe Tabulo::Row do
   end
 
   let(:row) do
-    Tabulo::Row.new(table, 3, header: header, divider: divider)
+    Tabulo::Row.new(table, 3, divider: divider, header: header, index: index)
   end
 
-  let(:header) { [true, false].sample }
   let(:divider) { [true, false].sample }
+  let(:header) { [true, false].sample }
+  let(:index) { 3 }
 
   it "is an Enumerable" do
     expect(row).to be_a(Enumerable)

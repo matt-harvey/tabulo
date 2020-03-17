@@ -13,6 +13,7 @@ module Tabulo
       formatter:,
       header:,
       header_styler:,
+      index:,
       padding_character:,
       styler:,
       truncation_indicator:,
@@ -23,6 +24,7 @@ module Tabulo
       @extractor = extractor
       @formatter = formatter
       @header = header
+      @index = index
 
       @header_styler =
         if header_styler
@@ -38,8 +40,10 @@ module Tabulo
     end
 
     def header_cell
+      # TODO column_index should optionally feature in the header_styler callback
       Cell.new(
         alignment: @align_header,
+        cell_data: nil,
         formatter: -> (s) { s },
         padding_character: @padding_character,
         styler: @header_styler,
@@ -49,9 +53,11 @@ module Tabulo
       )
     end
 
-    def body_cell(source)
+    def body_cell(source, row_index:)
+      cell_data = CellData.new(source, row_index, @index) if body_cell_data_required?
       Cell.new(
         alignment: @align_body,
+        cell_data: cell_data,
         formatter: @formatter,
         padding_character: @padding_character,
         styler: @styler,
@@ -63,6 +69,12 @@ module Tabulo
 
     def body_cell_value(source)
       @extractor.call(source)
+    end
+
+    private
+
+    def body_cell_data_required?
+      @cell_data_required ||= (@styler.arity == 3)
     end
   end
 end

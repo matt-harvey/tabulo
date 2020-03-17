@@ -7,11 +7,12 @@ module Tabulo
     attr_reader :source
 
     # @!visibility private
-    def initialize(table, source, divider: false, header: :top)
+    def initialize(table, source, divider:, header:, index:)
       @table = table
       @source = source
       @divider = divider
       @header = header
+      @index = index
     end
 
     # Calls the given block once for each {Cell} in the {Row}, passing that {Cell} as parameter.
@@ -23,8 +24,8 @@ module Tabulo
     #     puts cell.value   # => 1,       => false
     #   end
     def each
-      @table.column_registry.each do |_, column|
-        yield column.body_cell(@source)
+      @table.column_registry.each_with_index do |(_, column), column_index|
+        yield column.body_cell(@source, row_index: @index)
       end
     end
 
@@ -34,7 +35,7 @@ module Tabulo
     #   and divider frequency).
     def to_s
       if @table.column_registry.any?
-        @table.formatted_body_row(@source, header: @header, divider: @divider)
+        @table.formatted_body_row(@source, divider: @divider, header: @header, index: @index)
       else
         ""
       end
@@ -42,7 +43,9 @@ module Tabulo
 
     # @return a Hash representation of the {Row}, with column labels acting as keys and the {Cell}s the values.
     def to_h
-      @table.column_registry.map { |label, column| [label, column.body_cell(@source)] }.to_h
+      @table.column_registry.map.with_index do |(label, column), index|
+        [label, column.body_cell(@source, row_index: index)]
+      end.to_h
     end
   end
 end

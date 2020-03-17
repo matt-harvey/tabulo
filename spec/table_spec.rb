@@ -1269,59 +1269,97 @@ describe Tabulo::Table do
     end
 
     describe "`styler` param" do
-      it "styles the cell value by calling the styler on the underlying cell value and the formatted value, "\
-        "without changing the underlying cell value's default alignment, and without affecting column width "\
-        "calculations" do
-        table.add_column(
-          "Trebled",
-          formatter: -> (val) { "%.2f" % val },
-          styler: -> (val, str) { val == 6 ? "\033[31;1;4m#{str}\033[0m" : str }
-        ) do |n|
-          n * 3
+      context "when passed a two-parameter callable" do
+        it "styles the cell value by calling the styler on the underlying cell value and the formatted value, "\
+          "without changing the underlying cell value's default alignment, and without affecting column width "\
+          "calculations" do
+          table.add_column(
+            "Trebled",
+            formatter: -> (val) { "%.2f" % val },
+            styler: -> (val, str) { val == 6 ? "\033[31;1;4m#{str}\033[0m" : str }
+          ) do |n|
+            n * 3
+          end
+
+          expect(table.to_s).to eq \
+            %Q(+--------------+--------------+--------------+
+               |       N      |    Doubled   |    Trebled   |
+               +--------------+--------------+--------------+
+               |            1 |            2 |         3.00 |
+               |            2 |            4 |         \033[31;1;4m6.00\033[0m |
+               |            3 |            6 |         9.00 |
+               |            4 |            8 |        12.00 |
+               |            5 |           10 |        15.00 |
+               +--------------+--------------+--------------+).gsub(/^ +/, "")
+          top_right_body_cell = table.first.to_a.last
+          expect(top_right_body_cell.value).to eq(3)
+          expect(top_right_body_cell.value).to be_a(Integer)
         end
 
-        expect(table.to_s).to eq \
-          %Q(+--------------+--------------+--------------+
-             |       N      |    Doubled   |    Trebled   |
-             +--------------+--------------+--------------+
-             |            1 |            2 |         3.00 |
-             |            2 |            4 |         \033[31;1;4m6.00\033[0m |
-             |            3 |            6 |         9.00 |
-             |            4 |            8 |        12.00 |
-             |            5 |           10 |        15.00 |
-             +--------------+--------------+--------------+).gsub(/^ +/, "")
-        top_right_body_cell = table.first.to_a.last
-        expect(top_right_body_cell.value).to eq(3)
-        expect(top_right_body_cell.value).to be_a(Integer)
+        it "applies the same styling to the truncation indicator as to the cell content" do
+          table = Tabulo::Table.new(%w[hello yes], wrap_body_cells_to: 1)
+          table.add_column(:itself, width: 3, styler: -> (val, str) { "\033[31m#{str}\033[0m" }) { |n| n }
+
+          expect(table.to_s).to eq \
+            %Q(+-----+
+               | its |
+               | elf |
+               +-----+
+               | \033[31mhel\033[0m\033[31m~\033[0m|
+               | \033[31myes\033[0m |
+               +-----+).gsub(/^ +/, "")
+        end
+
+        it "applies styling separately to each part of the wrapped cell content that's on its own line" do
+          table = Tabulo::Table.new(%w[hello yes])
+          table.add_column(:itself, width: 3, styler: -> (val, str) { "\033[31m#{str}\033[0m" }) { |n| n }
+
+          expect(table.to_s).to eq \
+            %Q(+-----+
+               | its |
+               | elf |
+               +-----+
+               | \033[31mhel\033[0m |
+               | \033[31mlo\033[0m  |
+               | \033[31myes\033[0m |
+               +-----+).gsub(/^ +/, "")
+        end
       end
 
-      it "applies the same styling to the truncation indicator as to the cell content" do
-        table = Tabulo::Table.new(%w[hello yes], wrap_body_cells_to: 1)
-        table.add_column(:itself, width: 3, styler: -> (val, str) { "\033[31m#{str}\033[0m" }) { |n| n }
+      context "when passed a 3-parameter callable" do
+        it "styles the cell value by calling the styler on the underlying cell value, the formatted value, "\
+          "and a CellData instance containing information about the row index, column index and source record "\
+          "for the row, without changing the underlying cell value's default alignment, and without affecting "\
+          "column width calculations" do
+          puts "yo"
+          styler = -> (val, str, data) do
+            expect(data.column_index).to eq(2)
+            expect(0..4).to include(data.row_index)
+            if data.source == 1
+              "\033[31;4m#{str}\033[0m"
+            elsif data.row_index.odd?
+              "\033[31;1;4m#{str}\033[0m"
+            else
+              str
+            end
+          end
+          formatter = -> (val) { "%.2f" % val }
+          table.add_column("Trebled", formatter: formatter, styler: styler) { |n| n * 3 }
 
-        expect(table.to_s).to eq \
-          %Q(+-----+
-             | its |
-             | elf |
-             +-----+
-             | \033[31mhel\033[0m\033[31m~\033[0m|
-             | \033[31myes\033[0m |
-             +-----+).gsub(/^ +/, "")
-      end
-
-      it "applies styling separately to each part of the wrapped cell content that's on its own line" do
-        table = Tabulo::Table.new(%w[hello yes])
-        table.add_column(:itself, width: 3, styler: -> (val, str) { "\033[31m#{str}\033[0m" }) { |n| n }
-
-        expect(table.to_s).to eq \
-          %Q(+-----+
-             | its |
-             | elf |
-             +-----+
-             | \033[31mhel\033[0m |
-             | \033[31mlo\033[0m  |
-             | \033[31myes\033[0m |
-             +-----+).gsub(/^ +/, "")
+          expect(table.to_s).to eq \
+            %Q(+--------------+--------------+--------------+
+               |       N      |    Doubled   |    Trebled   |
+               +--------------+--------------+--------------+
+               |            1 |            2 |         \033[31;4m3.00\033[0m |
+               |            2 |            4 |         \033[31;1;4m6.00\033[0m |
+               |            3 |            6 |         9.00 |
+               |            4 |            8 |        \033[31;1;4m12.00\033[0m |
+               |            5 |           10 |        15.00 |
+               +--------------+--------------+--------------+).gsub(/^ +/, "")
+          top_right_body_cell = table.first.to_a.last
+          expect(top_right_body_cell.value).to eq(3)
+          expect(top_right_body_cell.value).to be_a(Integer)
+        end
       end
     end
 
@@ -2048,9 +2086,11 @@ describe Tabulo::Table do
   end
 
   describe "#formatted_body_row" do
+    let(:index) { 3 }
+
     context "when passed `header: true`" do
       it "returns a string representing a row in the body of the table, with a header" do
-        expect(table.formatted_body_row(3, header: true, divider: false)).to eq \
+        expect(table.formatted_body_row(3, header: true, divider: false, index: index)).to eq \
           %q(+--------------+--------------+
              |       N      |    Doubled   |
              +--------------+--------------+
@@ -2061,14 +2101,14 @@ describe Tabulo::Table do
     context "when passed `header: false" do
       context "when passed `divider: false`" do
         it "returns a string representing a row in the body of the table, without a header" do
-          expect(table.formatted_body_row(3, header: false, divider: false)).to \
+          expect(table.formatted_body_row(3, header: false, divider: false, index: index)).to \
             eq("|            3 |            6 |")
         end
       end
 
       context "when passed `divider: true`" do
         it "returns a string representing a row in the body of the table, without a header" do
-          expect(table.formatted_body_row(3, header: false, divider: true)).to eq \
+          expect(table.formatted_body_row(3, header: false, divider: true, index: index)).to eq \
             %q(+--------------+--------------+
                |            3 |            6 |).gsub(/^ +/, "")
         end

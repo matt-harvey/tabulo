@@ -186,21 +186,32 @@ module Tabulo
     #   cell width calculations involved in rendering the table. Thus it can be used to apply
     #   ANSI escape codes to header cell content, to colour the cell content for example, without
     #   breaking the table formatting.
-    #   Note that if the header content is truncated, then any <tt>header_styler</tt> will be applied
-    #   to the truncation indicator character as well as to the truncated content.
-    # @param [nil, #to_proc] styler (nil) A lambda or other callable object that will be passed
-    #   two arguments: the calculated value of the cell (prior to the <tt>formatter</tt> being applied);
-    #   and a string representing a single formatted line within the cell. For example, if the
-    #   cell content is wrapped over three lines, then for that cell, the <tt>styler</tt> will be called
-    #   three times, once for each line of content within the cell. If passed <tt>nil</tt>, then
-    #   no additional styling will be applied to the cell content (other than what was already
-    #   applied by the <tt>formatter</tt>). If passed a callable, then that callable will be called for
-    #   each line of content within the cell, and the resulting string rendered in place of that
-    #   line. The <tt>styler</tt> option differs from the <tt>formatter</tt> option in that the extra width of the
-    #   string returned by <tt>styler</tt> is not taken into consideration by the internal table and
-    #   cell width calculations involved in rendering the table. Thus it can be used to apply
-    #   ANSI escape codes to cell content, to colour the cell content for example, without
-    #   breaking the table formatting.
+    #   Note that if the header content is truncated, then any <tt>header_styler</tt> will be applied to the
+    #   truncation indicator character as well as to the truncated content.
+    # @param [nil, #to_proc] styler (nil) A lambda or other callable object that will determine
+    #   the colors or other styling applied to the formatted value of the cell. Can be passed
+    #   <tt>nil</tt>, or can be passed a callable that takes either 2 or 3 parameters:
+    #   * If passed <tt>nil</tt>, then no additional styling will be applied to the cell content
+    #     (other than what was already applied by the <tt>formatter</tt>).
+    #   * If passed a callable, then that callable will be called for each line of content within
+    #     the cell, and the resulting string rendered in place of that line.
+    #     The <tt>styler</tt> option differs from the <tt>formatter</tt> option in that the extra width of the
+    #     string returned by <tt>styler</tt> is not taken into consideration by the internal table and
+    #     cell width calculations involved in rendering the table. Thus it can be used to apply
+    #     ANSI escape codes to cell content, to color the cell content for example, without
+    #     breaking the table formatting.
+    #     * If the passed callable takes 2 parameters, then the first parameter is the calculated
+    #       value of the cell (prior to the <tt>formatter</tt> being applied); and the second parameter is
+    #       a string representing a single formatted line within the cell. For example, if the cell
+    #       content is wrapped over three lines, then for that cell, the <tt>styler</tt> will be called
+    #       three times, once for each line of content within the cell.
+    #     * If the passed callable takes 3 parameters, then the first two parameters are as above,
+    #       and the third parameter is a {CellData} instance, containing additional information
+    #       about the cell that may be relevant to what styles should be applied. For example
+    #       the {CellData#row_index} attribute can be inspected for odd- or evenness, to arrange for
+    #       different colors to be applied to alternating rows. See the documentation of {CellData}
+    #       for more.
+    #
     #   Note that if the content of a cell is truncated, then the whatever styling is applied by the
     #   <tt>styler</tt> to the cell content will also be applied to the truncation indicator character.
     # @param [Integer] width (nil) Specifies the width of the column, excluding padding. If
@@ -229,6 +240,7 @@ module Tabulo
         formatter: formatter || @formatter,
         header: (header || label).to_s,
         header_styler: header_styler || @header_styler,
+        index: column_registry.count,
         padding_character: PADDING_CHARACTER,
         styler: styler || @styler,
         truncation_indicator: @truncation_indicator,
@@ -297,7 +309,7 @@ module Tabulo
 
         show_divider = @row_divider_frequency && (index != 0) && Util.divides?(@row_divider_frequency, index)
 
-        yield Row.new(self, source, header: header, divider: show_divider)
+        yield Row.new(self, source, header: header, divider: show_divider, index: index)
       end
     end
 
@@ -360,9 +372,9 @@ module Tabulo
     def pack(max_table_width: :auto)
       get_columns.each { |column| column.width = wrapped_width(column.header) }
 
-      @sources.each do |source|
+      @sources.each_with_index do |source, index|
         get_columns.each do |column|
-          cell_width = wrapped_width(column.body_cell(source).formatted_content)
+          cell_width = wrapped_width(column.body_cell(source, row_index: index).formatted_content)
           column.width = Util.max(column.width, cell_width)
         end
       end
@@ -452,8 +464,11 @@ module Tabulo
     end
 
     # @!visibility private
-    def formatted_body_row(source, header:, divider:)
-      cells = get_columns.map { |column| column.body_cell(source) }
+    def formatted_body_row(source, header:, divider:, index:)
+      cells = get_columns.map.with_index do |column, i|
+        column.body_cell(source, row_index: index)
+      end
+
       inner = format_row(cells, @wrap_body_cells_to)
 
       if header == :top

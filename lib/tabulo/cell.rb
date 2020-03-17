@@ -9,14 +9,24 @@ module Tabulo
     attr_reader :value
 
     # @!visibility private
-    def initialize(value:, formatter:, alignment:, width:, styler:, truncation_indicator:, padding_character:)
-      @value = value
-      @formatter = formatter
+    def initialize(
+      alignment:,
+      cell_data:,
+      formatter:,
+      padding_character:,
+      styler:,
+      truncation_indicator:,
+      value:,
+      width:)
+
       @alignment = alignment
-      @width = width
+      @cell_data = cell_data
+      @padding_character = padding_character
+      @formatter = formatter
       @styler = styler
       @truncation_indicator = truncation_indicator
-      @padding_character = padding_character
+      @value = value
+      @width = width
     end
 
     # @!visibility private
@@ -42,6 +52,15 @@ module Tabulo
 
     private
 
+    def apply_styler(content)
+      case @styler.arity
+      when 2
+        @styler.call(@value, content)
+      when 3
+        @styler.call(@value, content, @cell_data)
+      end
+    end
+
     def subcells
       @subcells ||= calculate_subcells
     end
@@ -63,7 +82,7 @@ module Tabulo
     end
 
     def styled_truncation_indicator
-      @styler.call(@value, @truncation_indicator)
+      apply_styler(@truncation_indicator)
     end
 
     def calculate_subcells
@@ -99,7 +118,7 @@ module Tabulo
           [padding, 0]
         end
 
-      "#{' ' * left_padding}#{@styler.call(@value, content)}#{' ' * right_padding}"
+      "#{' ' * left_padding}#{apply_styler(content)}#{' ' * right_padding}"
     end
 
     def real_alignment

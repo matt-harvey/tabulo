@@ -587,16 +587,20 @@ table.add_column(
 )
 ```
 
-The `styler` option should be passed a callable that takes two parameters: the first represents
-the underlying value of the cell (in this case a boolean indicating whether the number is even);
-and the second represents the formatted string value of that cell, i.e. the cell content after
-any processing by the [formatter](#formatting-cell-values). If the content of a cell is wrapped
-over multiple lines, then the `styler` will be called once per line, so that each line of the
-cell will have the escape sequence applied to it separately (ensuring the styling doesn&#8217;t bleed
-into neighbouring cells).
+The `styler` option should be passed a callable that takes either two or three parameters: the
+first represents the underlying value of the cell (in this case a boolean indicating whether
+the number is even); the second represents the formatted string value of that cell, i.e. the cell
+content after any processing by the [formatter](#formatting-cell-values); and the third parameter,
+if present, will be passed a `CellData` object, containing other information about the cell
+that may be useful in determining how to style it&mdash;see the
+[documentation](https://www.rubydoc.info/gems/tabulo/2.3.3/Tabulo/CellData.html) for details.
 
-If the content of a cell has been [truncated](#overflow-handling), then whatever colours or other styling
-apply to the cell content will also be applied the truncation indicator character.
+If the content of a cell is wrapped over multiple lines, then the `styler` will be called once
+per line, so that each line of the cell will have the escape sequence applied to it separately
+(ensuring the styling doesn&#8217;t bleed into neighbouring cells).
+
+If the content of a cell has been [truncated](#overflow-handling), then whatever colours or other
+styling apply to the cell content will also be applied the truncation indicator character.
 
 <a name="styling-column-headers"></a>
 #### Styling column headers
