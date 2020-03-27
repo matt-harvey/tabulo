@@ -64,7 +64,7 @@ module Tabulo
     #   If passed <tt>nil</tt>, then no additional styling will be applied to borders. If passed a
     #   callable, then that callable will be called for each border section, with the
     #   resulting string rendered in place of that border. The extra width of the string returned by the
-    #   {border_styler} is not taken into consideration by the internal table rendering calculations
+    #   <tt>border_styler</tt> is not taken into consideration by the internal table rendering calculations
     #   Thus it can be used to apply ANSI escape codes to border characters, to colour the borders
     #   for example, without breaking the table formatting.
     # @param [nil, Integer, Array] column_padding (1) Determines the amount of blank space with which to pad
@@ -178,31 +178,31 @@ module Tabulo
     # @param [nil, #to_proc] header_styler (nil) A lambda or other callable object taking
     #   a single parameter, representing a single line of within the header content for
     #   this column. For example, if the header cell content is wrapped over three lines, then
-    #   the {header_styler} will be called once for each line. If passed <tt>nil</tt>, then
+    #   the <tt>header_styler</tt> will be called once for each line. If passed <tt>nil</tt>, then
     #   no additional styling will be applied to the header cell content. If passed a callable,
     #   then that callable will be called for each line of content within the header cell, and the
     #   resulting string rendered in place of that line. The extra width of the string returned by the
-    #   {header_styler} is not taken into consideration by the internal table and
+    #   <tt>header_styler</tt> is not taken into consideration by the internal table and
     #   cell width calculations involved in rendering the table. Thus it can be used to apply
     #   ANSI escape codes to header cell content, to colour the cell content for example, without
     #   breaking the table formatting.
-    #   Note that if the header content is truncated, then any {header_styler} will be applied to the
-    #   truncation indicator character as well as to the truncated content.
+    #   Note that if the header content is truncated, then any <tt>header_styler</tt> will be applied
+    #   to the truncation indicator character as well as to the truncated content.
     # @param [nil, #to_proc] styler (nil) A lambda or other callable object that will be passed
-    #   two arguments: the calculated value of the cell (prior to the {formatter} being applied);
+    #   two arguments: the calculated value of the cell (prior to the <tt>formatter</tt> being applied);
     #   and a string representing a single formatted line within the cell. For example, if the
-    #   cell content is wrapped over three lines, then for that cell, the {styler} will be called
+    #   cell content is wrapped over three lines, then for that cell, the <tt>styler</tt> will be called
     #   three times, once for each line of content within the cell. If passed <tt>nil</tt>, then
     #   no additional styling will be applied to the cell content (other than what was already
-    #   applied by the {formatter}). If passed a callable, then that callable will be called for
+    #   applied by the <tt>formatter</tt>). If passed a callable, then that callable will be called for
     #   each line of content within the cell, and the resulting string rendered in place of that
-    #   line. The {styler} option differs from the {formatter} option in that the extra width of the
-    #   string returned by {styler} is not taken into consideration by the internal table and
+    #   line. The <tt>styler</tt> option differs from the <tt>formatter</tt> option in that the extra width of the
+    #   string returned by <tt>styler</tt> is not taken into consideration by the internal table and
     #   cell width calculations involved in rendering the table. Thus it can be used to apply
     #   ANSI escape codes to cell content, to colour the cell content for example, without
     #   breaking the table formatting.
     #   Note that if the content of a cell is truncated, then the whatever styling is applied by the
-    #   {styler} to the cell content will also be applied to the truncation indicator character.
+    #   <tt>styler</tt> to the cell content will also be applied to the truncation indicator character.
     # @param [Integer] width (nil) Specifies the width of the column, excluding padding. If
     #   nil, then the column will take the width provided by the `column_width` param
     #   with which the Table was initialized.
@@ -307,7 +307,7 @@ module Tabulo
       format_row(cells, @wrap_header_cells_to)
     end
 
-    # @param [:top, :middle, :bottom] align_body (:bottom) Specifies the position
+    # @param [:top, :middle, :bottom] position (:bottom) Specifies the position
     #   for which the resulting horizontal dividing line is intended to be printed.
     #   This determines the border characters that are used to construct the line.
     # @return [String] an "ASCII" graphical representation of a horizontal
