@@ -27,10 +27,12 @@ module Tabulo
       @index = index
 
       @header_styler =
-        if header_styler
-          -> (_, s) { header_styler.call(s) }
+        if header_styler && (header_styler.arity == 2)
+          -> (_, str, cell_data) { header_styler.call(str, cell_data.position.column) }
+        elsif header_styler
+          -> (_, str) { header_styler.call(str) }
         else
-          -> (_, s) { s }
+          -> (_, str) { str }
         end
 
       @padding_character = padding_character
@@ -40,10 +42,13 @@ module Tabulo
     end
 
     def header_cell
-      # TODO Position should optionally feature in the header_styler callback
+      if @header_styler.arity == 3
+        position = Position.new(row: nil, column: @index)
+        cell_data = CellData.new(source: nil, position: position)
+      end
       Cell.new(
         alignment: @align_header,
-        cell_data: nil,
+        cell_data: cell_data,
         formatter: -> (s) { s },
         padding_character: @padding_character,
         styler: @header_styler,

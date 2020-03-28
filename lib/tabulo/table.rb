@@ -186,17 +186,26 @@ module Tabulo
     #     See the documentation for {CellData} for more.
     # @param [nil, #to_s] header (nil) Text to be displayed in the column header. If passed nil,
     #   the column's label will also be used as its header text.
-    # @param [nil, #to_proc] header_styler (nil) A lambda or other callable object taking
-    #   a single parameter, representing a single line of within the header content for
-    #   this column. For example, if the header cell content is wrapped over three lines, then
-    #   the <tt>header_styler</tt> will be called once for each line. If passed <tt>nil</tt>, then
-    #   no additional styling will be applied to the header cell content. If passed a callable,
-    #   then that callable will be called for each line of content within the header cell, and the
-    #   resulting string rendered in place of that line. The extra width of the string returned by the
-    #   <tt>header_styler</tt> is not taken into consideration by the internal table and
-    #   cell width calculations involved in rendering the table. Thus it can be used to apply
-    #   ANSI escape codes to header cell content, to colour the cell content for example, without
-    #   breaking the table formatting.
+    # @param [nil, #to_proc] header_styler (nil) A lambda or other callable object that will
+    #   determine the colors or other styling applied to the header content. Can be passed
+    #   <tt>nil</tt>, or can be passed a callable that takes either 1 or 2 parameters:
+    #   * If passed <tt>nil</tt>, then no additional styling will be applied to the cell content
+    #     (other than what was already applied by the <tt>formatter</tt>).
+    #   * If passed a callable, then that callable will be called for each line of content within
+    #     the header cell, and the resulting string rendered in place of that line.
+    #     The extra width of the string returned by the <tt>header_styler</tt> is not taken into
+    #     consideration by the internal table and cell width calculations involved in rendering the
+    #     table. Thus it can be used to apply ANSI escape codes to header cell content, to color the
+    #     cell content for example, without breaking the table formatting.
+    #     * If the passed callable takes 1 parameter, then the first parameter is a string
+    #       representing a single formatted line within the header cell. For example, if the header
+    #       cell content is wrapped over three lines, then the <tt>header_styler</tt> will be called
+    #       three times for that header cell, once for each line of content.
+    #     * If the passed callable takes 2 parameters, then the first parameter is as above, and the
+    #       second parameter is an Integer representing the positional index of this header's {Column},
+    #       with the leftmost column having index 0, the next having index 1 etc.. This can be
+    #       used, for example, to apply different styles to alternating {Column}s.
+    #
     #   Note that if the header content is truncated, then any <tt>header_styler</tt> will be applied to the
     #   truncation indicator character as well as to the truncated content.
     # @param [nil, #to_proc] styler (nil) A lambda or other callable object that will determine

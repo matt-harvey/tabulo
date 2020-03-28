@@ -1399,49 +1399,74 @@ describe Tabulo::Table do
     end
 
     describe "`header_styler` param" do
-      it "styles the header cell content by calling the header_styler on the header text without "\
-        "affecting width calculations" do
-        table.add_column("Trebled", header_styler: -> (str) { "\033[31;1;4m#{str}\033[0m" }) { |n| n * 3 }
+      context "when passed a 1-parameter callable" do
+        it "styles the header cell content by calling the header_styler on the header text without "\
+          "affecting width calculations" do
+          table.add_column("Trebled", header_styler: -> (str) { "\033[31;1;4m#{str}\033[0m" }) { |n| n * 3 }
 
-        expect(table.to_s).to eq \
-          %Q(+--------------+--------------+--------------+
-             |       N      |    Doubled   |    \033[31;1;4mTrebled\033[0m   |
-             +--------------+--------------+--------------+
-             |            1 |            2 |            3 |
-             |            2 |            4 |            6 |
-             |            3 |            6 |            9 |
-             |            4 |            8 |           12 |
-             |            5 |           10 |           15 |
-             +--------------+--------------+--------------+).gsub(/^ +/, "")
+          expect(table.to_s).to eq \
+            %Q(+--------------+--------------+--------------+
+               |       N      |    Doubled   |    \033[31;1;4mTrebled\033[0m   |
+               +--------------+--------------+--------------+
+               |            1 |            2 |            3 |
+               |            2 |            4 |            6 |
+               |            3 |            6 |            9 |
+               |            4 |            8 |           12 |
+               |            5 |           10 |           15 |
+               +--------------+--------------+--------------+).gsub(/^ +/, "")
+        end
+
+        it "applies the same styling to the truncation indicator as to the cell content" do
+          table = Tabulo::Table.new(%w[hello yes], wrap_header_cells_to: 1)
+          table.add_column("itself", width: 3, header_styler: -> (str) { "\033[31m#{str}\033[0m" }) { |n| n }
+
+          expect(table.to_s).to eq \
+            %Q(+-----+
+               | \033[31mits\033[0m\033[31m~\033[0m|
+               +-----+
+               | hel |
+               | lo  |
+               | yes |
+               +-----+).gsub(/^ +/, "")
+        end
+
+        it "applies styling separately to each part of the wrapped header cell content that's on its own line" do
+          table = Tabulo::Table.new(%w[hello yes])
+          table.add_column("itself", width: 3, header_styler: -> (str) { "\033[31m#{str}\033[0m" }) { |n| n }
+
+          expect(table.to_s).to eq \
+            %Q(+-----+
+               | \033[31mits\033[0m |
+               | \033[31melf\033[0m |
+               +-----+
+               | hel |
+               | lo  |
+               | yes |
+               +-----+).gsub(/^ +/, "")
+        end
       end
 
-      it "applies the same styling to the truncation indicator as to the cell content" do
-        table = Tabulo::Table.new(%w[hello yes], wrap_header_cells_to: 1)
-        table.add_column("itself", width: 3, header_styler: -> (str) { "\033[31m#{str}\033[0m" }) { |n| n }
+      context "when passed a 2-parameter callable" do
+        it "styles the header cell content by calling the header_styler on the header text without "\
+          "affecting width calculations, passing the header content and the column index" do
+          header_styler = -> (str, column_index) do
+            expect(column_index).to eq(2)
+            "\033[31;1;4m#{str}\033[0m"
+          end
+          table.add_column("Trebled", header_styler: header_styler) { |n| n * 3 }
 
-        expect(table.to_s).to eq \
-          %Q(+-----+
-             | \033[31mits\033[0m\033[31m~\033[0m|
-             +-----+
-             | hel |
-             | lo  |
-             | yes |
-             +-----+).gsub(/^ +/, "")
-      end
+          expect(table.to_s).to eq \
+            %Q(+--------------+--------------+--------------+
+               |       N      |    Doubled   |    \033[31;1;4mTrebled\033[0m   |
+               +--------------+--------------+--------------+
+               |            1 |            2 |            3 |
+               |            2 |            4 |            6 |
+               |            3 |            6 |            9 |
+               |            4 |            8 |           12 |
+               |            5 |           10 |           15 |
+               +--------------+--------------+--------------+).gsub(/^ +/, "")
+        end
 
-      it "applies styling separately to each part of the wrapped header cell content that's on its own line" do
-        table = Tabulo::Table.new(%w[hello yes])
-        table.add_column("itself", width: 3, header_styler: -> (str) { "\033[31m#{str}\033[0m" }) { |n| n }
-
-        expect(table.to_s).to eq \
-          %Q(+-----+
-             | \033[31mits\033[0m |
-             | \033[31melf\033[0m |
-             +-----+
-             | hel |
-             | lo  |
-             | yes |
-             +-----+).gsub(/^ +/, "")
       end
     end
 

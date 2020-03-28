@@ -618,6 +618,10 @@ to cells in the table body, use the `header_styler` option, e.g.:
 table.add_column(:even?, header_styler: -> (s) { "\033[32m#{s}\033[0m" })
 ```
 
+The `header_styler` option accepts either a 1- or 2-parameter callable. See the
+[documentation](https://www.rubydoc.info/gems/tabulo/2.3.3/Tabulo/Table#add_column-instance_method)
+for details.
+
 <a name="default-styles"></a>
 #### Setting default styles
 
