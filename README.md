@@ -550,6 +550,12 @@ end
 Formatters set for individual columns on calling `#add_column` always override the default formatter for
 the table.
 
+The `formatter` callback has an alternative, two-parameter version. If `formatter` is passed
+a two-parameter callable, the second parameter will be given a `CellData` instance,
+containing additional information about the cell that may be useful in determining how to format
+it&mdash;see the [documentation](https://www.rubydoc.info/gems/tabulo/2.3.3/Tabulo/CellData.html)
+for details.
+
 <a name="colours-and-styling"></a>
 ### Colours and other styling
 
@@ -588,7 +594,7 @@ table.add_column(
 ```
 
 The `styler` option should be passed a callable that takes either two or three parameters: the
-first represents the underlying value of the cell (in this case a boolean indicating whether
+first parameter represents the underlying value of the cell (in this case a boolean indicating whether
 the number is even); the second represents the formatted string value of that cell, i.e. the cell
 content after any processing by the [formatter](#formatting-cell-values); and the third parameter,
 if present, will be passed a `CellData` object, containing other information about the cell

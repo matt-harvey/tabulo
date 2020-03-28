@@ -47,17 +47,24 @@ module Tabulo
     # @return [String] the content of the Cell, after applying the formatter for this Column (but
     #   without applying any wrapping or the styler).
     def formatted_content
-      @formatted_content ||= @formatter.call(@value)
+      @formatted_content ||= apply_formatter
     end
 
     private
 
+    def apply_formatter
+      if @formatter.arity == 2
+        @formatter.call(@value, @cell_data)
+      else
+        @formatter.call(@value)
+      end
+    end
+
     def apply_styler(content)
-      case @styler.arity
-      when 2
-        @styler.call(@value, content)
-      when 3
+      if @styler.arity == 3
         @styler.call(@value, content, @cell_data)
+      else
+        @styler.call(@value, content)
       end
     end
 

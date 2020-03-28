@@ -168,11 +168,21 @@ module Tabulo
     #   in either String or Symbol form for this purpose.
     # @param [#to_proc] formatter (nil) A lambda or other callable object that
     #   will be passed the calculated value of each cell to determine how it should be displayed. This
-    #   is distinct from the extractor (see below). For example, if the extractor for this column
-    #   generates a Date, then the formatter might format that Date in a particular way.
-    #   If no formatter is provided, then the callable that was passed to the `formatter` option
-    #   of the table itself on its creation (see {#initialize}) (which itself defaults to
-    #   `:to_s.to_proc`), will be used as the formatter for the column.
+    #   is distinct from the extractor and the styler (see below).
+    #   For example, if the extractor for this column generates a Date, then the formatter might format
+    #   that Date in a particular way.
+    #   * If <tt>nil</tt> is provided, then the callable that was passed to the `formatter` option
+    #    of the table itself on its creation (see {#initialize}) (which itself defaults to
+    #    `:to_s.to_proc`), will be used as the formatter for the column.
+    #   * If a 1-parameter callable is passed, then this callable will be called with the calculated
+    #     value of the cell; it should then return a String, and this String will be displayed as
+    #     the formatted value of the cell.
+    #   * If a 2-parameter callable is passed, then the first parameter represents the calculated
+    #     value of the cell, and the second parameter is a {CellData} instance, containing
+    #     additional information about the cell that may be relevant to what formatting should
+    #     be applied. For example, the {CellData#row_index} attribute can be inspected for odd- or
+    #     evenness, to arrange for different formatting to be applied to alternating rows.
+    #     See the documentation for {CellData} for more.
     # @param [nil, #to_s] header (nil) Text to be displayed in the column header. If passed nil,
     #   the column's label will also be used as its header text.
     # @param [nil, #to_proc] header_styler (nil) A lambda or other callable object taking
@@ -209,7 +219,7 @@ module Tabulo
     #       and the third parameter is a {CellData} instance, containing additional information
     #       about the cell that may be relevant to what styles should be applied. For example
     #       the {CellData#row_index} attribute can be inspected for odd- or evenness, to arrange for
-    #       different colors to be applied to alternating rows. See the documentation of {CellData}
+    #       different colors to be applied to alternating rows. See the documentation for {CellData}
     #       for more.
     #
     #   Note that if the content of a cell is truncated, then the whatever styling is applied by the

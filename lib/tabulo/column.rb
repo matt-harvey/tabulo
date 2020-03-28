@@ -74,7 +74,7 @@ module Tabulo
     private
 
     def body_cell_data_required?
-      @cell_data_required ||= (@styler.arity == 3)
+      @cell_data_required ||= (@styler.arity == 3 || @formatter.arity == 2)
     end
   end
 end

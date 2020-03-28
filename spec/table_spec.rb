@@ -1248,28 +1248,63 @@ describe Tabulo::Table do
     end
 
     describe "`formatter` param" do
-      it "formats the cell value for display, without changing the underlying cell value or its default alignment" do
-        table.add_column("Trebled", formatter: -> (val) { "%.2f" % val }) do |n|
-          n * 3
+      context "when passed a 1-parameter callable" do
+        it "formats the cell value for display, without changing the underlying cell value or its default alignment" do
+          table.add_column("Trebled", formatter: -> (val) { "%.2f" % val }) do |n|
+            n * 3
+          end
+          expect(table.to_s).to eq \
+            %q(+--------------+--------------+--------------+
+               |       N      |    Doubled   |    Trebled   |
+               +--------------+--------------+--------------+
+               |            1 |            2 |         3.00 |
+               |            2 |            4 |         6.00 |
+               |            3 |            6 |         9.00 |
+               |            4 |            8 |        12.00 |
+               |            5 |           10 |        15.00 |
+               +--------------+--------------+--------------+).gsub(/^ +/, "")
+          top_right_body_cell = table.first.to_a.last
+          expect(top_right_body_cell.value).to eq(3)
+          expect(top_right_body_cell.value).to be_a(Integer)
         end
-        expect(table.to_s).to eq \
-          %q(+--------------+--------------+--------------+
-             |       N      |    Doubled   |    Trebled   |
-             +--------------+--------------+--------------+
-             |            1 |            2 |         3.00 |
-             |            2 |            4 |         6.00 |
-             |            3 |            6 |         9.00 |
-             |            4 |            8 |        12.00 |
-             |            5 |           10 |        15.00 |
-             +--------------+--------------+--------------+).gsub(/^ +/, "")
-        top_right_body_cell = table.first.to_a.last
-        expect(top_right_body_cell.value).to eq(3)
-        expect(top_right_body_cell.value).to be_a(Integer)
+      end
+
+      context "when passed a 2-parameter callable" do
+        it "formats the cell value for display, by applying the callable to the underlying cell value together"\
+          "with a CellData instance, without changing the underlying cell value or its default alignment" do
+          formatter = -> (val, cell_data) do
+            expect(cell_data.column_index).to eq(2)
+            expect(0..4).to include(cell_data.row_index)
+            if cell_data.source == 1
+              val.to_s
+            elsif cell_data.row_index.even?
+              "%.2f" % val
+            else
+              "%.1f" % val
+            end
+          end
+          table.add_column("Trebled", formatter: formatter) do |n|
+            n * 3
+          end
+          expect(table.to_s).to eq \
+            %q(+--------------+--------------+--------------+
+               |       N      |    Doubled   |    Trebled   |
+               +--------------+--------------+--------------+
+               |            1 |            2 |            3 |
+               |            2 |            4 |          6.0 |
+               |            3 |            6 |         9.00 |
+               |            4 |            8 |         12.0 |
+               |            5 |           10 |        15.00 |
+               +--------------+--------------+--------------+).gsub(/^ +/, "")
+          top_right_body_cell = table.first.to_a.last
+          expect(top_right_body_cell.value).to eq(3)
+          expect(top_right_body_cell.value).to be_a(Integer)
+        end
       end
     end
 
     describe "`styler` param" do
-      context "when passed a two-parameter callable" do
+      context "when passed a 2-parameter callable" do
         it "styles the cell value by calling the styler on the underlying cell value and the formatted value, "\
           "without changing the underlying cell value's default alignment, and without affecting column width "\
           "calculations" do
@@ -1332,12 +1367,12 @@ describe Tabulo::Table do
           "for the row, without changing the underlying cell value's default alignment, and without affecting "\
           "column width calculations" do
           puts "yo"
-          styler = -> (val, str, data) do
-            expect(data.column_index).to eq(2)
-            expect(0..4).to include(data.row_index)
-            if data.source == 1
+          styler = -> (val, str, cell_data) do
+            expect(cell_data.column_index).to eq(2)
+            expect(0..4).to include(cell_data.row_index)
+            if cell_data.source == 1
               "\033[31;4m#{str}\033[0m"
-            elsif data.row_index.odd?
+            elsif cell_data.row_index.odd?
               "\033[31;1;4m#{str}\033[0m"
             else
               str
