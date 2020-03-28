@@ -14,12 +14,12 @@ describe Tabulo::Cell do
   end
 
   let(:formatter) { -> (source) { source.to_s } }
-  let(:position) { Tabulo::Position.new(row: 5, column: 3) }
+  let(:position) { Tabulo::Position.new(5, 3) }
   let(:source) { "hi" }
   let(:styler) { -> (source, str) { str } }
   let(:value) { 30 }
   let(:width) { 6 }
-  let(:cell_data) { Tabulo::CellData.new(source: source, position: position) }
+  let(:cell_data) { Tabulo::CellData.new(source, position) }
 
   describe "#height" do
     subject { cell.height }
