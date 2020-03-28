@@ -40,7 +40,7 @@ module Tabulo
     end
 
     def header_cell
-      # TODO column_index should optionally feature in the header_styler callback
+      # TODO Position should optionally feature in the header_styler callback
       Cell.new(
         alignment: @align_header,
         cell_data: nil,
@@ -54,7 +54,10 @@ module Tabulo
     end
 
     def body_cell(source, row_index:)
-      cell_data = CellData.new(source, row_index, @index) if body_cell_data_required?
+      if body_cell_data_required?
+        position = Position.new(row_index, @index)
+        cell_data = CellData.new(source, position)
+      end
       Cell.new(
         alignment: @align_body,
         cell_data: cell_data,

@@ -180,8 +180,9 @@ module Tabulo
     #   * If a 2-parameter callable is passed, then the first parameter represents the calculated
     #     value of the cell, and the second parameter is a {CellData} instance, containing
     #     additional information about the cell that may be relevant to what formatting should
-    #     be applied. For example, the {CellData#row_index} attribute can be inspected for odd- or
-    #     evenness, to arrange for different formatting to be applied to alternating rows.
+    #     be applied. For example, the {CellData#position} attribute can be inspected to determine
+    #     whether the {Cell} is an odd- or even-numbered {Row}, to arrange for different formatting
+    #     to be applied to alternating rows.
     #     See the documentation for {CellData} for more.
     # @param [nil, #to_s] header (nil) Text to be displayed in the column header. If passed nil,
     #   the column's label will also be used as its header text.
@@ -217,10 +218,10 @@ module Tabulo
     #       three times, once for each line of content within the cell.
     #     * If the passed callable takes 3 parameters, then the first two parameters are as above,
     #       and the third parameter is a {CellData} instance, containing additional information
-    #       about the cell that may be relevant to what styles should be applied. For example
-    #       the {CellData#row_index} attribute can be inspected for odd- or evenness, to arrange for
-    #       different colors to be applied to alternating rows. See the documentation for {CellData}
-    #       for more.
+    #       about the cell that may be relevant to what styles should be applied. For example, the
+    #       {CellData#position} attribute can be inspected to determine whether the {Cell} is an
+    #       odd- or even-numbered {Row}, to arrange for different styling to be applied to
+    #       alternating rows. See the documentation for {CellData} for more.
     #
     #   Note that if the content of a cell is truncated, then the whatever styling is applied by the
     #   <tt>styler</tt> to the cell content will also be applied to the truncation indicator character.
