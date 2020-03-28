@@ -237,10 +237,16 @@ module Tabulo
     # @param [Integer] width (nil) Specifies the width of the column, excluding padding. If
     #   nil, then the column will take the width provided by the `column_width` param
     #   with which the Table was initialized.
-    # @param [#to_proc] extractor A block or other callable
-    #   that will be passed each of the Table sources to determine the value in each cell of this
-    #   column. If this is not provided, then the column label will be treated as a method to be
-    #   called on each source item to determine each cell's value.
+    # @param [#to_proc] extractor A block or other callable that will be passed each of the {Table}
+    #   sources to determine the value in each cell of this column.
+    #   * If this is not provided, then the column label will be treated as a method to be called on
+    #     each source item to determine each cell's value.
+    #   * If provided a single-parameter callable, then this callable will be passed each of the
+    #     {Table} sources to determine the cell value for each row in this column.
+    #   * If provided a 2-parameter callable, then for each of the {Table} sources, this callable
+    #     will be passed the source, and the row index, to determine the cell value for that row.
+    #     For this purpose, the first body row (not counting the header row) has an index of 0,
+    #     the next an index of 1, etc..
     # @raise [InvalidColumnLabelError] if label has already been used for another column in this
     #   Table. (This is case-sensitive, but is insensitive to whether a String or Symbol is passed
     #   to the label parameter.)
@@ -392,9 +398,10 @@ module Tabulo
     def pack(max_table_width: :auto)
       get_columns.each { |column| column.width = wrapped_width(column.header) }
 
-      @sources.each_with_index do |source, index|
-        get_columns.each do |column|
-          cell_width = wrapped_width(column.body_cell(source, row_index: index).formatted_content)
+      @sources.each_with_index do |source, row_index|
+        get_columns.each_with_index do |column, column_index|
+          cell = column.body_cell(source, row_index: row_index, column_index: column_index)
+          cell_width = wrapped_width(cell.formatted_content)
           column.width = Util.max(column.width, cell_width)
         end
       end
@@ -477,7 +484,7 @@ module Tabulo
         # Add a column to the new table for each of the original table's sources
         sources.each_with_index do |source, i|
           t.add_column(i, header: extra_opts[:headers].call(source)) do |original_column|
-            original_column.body_cell_value(source)
+            original_column.body_cell_value(source, row_index: i, column_index: original_column.index)
           end
         end
       end
@@ -485,8 +492,8 @@ module Tabulo
 
     # @!visibility private
     def formatted_body_row(source, header:, divider:, index:)
-      cells = get_columns.map.with_index do |column, i|
-        column.body_cell(source, row_index: index)
+      cells = get_columns.map.with_index do |column, column_index|
+        column.body_cell(source, row_index: index, column_index: column_index)
       end
 
       inner = format_row(cells, @wrap_body_cells_to)

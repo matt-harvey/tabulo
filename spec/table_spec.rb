@@ -1471,7 +1471,7 @@ describe Tabulo::Table do
     end
 
     describe "`extractor` param" do
-      context "when provided" do
+      context "when provided a single-parameter callable" do
         let(:table) do
           Tabulo::Table.new(1..5) do |t|
             t.add_column("N") { |s| s }
@@ -1484,7 +1484,7 @@ describe Tabulo::Table do
           end
         end
 
-        it "accepts a block or other callable, with which it calculates the cell value" do
+        it "uses the callable to calculate the cell value from the member of the underlying enumerable" do
           expect(table.to_s).to eq \
             %q(+--------------+--------------+--------------+--------------+--------------+
                |       N      |      x 2     |      x 3     |      x 4     |      x 5     |
@@ -1495,6 +1495,34 @@ describe Tabulo::Table do
                |            4 |            8 |           12 |           16 |           20 |
                |            5 |           10 |           15 |           20 |           25 |
                +--------------+--------------+--------------+--------------+--------------+).gsub(/^ +/, "")
+        end
+      end
+
+      context "when provided a 2-parameter callable" do
+        let(:table) do
+          sources = [10, 20, 30, 40, 50]
+          Tabulo::Table.new(sources) do |t|
+            t.add_column("Index") do |n, i|
+              expect(sources).to include(n)
+              expect(0..4).to include(i)
+              i
+            end
+            t.add_column("N", &:itself)
+          end
+        end
+
+        it "uses the callable to calculate the cell value from the member of the underyling enumberable "\
+          "together with the row index" do
+          expect(table.to_s).to eq \
+            %q(+--------------+--------------+
+               |     Index    |       N      |
+               +--------------+--------------+
+               |            0 |           10 |
+               |            1 |           20 |
+               |            2 |           30 |
+               |            3 |           40 |
+               |            4 |           50 |
+               +--------------+--------------+).gsub(/^ +/, "")
         end
       end
 

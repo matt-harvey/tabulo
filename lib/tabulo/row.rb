@@ -25,7 +25,7 @@ module Tabulo
     #   end
     def each
       @table.column_registry.each_with_index do |(_, column), column_index|
-        yield column.body_cell(@source, row_index: @index)
+        yield column.body_cell(@source, row_index: @index, column_index: column_index)
       end
     end
 
@@ -43,8 +43,8 @@ module Tabulo
 
     # @return a Hash representation of the {Row}, with column labels acting as keys and the {Cell}s the values.
     def to_h
-      @table.column_registry.map.with_index do |(label, column), index|
-        [label, column.body_cell(@source, row_index: index)]
+      @table.column_registry.map.with_index do |(label, column), column_index|
+        [label, column.body_cell(@source, row_index: @index, column_index: column_index)]
       end.to_h
     end
   end

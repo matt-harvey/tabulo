@@ -216,6 +216,28 @@ end
 +--------------+--------------+--------------+
 ```
 
+The `add_column` can alternatively be passed a callable with 2 parameters. In this case, the second
+parameter is the 0-based index of the current row. This can be useful if you want to display
+a row number in one of the columns, for example:
+
+```ruby
+table = Tabulo::Table.new(["a", "b", "c"]) do |t|
+  t.add_column("Row") { |letter, row_index| row_index + 1 }
+  t.add_column("Value", &:itself)
+end
+```
+
+```
+> puts table
++--------------+--------------+
+|      Row     |     Value    |
++--------------+--------------+
+|            1 | a            |
+|            2 | b            |
+|            3 | c            |
++--------------+--------------+
+```
+
 <a name="labels-headers"></a>
 #### Column labels _vs_ headers
 

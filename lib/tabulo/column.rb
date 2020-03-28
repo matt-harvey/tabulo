@@ -5,6 +5,7 @@ module Tabulo
 
     attr_accessor :width
     attr_reader :header
+    attr_reader :index
 
     def initialize(
       align_body:,
@@ -58,7 +59,7 @@ module Tabulo
       )
     end
 
-    def body_cell(source, row_index:)
+    def body_cell(source, row_index:, column_index:)
       if body_cell_data_required?
         position = Position.new(row_index, @index)
         cell_data = CellData.new(source, position)
@@ -70,13 +71,17 @@ module Tabulo
         padding_character: @padding_character,
         styler: @styler,
         truncation_indicator: @truncation_indicator,
-        value: body_cell_value(source),
+        value: body_cell_value(source, row_index: row_index, column_index: column_index),
         width: @width,
       )
     end
 
-    def body_cell_value(source)
-      @extractor.call(source)
+    def body_cell_value(source, row_index:, column_index:)
+      if @extractor.arity == 2
+        @extractor.call(source, row_index)
+      else
+        @extractor.call(source)
+      end
     end
 
     private
