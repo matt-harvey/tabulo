@@ -55,8 +55,8 @@ module Tabulo
 
     def body_cell(source, row_index:)
       if body_cell_data_required?
-        position = Position.new(row_index, @index)
-        cell_data = CellData.new(source, position)
+        position = Position.new(row: row_index, column: @index)
+        cell_data = CellData.new(source: source, position: position)
       end
       Cell.new(
         alignment: @align_body,

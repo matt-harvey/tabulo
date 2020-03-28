@@ -6,6 +6,6 @@ module Tabulo
   #   {Table} has index 0, the next has index 1, etc..
   # @attr column [Integer] The positional index of the {Cell}'s {Column}. The leftmost {Column}
   #   of the {Table} has index 0, the next has index 1, etc..
-  Position = Struct.new(:row, :column)
+  Position = Struct.new(:row, :column, keyword_init: true)
 
 end
