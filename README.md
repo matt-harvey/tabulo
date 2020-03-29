@@ -573,7 +573,7 @@ end
 Formatters set for individual columns on calling `#add_column` always override the default formatter for
 the table.
 
-The `formatter` callback has an alternative, 2-parameter version. If `formatter` is passed
+The `formatter` callback also has an alternative, 2-parameter version. If `formatter` is passed
 a 2-parameter callable, the second parameter will be given a `CellData` instance,
 containing additional information about the cell that may be useful in determining how to format
 it&mdash;see the [documentation](https://www.rubydoc.info/gems/tabulo/2.4.0/Tabulo/CellData.html)
