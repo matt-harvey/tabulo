@@ -1507,7 +1507,7 @@ describe Tabulo::Table do
               expect(0..4).to include(i)
               i
             end
-            t.add_column("N", &:itself)
+            t.add_column("N") { |n| n }
           end
         end
 
