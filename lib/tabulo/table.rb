@@ -493,10 +493,7 @@ module Tabulo
 
     # @!visibility private
     def formatted_body_row(source, header:, divider:, index:)
-      cells = get_columns.map.with_index do |column, column_index|
-        column.body_cell(source, row_index: index, column_index: column_index)
-      end
-
+      cells = get_columns.map.with_index { |c, i| c.body_cell(source, row_index: index, column_index: i) }
       inner = format_row(cells, @wrap_body_cells_to)
 
       if header == :top
