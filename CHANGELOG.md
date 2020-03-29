@@ -1,5 +1,14 @@
 # Changelog
 
+### v2.4.0
+
+* Add additional, optional `CellData` parameter to `styler` and `formatter` callbacks
+* Add optional `column_index` parameter to `header_styler` callback
+* Add optional `row_index` parameter to `extractor` callback
+* Add `rake yard` Rake task for generating YARD documentation
+* Minor documentation fixes
+* Upgrade dependency version: `unicode-display_width` gem to 1.7.0
+
 ### v2.3.3
 
 * Fix styler option on Table initializer, which had no effect

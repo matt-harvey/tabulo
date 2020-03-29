@@ -576,7 +576,7 @@ the table.
 The `formatter` callback has an alternative, 2-parameter version. If `formatter` is passed
 a 2-parameter callable, the second parameter will be given a `CellData` instance,
 containing additional information about the cell that may be useful in determining how to format
-it&mdash;see the [documentation](https://www.rubydoc.info/gems/tabulo/2.3.3/Tabulo/CellData.html)
+it&mdash;see the [documentation](https://www.rubydoc.info/gems/tabulo/2.4.0/Tabulo/CellData.html)
 for details.
 
 <a name="colours-and-styling"></a>
@@ -622,7 +622,7 @@ the number is even); the second represents the formatted string value of that ce
 content after any processing by the [formatter](#formatting-cell-values); and the third parameter,
 if present, will be passed a `CellData` object, containing other information about the cell
 that may be useful in determining how to style it&mdash;see the
-[documentation](https://www.rubydoc.info/gems/tabulo/2.3.3/Tabulo/CellData.html) for details.
+[documentation](https://www.rubydoc.info/gems/tabulo/2.4.0/Tabulo/CellData.html) for details.
 
 If the content of a cell is wrapped over multiple lines, then the `styler` will be called once
 per line, so that each line of the cell will have the escape sequence applied to it separately
@@ -642,7 +642,7 @@ table.add_column(:even?, header_styler: -> (s) { "\033[32m#{s}\033[0m" })
 ```
 
 The `header_styler` option accepts either a 1- or 2-parameter callable. See the
-[documentation](https://www.rubydoc.info/gems/tabulo/2.3.3/Tabulo/Table#add_column-instance_method)
+[documentation](https://www.rubydoc.info/gems/tabulo/2.4.0/Tabulo/Table#add_column-instance_method)
 for details.
 
 <a name="default-styles"></a>
@@ -835,7 +835,7 @@ a new table in which the rows and columns are swapped:
 By default, a header row is added to the new table, showing the string value of the element
 represented in that column. This can be configured, however, along with other aspects of
 `transpose`&#8217;s behaviour. For details, see the
-[documentation](https://www.rubydoc.info/gems/tabulo/2.3.3/Tabulo/Table#transpose-instance_method).
+[documentation](https://www.rubydoc.info/gems/tabulo/2.4.0/Tabulo/Table#transpose-instance_method).
 
 <a name="borders"></a>
 ### Configuring borders
@@ -1144,14 +1144,14 @@ The gem is available as open source under the terms of the [MIT
 License](http://opensource.org/licenses/MIT).
 
 [Gem Version]: https://rubygems.org/gems/tabulo
-[Documentation]: http://www.rubydoc.info/gems/tabulo/2.3.3
+[Documentation]: http://www.rubydoc.info/gems/tabulo/2.4.0
 [Build Status]: https://travis-ci.org/matt-harvey/tabulo
 [Coverage Status]: https://coveralls.io/r/matt-harvey/tabulo
 [Code Climate]: https://codeclimate.com/github/matt-harvey/tabulo
 [Awesome Ruby]: https://github.com/markets/awesome-ruby#cli-utilities
 
 [GV img]: https://img.shields.io/gem/v/tabulo.svg
-[DC img]: https://img.shields.io/badge/documentation-v2.3.3-blue.svg
+[DC img]: https://img.shields.io/badge/documentation-v2.4.0-blue.svg
 [BS img]: https://img.shields.io/travis/matt-harvey/tabulo.svg
 [CS img]: https://img.shields.io/coveralls/matt-harvey/tabulo.svg
 [CC img]: https://codeclimate.com/github/matt-harvey/tabulo/badges/gpa.svg
