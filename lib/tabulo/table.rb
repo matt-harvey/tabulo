@@ -345,14 +345,15 @@ module Tabulo
       format_row(cells, @wrap_header_cells_to)
     end
 
+    # Produce a horizontal dividing line suitable for printing at the top, bottom or middle
+    # of the table.
+    #
     # @param [:top, :middle, :bottom] position (:bottom) Specifies the position
     #   for which the resulting horizontal dividing line is intended to be printed.
     #   This determines the border characters that are used to construct the line.
     # @return [String] an "ASCII" graphical representation of a horizontal
-    #   dividing line suitable for printing at the top, bottom or middle of the
-    #   table.
-    # @example Print a horizontal divider between each pair of rows, and again
-    #   at the bottom:
+    #   dividing line.
+    # @example Print a horizontal divider between each pair of rows, and again at the bottom:
     #
     #   table.each_with_index do |row, i|
     #     puts table.horizontal_rule(:middle) unless i == 0

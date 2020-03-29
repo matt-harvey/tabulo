@@ -216,13 +216,14 @@ end
 +--------------+--------------+--------------+
 ```
 
-The `add_column` can alternatively be passed a callable with 2 parameters. In this case, the second
-parameter is the 0-based index of the current row. This can be useful if you want to display
-a row number in one of the columns, for example:
+The `add_column` method can be passed a single parameter callable, as shown in the above example,
+with the parameter representing the member of the underyling enumerable; or it can be passed
+2-parameter callable, with the second parameter representing the (0-based) index of each row. This can be
+useful if you want to display a row number in one of the columns:
 
 ```ruby
 table = Tabulo::Table.new(["a", "b", "c"]) do |t|
-  t.add_column("Row") { |letter, row_index| row_index + 1 }
+  t.add_column("Row") { |letter, row_index| row_index }
   t.add_column("Value", &:itself)
 end
 ```
@@ -232,9 +233,9 @@ end
 +--------------+--------------+
 |      Row     |     Value    |
 +--------------+--------------+
-|            1 | a            |
-|            2 | b            |
-|            3 | c            |
+|            0 | a            |
+|            1 | b            |
+|            2 | c            |
 +--------------+--------------+
 ```
 
@@ -572,8 +573,8 @@ end
 Formatters set for individual columns on calling `#add_column` always override the default formatter for
 the table.
 
-The `formatter` callback has an alternative, two-parameter version. If `formatter` is passed
-a two-parameter callable, the second parameter will be given a `CellData` instance,
+The `formatter` callback has an alternative, 2-parameter version. If `formatter` is passed
+a 2-parameter callable, the second parameter will be given a `CellData` instance,
 containing additional information about the cell that may be useful in determining how to format
 it&mdash;see the [documentation](https://www.rubydoc.info/gems/tabulo/2.3.3/Tabulo/CellData.html)
 for details.
