@@ -1273,11 +1273,11 @@ describe Tabulo::Table do
         it "formats the cell value for display, by applying the callable to the underlying cell value together"\
           "with a CellData instance, without changing the underlying cell value or its default alignment" do
           formatter = -> (val, cell_data) do
-            expect(cell_data.position.column).to eq(2)
-            expect(0..4).to include(cell_data.position.row)
+            expect(cell_data.column_index).to eq(2)
+            expect(0..4).to include(cell_data.row_index)
             if cell_data.source == 1
               val.to_s
-            elsif cell_data.position.row.even?
+            elsif cell_data.row_index.even?
               "%.2f" % val
             else
               "%.1f" % val
@@ -1368,11 +1368,11 @@ describe Tabulo::Table do
           "column width calculations" do
           puts "yo"
           styler = -> (val, str, cell_data) do
-            expect(cell_data.position.column).to eq(2)
-            expect(0..4).to include(cell_data.position.row)
+            expect(cell_data.column_index).to eq(2)
+            expect(0..4).to include(cell_data.row_index)
             if cell_data.source == 1
               "\033[31;4m#{str}\033[0m"
-            elsif cell_data.position.row.odd?
+            elsif cell_data.row_index.odd?
               "\033[31;1;4m#{str}\033[0m"
             else
               str

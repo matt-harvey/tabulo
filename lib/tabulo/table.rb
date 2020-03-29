@@ -180,7 +180,7 @@ module Tabulo
     #   * If a 2-parameter callable is passed, then the first parameter represents the calculated
     #     value of the cell, and the second parameter is a {CellData} instance, containing
     #     additional information about the cell that may be relevant to what formatting should
-    #     be applied. For example, the {CellData#position} attribute can be inspected to determine
+    #     be applied. For example, the {CellData#row_index} attribute can be inspected to determine
     #     whether the {Cell} is an odd- or even-numbered {Row}, to arrange for different formatting
     #     to be applied to alternating rows.
     #     See the documentation for {CellData} for more.
@@ -228,7 +228,7 @@ module Tabulo
     #     * If the passed callable takes 3 parameters, then the first two parameters are as above,
     #       and the third parameter is a {CellData} instance, containing additional information
     #       about the cell that may be relevant to what styles should be applied. For example, the
-    #       {CellData#position} attribute can be inspected to determine whether the {Cell} is an
+    #       {CellData#row_index} attribute can be inspected to determine whether the {Cell} is an
     #       odd- or even-numbered {Row}, to arrange for different styling to be applied to
     #       alternating rows. See the documentation for {CellData} for more.
     #

@@ -29,7 +29,7 @@ module Tabulo
 
       @header_styler =
         if header_styler && (header_styler.arity == 2)
-          -> (_, str, cell_data) { header_styler.call(str, cell_data.position.column) }
+          -> (_, str, cell_data) { header_styler.call(str, cell_data.column_index) }
         elsif header_styler
           -> (_, str) { header_styler.call(str) }
         else
@@ -44,8 +44,7 @@ module Tabulo
 
     def header_cell
       if @header_styler.arity == 3
-        position = Position.new(nil, @index)
-        cell_data = CellData.new(nil, position)
+        cell_data = CellData.new(nil, nil, @index)
       end
       Cell.new(
         alignment: @align_header,
@@ -61,8 +60,7 @@ module Tabulo
 
     def body_cell(source, row_index:, column_index:)
       if body_cell_data_required?
-        position = Position.new(row_index, @index)
-        cell_data = CellData.new(source, position)
+        cell_data = CellData.new(source, row_index, @index)
       end
       Cell.new(
         alignment: @align_body,
