@@ -65,6 +65,7 @@ end
 * Easily [transpose](#transposition) the table, so that rows are swapped with columns.
 * Choose from multiple [border configurations](#borders), including Markdown, &ldquo;ASCII&rdquo;, and smoothly
   joined Unicode border characters.
+* Optionally add a [title](#title) to your table.
 
 Tabulo has also been ported to Crystal (with some modifications): see [Tablo](https://github.com/hutou/tablo).
 
@@ -82,6 +83,7 @@ Tabulo has also been ported to Crystal (with some modifications): see [Tablo](ht
         * [Column labels _vs_ headers](#labels-headers)
         * [Positioning columns](#column-positioning)
      * [Removing columns](#removing-columns)
+     * [Adding a title](#title)
      * [Cell alignment](#cell-alignment)
      * [Column width, wrapping and truncation](#column-width-wrapping-and-truncation)
         * [Configuring fixed widths](#configuring-fixed-widths)
@@ -286,6 +288,33 @@ the label of the column you want to remove:
 table.remove_column(:even?)
 ```
 
+<a name="title"></a>
+### Adding a title
+
+You can optionally give your table a title, using the `title` option when initializing the table:
+
+```ruby
+table = Tabulo::Table.new([1, 2, 3], :itself, :odd?, title: "Numbers")
+table.add_column(:even?, before: :odd?)
+```
+
+```
+> puts table
++--------------------------------------------+
+|                   Numbers                  |
++--------------+--------------+--------------+
+|    itself    |     even?    |     odd?     |
++--------------+--------------+--------------+
+|            1 |     false    |     true     |
+|            2 |     true     |     false    |
+|            3 |     false    |     true     |
++--------------+--------------+--------------+
+```
+
+There is a caveat: Using the `title` option with the `:markdown` [border type](#borders) will cause
+the rendered table to cease being valid Markdown, as unfortunately almost no markdown engines support
+adding a captions (i.e. titles) to tables.
+
 <a name="cell-alignment"></a>
 ### Cell alignment
 
@@ -371,6 +400,26 @@ table.pack
 | short                   |    5 |
 | here is a longer phrase |   23 |
 +-------------------------+------+
+```
+
+If the table [title](#title) happens to be too long to for the existing width of the table, `pack`
+will also arrange for the table to be widened sufficiently to accommodate it without wrapping:
+
+```ruby
+table = Tabulo::Table.new(["a", "b"], :itself, :size, title: "Here are some letters of the alphabet")
+table.pack
+```
+
+```
+> puts table
++---------------------------------------+
+| Here are some letters of the alphabet |
++-------------------+-------------------+
+|       itself      |        size       |
++-------------------+-------------------+
+| a                 |                 1 |
+| b                 |                 1 |
++-------------------+-------------------+
 ```
 
 The `pack` method returns the table itself, so you can &ldquo;pack-and-print&rdquo; in one go:
@@ -706,6 +755,8 @@ table = Tabulo::Table.new(1..10, :itself, :even?, header_frequency: 5)
 +--------------+--------------+
 ```
 
+Note that if the table has a [title](#title), it will not be repeated; only column headers are repeated.
+
 <a name="enumerator"></a>
 ### Using a Table Enumerator
 
@@ -854,6 +905,17 @@ This is done using the `border` option passed to `Table.new`. The options are as
 |            2 |     true     |     false    |
 |            3 |     false    |     true     |
 +--------------+--------------+--------------+
+
+> puts Tabulo::Table.new(1..3, :itself, :even?, :odd?, border: :ascii, title: "Numbers")
++--------------------------------------------+
+|                   Numbers                  |
++--------------+--------------+--------------+
+|    itself    |     even?    |     odd?     |
++--------------+--------------+--------------+
+|            1 |     false    |     true     |
+|            2 |     true     |     false    |
+|            3 |     false    |     true     |
++--------------+--------------+--------------+
 ```
 
 `:modern`&mdash;uses smoothly joined Unicode characters:
@@ -861,6 +923,17 @@ This is done using the `border` option passed to `Table.new`. The options are as
 ```
 > puts Tabulo::Table.new(1..3, :itself, :even?, :odd?, border: :modern)
 ┌──────────────┬──────────────┬──────────────┐
+│    itself    │     even?    │     odd?     │
+├──────────────┼──────────────┼──────────────┤
+│            1 │     false    │     true     │
+│            2 │     true     │     false    │
+│            3 │     false    │     true     │
+└──────────────┴──────────────┴──────────────┘
+
+> puts Tabulo::Table.new(1..3, :itself, :even?, :odd?, border: :modern, title: "Numbers")
+┌────────────────────────────────────────────┐
+│                   Numbers                  │
+├──────────────┬──────────────┬──────────────┤
 │    itself    │     even?    │     odd?     │
 ├──────────────┼──────────────┼──────────────┤
 │            1 │     false    │     true     │
@@ -878,12 +951,32 @@ This is done using the `border` option passed to `Table.new`. The options are as
 |            1 |     false    |     true     |
 |            2 |     true     |     false    |
 |            3 |     false    |     true     |
+
+> puts Tabulo::Table.new(1..3, :itself, :even?, :odd?, border: :markdown, title: "Numbers")
+|                   Numbers                  |
+|    itself    |     even?    |     odd?     |
+|--------------|--------------|--------------|
+|            1 |     false    |     true     |
+|            2 |     true     |     false    |
+|            3 |     false    |     true     |
 ```
+
+_However_, note that when a table is rendered using the `:markdown` border type in combination with a
+(non-`nil`) `title`, the result will be _invalid Markdown_. This is because Markdown engines do not
+generally support adding a caption (i.e. title) element to tables.
 
 `:blank`&mdash;no border or divider characters are printed:
 
 ```
 > puts Tabulo::Table.new(1..3, :itself, :even?, :odd?, border: :blank)
+    itself         even?         odd?     
+            1      false         true     
+            2      true          false    
+            3      false         true     
+
+
+> puts Tabulo::Table.new(1..3, :itself, :even?, :odd?, border: :blank, title: "Numbers")
+                  Numbers                 
     itself         even?         odd?     
             1      false         true     
             2      true          false    
@@ -894,6 +987,17 @@ This is done using the `border` option passed to `Table.new`. The options are as
 
 ```
 > puts Tabulo::Table.new(1..3, :itself, :even?, :odd?, border: :reduced_modern)
+-------------- -------------- --------------
+    itself          even?          odd?     
+-------------- -------------- --------------
+            1       false          true     
+            2       true           false    
+            3       false          true     
+-------------- -------------- --------------
+
+> puts Tabulo::Table.new(1..3, :itself, :even?, :odd?, border: :reduced_modern, title: "Numbers")
+--------------------------------------------
+                   Numbers                  
 -------------- -------------- --------------
     itself          even?          odd?     
 -------------- -------------- --------------
@@ -914,6 +1018,17 @@ This is done using the `border` option passed to `Table.new`. The options are as
             2       true           false    
             3       false          true     
 ────────────── ────────────── ──────────────
+
+> puts Tabulo::Table.new(1..3, :itself, :even?, :odd?, border: :reduced_ascii, title: "Numbers")
+────────────────────────────────────────────
+                   Numbers                  
+────────────── ────────────── ──────────────
+    itself          even?          odd?     
+────────────── ────────────── ──────────────
+            1       false          true     
+            2       true           false    
+            3       false          true     
+────────────── ────────────── ──────────────
 ```
 
 `:classic`&mdash;reproduces the default behaviour in Tabulo v1; this is like the `:ascii` option,
@@ -921,6 +1036,16 @@ but without a bottom border:
 
 ```
 > puts Tabulo::Table.new(1..3, :itself, :even?, :odd?, border: :classic)
++--------------+--------------+--------------+
+|    itself    |     even?    |     odd?     |
++--------------+--------------+--------------+
+|            1 |     false    |     true     |
+|            2 |     true     |     false    |
+|            3 |     false    |     true     |
+
+> puts Tabulo::Table.new(1..3, :itself, :even?, :odd?, border: :classic, title: "Numbers")
++--------------------------------------------+
+|                   Numbers                  |
 +--------------+--------------+--------------+
 |    itself    |     even?    |     odd?     |
 +--------------+--------------+--------------+

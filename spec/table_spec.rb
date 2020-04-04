@@ -17,6 +17,7 @@ describe Tabulo::Table do
       header_styler: header_styler,
       row_divider_frequency: row_divider_frequency,
       styler: styler,
+      title: title,
       truncation_indicator: truncation_indicator,
       wrap_body_cells_to: wrap_body_cells_to,
       wrap_header_cells_to: wrap_header_cells_to,
@@ -35,6 +36,7 @@ describe Tabulo::Table do
   let(:header_styler) { nil }
   let(:row_divider_frequency) { nil }
   let(:styler) { nil }
+  let(:title) { nil }
   let(:truncation_indicator) { nil }
   let(:wrap_body_cells_to) { nil }
   let(:wrap_header_cells_to) { nil }
@@ -124,6 +126,25 @@ describe Tabulo::Table do
                │            4 │            8 │
                │            5 │           10 │
                └──────────────┴──────────────┘).gsub(/^ +/, "")
+        end
+
+        context "when the table also has a title" do
+          it "does not repeat the title" do
+            %q(┌─────────────────────────────┐
+               │           Numbers           │
+               ├──────────────┬──────────────┤
+               │       N      │    Doubled   │
+               ├──────────────┼──────────────┤
+               │            1 │            2 │
+               │            2 │            4 │
+               │            3 │            6 │
+               ├──────────────┼──────────────┤
+               │       N      │    Doubled   │
+               ├──────────────┼──────────────┤
+               │            4 │            8 │
+               │            5 │           10 │
+               └──────────────┴──────────────┘).gsub(/^ +/, "")
+          end
         end
       end
 
@@ -273,6 +294,65 @@ describe Tabulo::Table do
                  |            \033[31;1;4m5\033[0m |           \033[31;1;4m10\033[0m |           \033[32;4m15\033[0m |
                  +--------------+--------------+--------------+).gsub(/^ +/, "")
           end
+        end
+      end
+    end
+
+    describe "`title` param" do
+      context "when passed nil" do
+        let(:title) { nil }
+
+        it "does not display a table title" do
+          expect(table.to_s).to eq \
+            %q(+--------------+--------------+
+               |       N      |    Doubled   |
+               +--------------+--------------+
+               |            1 |            2 |
+               |            2 |            4 |
+               |            3 |            6 |
+               |            4 |            8 |
+               |            5 |           10 |
+               +--------------+--------------+).gsub(/^ +/, "")
+        end
+      end
+
+      context "when passed a string" do
+        let(:title) { "Numbers" }
+        let(:border) { :modern }
+
+        it "displays a title that aligns with the rest of the table" do
+          expect(table.to_s).to eq \
+            %q(┌─────────────────────────────┐
+               │           Numbers           │
+               ├──────────────┬──────────────┤
+               │       N      │    Doubled   │
+               ├──────────────┼──────────────┤
+               │            1 │            2 │
+               │            2 │            4 │
+               │            3 │            6 │
+               │            4 │            8 │
+               │            5 │           10 │
+               └──────────────┴──────────────┘).gsub(/^ +/, "")
+        end
+      end
+
+      context "when passed string that would overflow the table" do
+        let(:title) { "This table shows the numbers 1-5 and their doubles" }
+
+        it "displays a wrapped title" do
+          expect(table.to_s).to eq \
+            %q(+-----------------------------+
+               | This table shows the number |
+               |   s 1-5 and their doubles   |
+               +--------------+--------------+
+               |       N      |    Doubled   |
+               +--------------+--------------+
+               |            1 |            2 |
+               |            2 |            4 |
+               |            3 |            6 |
+               |            4 |            8 |
+               |            5 |           10 |
+               +--------------+--------------+).gsub(/^ +/, "")
         end
       end
     end
@@ -941,131 +1021,280 @@ describe Tabulo::Table do
     end
 
     describe "`border` param" do
-      let(:table) { Tabulo::Table.new([1, 2, 3], :to_i, :to_f, border: border) }
+      let(:table) { Tabulo::Table.new([1, 2, 3], :to_i, :to_f, border: border, title: title) }
 
-      context "when passed `nil`" do
-        let(:border) { nil }
+      context "when the table does not have a title" do
+        let(:title) { nil }
 
-        it "produces a table with borders consisting of ASCII characters" do
-          expect(table.to_s).to eq \
-            %q(+--------------+--------------+
-               |     to_i     |     to_f     |
-               +--------------+--------------+
-               |            1 |          1.0 |
-               |            2 |          2.0 |
-               |            3 |          3.0 |
-               +--------------+--------------+).gsub(/^ +/, "")
+        context "when passed `nil`" do
+          let(:border) { nil }
+
+          it "produces a table with borders consisting of ASCII characters" do
+            expect(table.to_s).to eq \
+              %q(+--------------+--------------+
+                 |     to_i     |     to_f     |
+                 +--------------+--------------+
+                 |            1 |          1.0 |
+                 |            2 |          2.0 |
+                 |            3 |          3.0 |
+                 +--------------+--------------+).gsub(/^ +/, "")
+          end
+        end
+
+        context "when passed `:ascii`" do
+          let(:border) { :ascii }
+
+          it "produces a table with borders consisting of ASCII characters" do
+            expect(table.to_s).to eq \
+              %q(+--------------+--------------+
+                 |     to_i     |     to_f     |
+                 +--------------+--------------+
+                 |            1 |          1.0 |
+                 |            2 |          2.0 |
+                 |            3 |          3.0 |
+                 +--------------+--------------+).gsub(/^ +/, "")
+          end
+        end
+
+        context "when passed `:classic`" do
+          let(:border) { :classic }
+
+          it "produces a table with borders consisting of ASCII characters, with no bottom border" do
+            expect(table.to_s).to eq \
+              %q(+--------------+--------------+
+                 |     to_i     |     to_f     |
+                 +--------------+--------------+
+                 |            1 |          1.0 |
+                 |            2 |          2.0 |
+                 |            3 |          3.0 |).gsub(/^ +/, "")
+          end
+        end
+
+        context "when passed `:reduced_ascii`" do
+          let(:border) { :reduced_ascii }
+
+          it "produces a table with borders consisting of ASCII characters, with no vertical lines" do
+            expect(table.to_s).to eq([
+                "-------------- --------------",
+                "     to_i           to_f     ",
+                "-------------- --------------",
+                "            1            1.0 ",
+                "            2            2.0 ",
+                "            3            3.0 ",
+                "-------------- --------------",
+            ].join($/))
+          end
+        end
+
+        context "when passed `:reduced_modern`" do
+          let(:border) { :reduced_modern }
+
+          it "produces a table with borders consisting of ASCII characters, with no vertical lines" do
+            expect(table.to_s).to eq([
+                "────────────── ──────────────",
+                "     to_i           to_f     ",
+                "────────────── ──────────────",
+                "            1            1.0 ",
+                "            2            2.0 ",
+                "            3            3.0 ",
+                "────────────── ──────────────",
+            ].join($/))
+          end
+        end
+
+        context "when passed `:markdown`" do
+          let(:border) { :markdown }
+
+          it "produces a Markdown table" do
+            expect(table.to_s).to eq \
+              %q(|     to_i     |     to_f     |
+                 |--------------|--------------|
+                 |            1 |          1.0 |
+                 |            2 |          2.0 |
+                 |            3 |          3.0 |).gsub(/^ +/, "")
+          end
+        end
+
+        context "when passed `:modern`" do
+          let(:border) { :modern }
+
+          it 'produces a table with smoothly joined "Unicode" borders' do
+            expect(table.to_s).to eq \
+              %q(┌──────────────┬──────────────┐
+                 │     to_i     │     to_f     │
+                 ├──────────────┼──────────────┤
+                 │            1 │          1.0 │
+                 │            2 │          2.0 │
+                 │            3 │          3.0 │
+                 └──────────────┴──────────────┘).gsub(/^ +/, "")
+          end
+        end
+
+        context "when passed `:blank`" do
+          let(:border) { :blank }
+
+          it "produces a table with no external or internal borders" do
+            # Using joined array of strings to work around editor auto-trimming trailing whitespace.
+            expect(table.to_s).to eq([
+              "     to_i          to_f     ",
+              "            1           1.0 ",
+              "            2           2.0 ",
+              "            3           3.0 "
+            ].join($/))
+          end
+        end
+
+        context "when passed an unrecognized value" do
+          let(:border) { :fence }
+
+          it "raises an InvalidBorderError" do
+            expect { table.to_s }.to raise_error(Tabulo::InvalidBorderError)
+          end
         end
       end
 
-      context "when passed `:ascii`" do
-        let(:border) { :ascii }
+      context "when the table has a title" do
+        let(:title) { "Numbers" }
 
-        it "produces a table with borders consisting of ASCII characters" do
-          expect(table.to_s).to eq \
-            %q(+--------------+--------------+
-               |     to_i     |     to_f     |
-               +--------------+--------------+
-               |            1 |          1.0 |
-               |            2 |          2.0 |
-               |            3 |          3.0 |
-               +--------------+--------------+).gsub(/^ +/, "")
+        context "when passed `nil`" do
+          let(:border) { nil }
+
+          it "produces a table with borders consisting of ASCII characters" do
+            expect(table.to_s).to eq \
+              %q(+-----------------------------+
+                 |           Numbers           |
+                 +--------------+--------------+
+                 |     to_i     |     to_f     |
+                 +--------------+--------------+
+                 |            1 |          1.0 |
+                 |            2 |          2.0 |
+                 |            3 |          3.0 |
+                 +--------------+--------------+).gsub(/^ +/, "")
+          end
         end
-      end
 
-      context "when passed `:classic`" do
-        let(:border) { :classic }
+        context "when passed `:ascii`" do
+          let(:border) { :ascii }
 
-        it "produces a table with borders consisting of ASCII characters, with no bottom border" do
-          expect(table.to_s).to eq \
-            %q(+--------------+--------------+
-               |     to_i     |     to_f     |
-               +--------------+--------------+
-               |            1 |          1.0 |
-               |            2 |          2.0 |
-               |            3 |          3.0 |).gsub(/^ +/, "")
+          it "produces a table with borders consisting of ASCII characters" do
+            expect(table.to_s).to eq \
+              %q(+-----------------------------+
+                 |           Numbers           |
+                 +--------------+--------------+
+                 |     to_i     |     to_f     |
+                 +--------------+--------------+
+                 |            1 |          1.0 |
+                 |            2 |          2.0 |
+                 |            3 |          3.0 |
+                 +--------------+--------------+).gsub(/^ +/, "")
+          end
         end
-      end
 
-      context "when passed `:reduced_ascii`" do
-        let(:border) { :reduced_ascii }
+        context "when passed `:classic`" do
+          let(:border) { :classic }
 
-        it "produces a table with borders consisting of ASCII characters, with no vertical lines" do
-          expect(table.to_s).to eq([
-              "-------------- --------------",
-              "     to_i           to_f     ",
-              "-------------- --------------",
-              "            1            1.0 ",
-              "            2            2.0 ",
-              "            3            3.0 ",
-              "-------------- --------------",
-          ].join($/))
+          it "produces a table with borders consisting of ASCII characters, with no bottom border" do
+            expect(table.to_s).to eq \
+              %q(+-----------------------------+
+                 |           Numbers           |
+                 +--------------+--------------+
+                 |     to_i     |     to_f     |
+                 +--------------+--------------+
+                 |            1 |          1.0 |
+                 |            2 |          2.0 |
+                 |            3 |          3.0 |).gsub(/^ +/, "")
+          end
         end
-      end
 
-      context "when passed `:reduced_modern`" do
-        let(:border) { :reduced_modern }
+        context "when passed `:reduced_ascii`" do
+          let(:border) { :reduced_ascii }
 
-        it "produces a table with borders consisting of ASCII characters, with no vertical lines" do
-          expect(table.to_s).to eq([
-              "────────────── ──────────────",
-              "     to_i           to_f     ",
-              "────────────── ──────────────",
-              "            1            1.0 ",
-              "            2            2.0 ",
-              "            3            3.0 ",
-              "────────────── ──────────────",
-          ].join($/))
+          it "produces a table with borders consisting of ASCII characters, with no vertical lines" do
+            expect(table.to_s).to eq([
+                "-----------------------------",
+                "           Numbers           ",
+                "-------------- --------------",
+                "     to_i           to_f     ",
+                "-------------- --------------",
+                "            1            1.0 ",
+                "            2            2.0 ",
+                "            3            3.0 ",
+                "-------------- --------------",
+            ].join($/))
+          end
         end
-      end
 
-      context "when passed `:markdown`" do
-        let(:border) { :markdown }
+        context "when passed `:reduced_modern`" do
+          let(:border) { :reduced_modern }
 
-        it "produces a Markdown table" do
-          expect(table.to_s).to eq \
-            %q(|     to_i     |     to_f     |
-               |--------------|--------------|
-               |            1 |          1.0 |
-               |            2 |          2.0 |
-               |            3 |          3.0 |).gsub(/^ +/, "")
+          it "produces a table with borders consisting of ASCII characters, with no vertical lines" do
+            expect(table.to_s).to eq([
+                "─────────────────────────────",
+                "           Numbers           ",
+                "────────────── ──────────────",
+                "     to_i           to_f     ",
+                "────────────── ──────────────",
+                "            1            1.0 ",
+                "            2            2.0 ",
+                "            3            3.0 ",
+                "────────────── ──────────────",
+            ].join($/))
+          end
         end
-      end
 
-      context "when passed `:modern`" do
-        let(:border) { :modern }
+        context "when passed `:markdown`" do
+          let(:border) { :markdown }
 
-        it 'produces a table with smoothly joined "Unicode" borders' do
-          expect(table.to_s).to eq \
-            %q(┌──────────────┬──────────────┐
-               │     to_i     │     to_f     │
-               ├──────────────┼──────────────┤
-               │            1 │          1.0 │
-               │            2 │          2.0 │
-               │            3 │          3.0 │
-               └──────────────┴──────────────┘).gsub(/^ +/, "")
+          it "produces a Markdown-like table (however Markdown doesn't support table title/caption so it won't "\
+            "actually be a valid Markdown table)" do
+            expect(table.to_s).to eq \
+              %q(|           Numbers           |
+                 |     to_i     |     to_f     |
+                 |--------------|--------------|
+                 |            1 |          1.0 |
+                 |            2 |          2.0 |
+                 |            3 |          3.0 |).gsub(/^ +/, "")
+          end
         end
-      end
 
-      context "when passed `:blank`" do
-        let(:border) { :blank }
+        context "when passed `:modern`" do
+          let(:border) { :modern }
 
-        it "produces a table with no external or internal borders" do
-          # Using joined array of strings to work around editor auto-trimming trailing whitespace.
-          expect(table.to_s).to eq([
-            "     to_i          to_f     ",
-            "            1           1.0 ",
-            "            2           2.0 ",
-            "            3           3.0 "
-          ].join($/))
+          it 'produces a table with smoothly joined "Unicode" borders' do
+            expect(table.to_s).to eq \
+              %q(┌─────────────────────────────┐
+                 │           Numbers           │
+                 ├──────────────┬──────────────┤
+                 │     to_i     │     to_f     │
+                 ├──────────────┼──────────────┤
+                 │            1 │          1.0 │
+                 │            2 │          2.0 │
+                 │            3 │          3.0 │
+                 └──────────────┴──────────────┘).gsub(/^ +/, "")
+          end
         end
-      end
 
-      context "when passed an unrecognized value" do
-        let(:border) { :fence }
+        context "when passed `:blank`" do
+          let(:border) { :blank }
 
-        it "raises an InvalidBorderError" do
-          expect { table.to_s }.to raise_error(Tabulo::InvalidBorderError)
+          it "produces a table with no external or internal borders" do
+            # Using joined array of strings to work around editor auto-trimming trailing whitespace.
+            expect(table.to_s).to eq([
+              "           Numbers          ",
+              "     to_i          to_f     ",
+              "            1           1.0 ",
+              "            2           2.0 ",
+              "            3           3.0 "
+            ].join($/))
+          end
+        end
+
+        context "when passed an unrecognized value" do
+          let(:border) { :fence }
+
+          it "raises an InvalidBorderError" do
+            expect { table.to_s }.to raise_error(Tabulo::InvalidBorderError)
+          end
         end
       end
     end
@@ -1849,7 +2078,7 @@ describe Tabulo::Table do
         )
 
         # Let's do a quick check to make sure that it will also expand the total table width if required.
-        small_table = Tabulo::Table.new(%w(hello goodbye), column_width: 3) do |t|
+        small_table = Tabulo::Table.new(%w[hello goodbye], column_width: 3) do |t|
           t.add_column("itself") { |s| s }
         end
         expect { small_table.pack }.to change(small_table, :to_s).from(
@@ -1870,6 +2099,37 @@ describe Tabulo::Table do
              | hello   |
              | goodbye |
              +---------+).gsub(/^ +/, "")
+        )
+      end
+
+      it "expands to accommodate the title if it's wider than the combined columns, by adding width 1-by-1 to "\
+        "the narrowest column, until it's wide enough" do
+        titled_table = Tabulo::Table.new(1..3, title: "Here are some numbers that are here") do |t|
+          t.add_column("N", width: 5) { |n| n }
+          t.add_column("X2", width: 18) { |n| n * 2 }
+        end
+
+        expect { titled_table.pack }.to change(titled_table, :to_s).from(
+          %q(+----------------------------+
+             | Here are some numbers that |
+             |           are here         |
+             +-------+--------------------+
+             |   N   |         X2         |
+             +-------+--------------------+
+             |     1 |                  2 |
+             |     2 |                  4 |
+             |     3 |                  6 |
+             +-------+--------------------+).gsub(/^ +/, "")
+        ).to(
+          %q(+-------------------------------------+
+             | Here are some numbers that are here |
+             +------------------+------------------+
+             |         N        |        X2        |
+             +------------------+------------------+
+             |                1 |                2 |
+             |                2 |                4 |
+             |                3 |                6 |
+             +------------------+------------------+).gsub(/^ +/, "")
         )
       end
     end

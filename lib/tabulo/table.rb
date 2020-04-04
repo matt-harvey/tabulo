@@ -49,7 +49,10 @@ module Tabulo
     #   If <tt>nil</tt>, then the value of {DEFAULT_BORDER} will be used.
     #   Possible values are:
     #   - `:ascii`          Uses ASCII characters only
-    #   - `:markdown`       Produces a GitHub-flavoured Markdown table
+    #   - `:markdown`       Produces a GitHub-flavoured Markdown table. Note: Using the `title`
+    #                       option in combination with this border type will cause the rendered
+    #                       table not to be valid Markdown, since Markdown engines do not generally
+    #                       support adding a caption element (i.e. title) to tables.
     #   - `:modern`         Uses non-ASCII Unicode characters to render a border with smooth continuous lines
     #   - `:blank`          No border characters are rendered
     #   - `:reduced_ascii`  Like `:ascii`, but without left or right borders, and with internal vertical
@@ -89,6 +92,10 @@ module Tabulo
     #   header row.
     # @param [nil, #to_proc] styler (nil) The default styler for columns in this table. See `styler`
     #   option of {#add_column} for details.
+    # @param [nil, String] title (nil) If passed a String, will arrange for a title to be shown at the top
+    #   of the table. Note: If the `border` option is set to `:markdown`, adding a title to the table
+    #   will cause it to cease being valid Markdown when rendered, since Markdown engines do not generally
+    #   support adding a caption element (i.e. title) to tables.
     # @param [nil, String] truncation_indicator Determines the character used to indicate that a
     #   cell's content has been truncated. If omitted or passed <tt>nil</tt>,
     #   defaults to {DEFAULT_TRUNCATION_INDICATOR}. If passed something other than <tt>nil</tt> or
@@ -110,7 +117,7 @@ module Tabulo
     def initialize(sources, *columns, align_body: :auto, align_header: :center, border: nil,
       border_styler: nil, column_padding: nil, column_width: nil, formatter: :to_s.to_proc,
       header_frequency: :start, header_styler: nil, row_divider_frequency: nil, styler: nil,
-      truncation_indicator: nil, wrap_body_cells_to: nil, wrap_header_cells_to: nil)
+      title: nil, truncation_indicator: nil, wrap_body_cells_to: nil, wrap_header_cells_to: nil)
 
       @sources = sources
 
@@ -130,6 +137,7 @@ module Tabulo
       @header_styler = header_styler
       @row_divider_frequency = row_divider_frequency
       @styler = styler
+      @title = title
       @truncation_indicator = validate_character(truncation_indicator,
         DEFAULT_TRUNCATION_INDICATOR, InvalidTruncationIndicatorError, "truncation indicator")
       @wrap_body_cells_to = wrap_body_cells_to
@@ -339,7 +347,8 @@ module Tabulo
       end
     end
 
-    # @return [String] an "ASCII" graphical representation of the Table column headers.
+    # @return [String] a graphical representation of the Table column headers formatted with fixed
+    #   width plain text.
     def formatted_header
       cells = get_columns.map(&:header_cell)
       format_row(cells, @wrap_header_cells_to)
@@ -348,9 +357,11 @@ module Tabulo
     # Produce a horizontal dividing line suitable for printing at the top, bottom or middle
     # of the table.
     #
-    # @param [:top, :middle, :bottom] position (:bottom) Specifies the position
-    #   for which the resulting horizontal dividing line is intended to be printed.
-    #   This determines the border characters that are used to construct the line.
+    # @param [:top, :middle, :bottom, :title_top, :title_bottom] position (:bottom)
+    #   Specifies the position for which the resulting horizontal dividing line is intended to
+    #   be printed. This determines the border characters that are used to construct the line.
+    #   The `:title_top` and `:title_bottom` options are used internally for adding borders
+    #   above and below the table title text.
     # @return [String] an "ASCII" graphical representation of a horizontal
     #   dividing line.
     # @example Print a horizontal divider between each pair of rows, and again at the bottom:
@@ -368,10 +379,13 @@ module Tabulo
       @border_instance.horizontal_rule(column_widths, position)
     end
 
-    # Reset all the column widths so that each column is *just* wide enough to accommodate
+    # Resets all the column widths so that each column is *just* wide enough to accommodate
     # its header text as well as the formatted content of each its cells for the entire
     # collection, together with a single character of padding on either side of the column,
-    # without any wrapping.
+    # without any wrapping. In addition, if the table has a title but is not wide enough to
+    # accommodate (without wrapping) the title text (with a character of padding either side),
+    # widens the columns roughly evenly until the table as a whole is just wide enough to
+    # accommodate the title text.
     #
     # Note that calling this method will cause the entire source Enumerable to
     # be traversed and all the column extractors and formatters to be applied in order
@@ -411,6 +425,15 @@ module Tabulo
         shrink_to(max_table_width == :auto ? TTY::Screen.width : max_table_width)
       end
 
+      if @title
+        expand_to(
+          Unicode::DisplayWidth.of(@title) +
+          @left_column_padding +
+          @right_column_padding +
+          (@border == :blank ? 0 : 2)
+        )
+      end
+
       self
     end
 
@@ -433,8 +456,8 @@ module Tabulo
     #   The following options are the same as the keyword params for the {#initialize} method for
     #   {Table}: <tt>column_width</tt>, <tt>column_padding</tt>, <tt>formatter</tt>,
     #   <tt>header_frequency</tt>, <tt>row_divider_frequency</tt>, <tt>wrap_header_cells_to</tt>,
-    #   <tt>wrap_body_cells_to</tt>, <tt>border</tt>, <tt>border_styler</tt>, <tt>truncation_indicator</tt>,
-    #   <tt>align_header</tt>, <tt>align_body</tt>.
+    #   <tt>wrap_body_cells_to</tt>, <tt>border</tt>, <tt>border_styler</tt>, <tt>title</tt>,
+    #   <tt>truncation_indicator</tt>, <tt>align_header</tt>, <tt>align_body</tt>.
     #   These are applied in the same way as documented for {#initialize}, when
     #   creating the new, transposed Table. Any options not specified explicitly in the call to {#transpose}
     #   will inherit their values from the original {Table} (with the exception of settings
@@ -459,8 +482,8 @@ module Tabulo
     # @raise [InvalidBorderError] if invalid argument passed to `border` parameter.
     def transpose(opts = {})
       default_opts = [:align_body, :align_header, :border, :border_styler, :column_padding, :column_width,
-        :formatter, :header_frequency, :row_divider_frequency, :truncation_indicator, :wrap_body_cells_to,
-        :wrap_header_cells_to].map do |sym|
+        :formatter, :header_frequency, :row_divider_frequency, :title, :truncation_indicator,
+        :wrap_body_cells_to, :wrap_header_cells_to].map do |sym|
         [sym, instance_variable_get("@#{sym}")]
       end.to_h
 
@@ -496,7 +519,16 @@ module Tabulo
       cells = get_columns.map.with_index { |c, i| c.body_cell(source, row_index: index, column_index: i) }
       inner = format_row(cells, @wrap_body_cells_to)
 
-      if header == :top
+      if @title && header == :top
+        join_lines([
+          horizontal_rule(:title_top),
+          formatted_title,
+          horizontal_rule(:title_bottom),
+          formatted_header,
+          horizontal_rule(:middle),
+          inner
+        ].reject(&:empty?))
+      elsif header == :top
         join_lines([
           horizontal_rule(:top),
           formatted_header,
@@ -548,6 +580,38 @@ module Tabulo
       @column_registry[label] = column
     end
 
+    # @visibility private
+    def formatted_title
+      columns = get_columns
+      num_fudged_columns = columns.count - 1
+      basic_width = columns.sum(&:width)
+      extra_for_internal_dividers = (@border == :blank ? 0 : 1)
+      extra_for_internal_padding = @left_column_padding + @right_column_padding
+      extra_total = num_fudged_columns * (extra_for_internal_dividers + extra_for_internal_padding)
+      title_cell_width = basic_width + extra_total
+      title_cell = Cell.new(
+        alignment: :center,
+        cell_data: nil,
+        formatter: -> (s) { s },
+        padding_character: PADDING_CHARACTER,
+        styler: -> (v, s) { s },
+        truncation_indicator: @truncation_indicator,
+        value: @title,
+        width: title_cell_width
+      )
+      cells = [title_cell]
+      max_cell_height = cells.map(&:height).max
+      row_height = ([nil, max_cell_height].compact.min || 1)
+      subcell_stacks = cells.map do |cell|
+        cell.padded_truncated_subcells(row_height, @left_column_padding, @right_column_padding)
+      end
+      subrows = subcell_stacks.transpose.map do |subrow_components|
+        @border_instance.join_cell_contents(subrow_components)
+      end
+
+      join_lines(subrows)
+    end
+
     # @!visibility private
     def normalize_column_label(label)
       case label
@@ -555,6 +619,25 @@ module Tabulo
         label
       when String
         label.to_sym
+      end
+    end
+
+    # @!visibility private
+    def expand_to(min_table_width)
+      columns = get_columns
+      num_columns = columns.count
+      total_columns_width = columns.inject(0) { |sum, column| sum + column.width }
+      total_padding = num_columns * total_column_padding
+      total_borders = num_columns + 1
+      unadjusted_table_width = total_columns_width + total_padding + total_borders
+      required_increase = Util.max(min_table_width - unadjusted_table_width, 0)
+
+      required_increase.times do
+        narrowest_column = columns.inject(columns.first) do |narrowest, column|
+          column.width <= narrowest.width ? column : narrowest
+        end
+
+        narrowest_column.width += 1
       end
     end
 

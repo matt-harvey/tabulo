@@ -115,6 +115,10 @@ module Tabulo
     def horizontal_rule(column_widths, position = :bottom)
       left, center, right, segment =
         case position
+        when :title_top
+          [@corner_top_left, @edge_top, @corner_top_right, @edge_top]
+        when :title_bottom
+          [@tee_left, @tee_top, @tee_right, @edge_top]
         when :top
           [@corner_top_left, @tee_top, @corner_top_right, @edge_top]
         when :middle
@@ -123,6 +127,11 @@ module Tabulo
           [@corner_bottom_left, @tee_bottom, @corner_bottom_right, @edge_bottom]
         end
       segments = column_widths.map { |width| segment * width }
+
+      # Prevent weird bottom edge of title if segments empty but right/left not empty, as in
+      # Markdown border.
+      left = right = "" if segments.all?(&:empty?)
+
       style("#{left}#{segments.join(center)}#{right}")
     end
 
