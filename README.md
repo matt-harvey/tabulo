@@ -261,7 +261,7 @@ table. However, if you want to insert a new column into some other position, you
 `before` option, passing the label of the column to the left of which you want the new column to be added:
 
 ```ruby
-table = Table::Table.new([1, 2, 3], :itself, :odd?)
+table = Tabulo::Table.new([1, 2, 3], :itself, :odd?)
 table.add_column(:even?, before: :odd?)
 ```
 
