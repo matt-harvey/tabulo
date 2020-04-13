@@ -94,6 +94,7 @@ Tabulo has also been ported to Crystal (with some modifications): see [Tablo](ht
      * [Colours and other styling](#colours-and-styling)
         * [Styling cell content](#styling-cell-content)
         * [Styling column headers](#styling-column-headers)
+        * [Styling the table title](#styling-title)
         * [Setting default styles](#default-styles)
         * [Styling borders](#border-styling)
      * [Repeating headers](#repeating-headers)
@@ -693,6 +694,16 @@ table.add_column(:even?, header_styler: -> (s) { "\033[32m#{s}\033[0m" })
 The `header_styler` option accepts either a 1- or 2-parameter callable. See the
 [documentation](https://www.rubydoc.info/gems/tabulo/2.4.1/Tabulo/Table#add_column-instance_method)
 for details.
+```
+
+<a name="styling-title"></a>
+#### Styling the table title
+
+To apply colours or other styling to the table title, if present, use the `title_styler` option
+when initializing the table. This accepts a single-parameter callable:
+
+```ruby
+table = Tabulo::Table.new(1..5, :itself, :even?, :odd?, title_styler: -> (s) { "\033[32m#{s}\033[0m" })
 
 <a name="default-styles"></a>
 #### Setting default styles

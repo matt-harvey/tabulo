@@ -18,6 +18,7 @@ describe Tabulo::Table do
       row_divider_frequency: row_divider_frequency,
       styler: styler,
       title: title,
+      title_styler: title_styler,
       truncation_indicator: truncation_indicator,
       wrap_body_cells_to: wrap_body_cells_to,
       wrap_header_cells_to: wrap_header_cells_to,
@@ -37,6 +38,7 @@ describe Tabulo::Table do
   let(:row_divider_frequency) { nil }
   let(:styler) { nil }
   let(:title) { nil }
+  let(:title_styler) { nil }
   let(:truncation_indicator) { nil }
   let(:wrap_body_cells_to) { nil }
   let(:wrap_header_cells_to) { nil }
@@ -293,6 +295,71 @@ describe Tabulo::Table do
                  |            \033[31;1;4m4\033[0m |            \033[31;1;4m8\033[0m |           \033[32;4m12\033[0m |
                  |            \033[31;1;4m5\033[0m |           \033[31;1;4m10\033[0m |           \033[32;4m15\033[0m |
                  +--------------+--------------+--------------+).gsub(/^ +/, "")
+          end
+        end
+      end
+    end
+
+    describe "`title_styler` param" do
+      context "when the table has a title" do
+        let(:title) { "Numbers" }
+
+        context "when passed nil" do
+          let(:title_styler) { nil }
+
+          it "has no effect" do
+            expect(table.to_s).to eq \
+              %Q(+-----------------------------+
+                 |           Numbers           |
+                 +--------------+--------------+
+                 |       N      |    Doubled   |
+                 +--------------+--------------+
+                 |            1 |            2 |
+                 |            2 |            4 |
+                 |            3 |            6 |
+                 |            4 |            8 |
+                 |            5 |           10 |
+                 +--------------+--------------+).gsub(/^ +/, "")
+          end
+        end
+
+        context "when passed a callable" do
+          let(:title_styler) { -> (str) { "\033[31;1;4m#{str}\033[0m" } }
+
+          it "applies styling to the title, without affecting table width calculations" do
+            expect(table.to_s).to eq \
+              %Q(+-----------------------------+
+                 |           \033[31;1;4mNumbers\033[0m           |
+                 +--------------+--------------+
+                 |       N      |    Doubled   |
+                 +--------------+--------------+
+                 |            1 |            2 |
+                 |            2 |            4 |
+                 |            3 |            6 |
+                 |            4 |            8 |
+                 |            5 |           10 |
+                 +--------------+--------------+).gsub(/^ +/, "")
+          end
+        end
+      end
+
+      context "when the table does not have a title" do
+        let(:title) { nil }
+
+        context "even when `title_styler` is passed a callable" do
+          let(:title_styler) { -> (str) { "\033[31;1;4m#{str}\033[0m" } }
+
+          it "has no effect" do
+            expect(table.to_s).to eq \
+              %Q(+--------------+--------------+
+                 |       N      |    Doubled   |
+                 +--------------+--------------+
+                 |            1 |            2 |
+                 |            2 |            4 |
+                 |            3 |            6 |
+                 |            4 |            8 |
+                 |            5 |           10 |
+                 +--------------+--------------+).gsub(/^ +/, "")
           end
         end
       end

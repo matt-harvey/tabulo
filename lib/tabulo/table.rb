@@ -96,6 +96,15 @@ module Tabulo
     #   of the table. Note: If the `border` option is set to `:markdown`, adding a title to the table
     #   will cause it to cease being valid Markdown when rendered, since Markdown engines do not generally
     #   support adding a caption element (i.e. title) to tables.
+    # @param [nil, #to_proc] title_styler (nil) A lambda or other callable object that will
+    #   determine the colors or other styling applied to the table title. If the table doesn't have
+    #   a title, this parameter has no effect. If passed a single-parameter callable, then that
+    #   callable will be called for each line of content within the title, and the resulting string
+    #   rendered in place of that line.
+    #   The extra width of the string returned by the <tt>title_styler</tt> is not taken into
+    #   consideration by the internal table width calculations involved in rendering the
+    #   table. Thus it can be used to apply ANSI escape codes to title content, to color the
+    #   title for example, without breaking the table formatting.
     # @param [nil, String] truncation_indicator Determines the character used to indicate that a
     #   cell's content has been truncated. If omitted or passed <tt>nil</tt>,
     #   defaults to {DEFAULT_TRUNCATION_INDICATOR}. If passed something other than <tt>nil</tt> or
@@ -117,7 +126,8 @@ module Tabulo
     def initialize(sources, *columns, align_body: :auto, align_header: :center, border: nil,
       border_styler: nil, column_padding: nil, column_width: nil, formatter: :to_s.to_proc,
       header_frequency: :start, header_styler: nil, row_divider_frequency: nil, styler: nil,
-      title: nil, truncation_indicator: nil, wrap_body_cells_to: nil, wrap_header_cells_to: nil)
+      title: nil, title_styler: nil, truncation_indicator: nil, wrap_body_cells_to: nil,
+      wrap_header_cells_to: nil)
 
       @sources = sources
 
@@ -138,6 +148,7 @@ module Tabulo
       @row_divider_frequency = row_divider_frequency
       @styler = styler
       @title = title
+      @title_styler = title_styler
       @truncation_indicator = validate_character(truncation_indicator,
         DEFAULT_TRUNCATION_INDICATOR, InvalidTruncationIndicatorError, "truncation indicator")
       @wrap_body_cells_to = wrap_body_cells_to
@@ -426,12 +437,7 @@ module Tabulo
       end
 
       if @title
-        expand_to(
-          Unicode::DisplayWidth.of(@title) +
-          @left_column_padding +
-          @right_column_padding +
-          (@border == :blank ? 0 : 2)
-        )
+        expand_to(Unicode::DisplayWidth.of(@title) + total_column_padding + (@border == :blank ? 0 : 2))
       end
 
       self
@@ -457,7 +463,7 @@ module Tabulo
     #   {Table}: <tt>column_width</tt>, <tt>column_padding</tt>, <tt>formatter</tt>,
     #   <tt>header_frequency</tt>, <tt>row_divider_frequency</tt>, <tt>wrap_header_cells_to</tt>,
     #   <tt>wrap_body_cells_to</tt>, <tt>border</tt>, <tt>border_styler</tt>, <tt>title</tt>,
-    #   <tt>truncation_indicator</tt>, <tt>align_header</tt>, <tt>align_body</tt>.
+    #   <tt>title_styler</tt>, <tt>truncation_indicator</tt>, <tt>align_header</tt>, <tt>align_body</tt>.
     #   These are applied in the same way as documented for {#initialize}, when
     #   creating the new, transposed Table. Any options not specified explicitly in the call to {#transpose}
     #   will inherit their values from the original {Table} (with the exception of settings
@@ -482,7 +488,7 @@ module Tabulo
     # @raise [InvalidBorderError] if invalid argument passed to `border` parameter.
     def transpose(opts = {})
       default_opts = [:align_body, :align_header, :border, :border_styler, :column_padding, :column_width,
-        :formatter, :header_frequency, :row_divider_frequency, :title, :truncation_indicator,
+        :formatter, :header_frequency, :row_divider_frequency, :title, :title_styler, :truncation_indicator,
         :wrap_body_cells_to, :wrap_header_cells_to].map do |sym|
         [sym, instance_variable_get("@#{sym}")]
       end.to_h
@@ -589,12 +595,18 @@ module Tabulo
       extra_for_internal_padding = @left_column_padding + @right_column_padding
       extra_total = num_fudged_columns * (extra_for_internal_dividers + extra_for_internal_padding)
       title_cell_width = basic_width + extra_total
+      styler =
+        if @title_styler
+          -> (v, s) { @title_styler.call(s) }
+        else
+          -> (v, s) { s }
+        end
       title_cell = Cell.new(
         alignment: :center,
         cell_data: nil,
         formatter: -> (s) { s },
         padding_character: PADDING_CHARACTER,
-        styler: -> (v, s) { s },
+        styler: styler,
         truncation_indicator: @truncation_indicator,
         value: @title,
         width: title_cell_width
