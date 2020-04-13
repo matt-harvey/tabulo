@@ -43,6 +43,8 @@ module Tabulo
     # @param [:left, :right, :center] align_header (:center) Determines the alignment of header text
     #   for columns in this Table. Can be overridden for individual columns using the
     #   <tt>align_header</tt> option passed to {#add_column}
+    # @param [:left, :right, :center] align_header (:center) Determines the alignment of the table
+    #   title, if present.
     # @param [:ascii, :markdown, :modern, :blank, nil] border (nil) Determines the characters used
     #   for the Table border, including both the characters around the outside of table, and the lines drawn
     #   within the table to separate columns from each other and the header row from the Table body.
@@ -123,8 +125,8 @@ module Tabulo
     # @return [Table] a new {Table}
     # @raise [InvalidColumnLabelError] if non-unique Symbols are provided to columns.
     # @raise [InvalidBorderError] if invalid option passed to `border` parameter.
-    def initialize(sources, *columns, align_body: :auto, align_header: :center, border: nil,
-      border_styler: nil, column_padding: nil, column_width: nil, formatter: :to_s.to_proc,
+    def initialize(sources, *columns, align_body: :auto, align_header: :center, align_title: :center,
+      border: nil, border_styler: nil, column_padding: nil, column_width: nil, formatter: :to_s.to_proc,
       header_frequency: :start, header_styler: nil, row_divider_frequency: nil, styler: nil,
       title: nil, title_styler: nil, truncation_indicator: nil, wrap_body_cells_to: nil,
       wrap_header_cells_to: nil)
@@ -133,6 +135,7 @@ module Tabulo
 
       @align_body = align_body
       @align_header = align_header
+      @align_title = align_title
       @border = (border || DEFAULT_BORDER)
       @border_styler = border_styler
       @border_instance = Border.from(@border, @border_styler)
@@ -463,7 +466,8 @@ module Tabulo
     #   {Table}: <tt>column_width</tt>, <tt>column_padding</tt>, <tt>formatter</tt>,
     #   <tt>header_frequency</tt>, <tt>row_divider_frequency</tt>, <tt>wrap_header_cells_to</tt>,
     #   <tt>wrap_body_cells_to</tt>, <tt>border</tt>, <tt>border_styler</tt>, <tt>title</tt>,
-    #   <tt>title_styler</tt>, <tt>truncation_indicator</tt>, <tt>align_header</tt>, <tt>align_body</tt>.
+    #   <tt>title_styler</tt>, <tt>truncation_indicator</tt>, <tt>align_header</tt>, <tt>align_body</tt>,
+    #   <tt>align_title</tt>.
     #   These are applied in the same way as documented for {#initialize}, when
     #   creating the new, transposed Table. Any options not specified explicitly in the call to {#transpose}
     #   will inherit their values from the original {Table} (with the exception of settings
@@ -487,9 +491,9 @@ module Tabulo
     # @return [Table] a new {Table}
     # @raise [InvalidBorderError] if invalid argument passed to `border` parameter.
     def transpose(opts = {})
-      default_opts = [:align_body, :align_header, :border, :border_styler, :column_padding, :column_width,
-        :formatter, :header_frequency, :row_divider_frequency, :title, :title_styler, :truncation_indicator,
-        :wrap_body_cells_to, :wrap_header_cells_to].map do |sym|
+      default_opts = [:align_body, :align_header, :align_title, :border, :border_styler, :column_padding,
+        :column_width, :formatter, :header_frequency, :row_divider_frequency, :title, :title_styler,
+        :truncation_indicator, :wrap_body_cells_to, :wrap_header_cells_to].map do |sym|
         [sym, instance_variable_get("@#{sym}")]
       end.to_h
 
@@ -602,7 +606,7 @@ module Tabulo
           -> (v, s) { s }
         end
       title_cell = Cell.new(
-        alignment: :center,
+        alignment: @align_title,
         cell_data: nil,
         formatter: -> (s) { s },
         padding_character: PADDING_CHARACTER,

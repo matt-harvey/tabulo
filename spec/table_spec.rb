@@ -1040,6 +1040,62 @@ describe Tabulo::Table do
       end
     end
 
+    describe "`align_title` param" do
+      let(:table) do
+        Tabulo::Table.new(
+          source,
+          align_title: :left,
+          border: border,
+          column_padding: column_padding,
+          column_width: column_width,
+          header_frequency: header_frequency,
+          title: title,
+          truncation_indicator: truncation_indicator,
+          wrap_body_cells_to: wrap_body_cells_to,
+          wrap_header_cells_to: wrap_header_cells_to,
+        ) do |t|
+          t.add_column("N") { |n| n }
+          t.add_column("Doubled") { |n| n * 2 }
+        end
+      end
+
+      context "when the table has a title" do
+        let(:title) { "Numbers" }
+
+        it "sets the alignment for table title" do
+          expect(table.to_s).to eq \
+            %q(+-----------------------------+
+               | Numbers                     |
+               +--------------+--------------+
+               |       N      |    Doubled   |
+               +--------------+--------------+
+               |            1 |            2 |
+               |            2 |            4 |
+               |            3 |            6 |
+               |            4 |            8 |
+               |            5 |           10 |
+               +--------------+--------------+).gsub(/^ +/, "")
+        end
+      end
+
+      context "when the table does not have a title" do
+        let(:title) { nil }
+
+        it "has no effect" do
+          expect(table.to_s).to eq \
+            %q(+--------------+--------------+
+               |       N      |    Doubled   |
+               +--------------+--------------+
+               |            1 |            2 |
+               |            2 |            4 |
+               |            3 |            6 |
+               |            4 |            8 |
+               |            5 |           10 |
+               +--------------+--------------+).gsub(/^ +/, "")
+        end
+      end
+    end
+
     describe "`align_body` param" do
       let(:table) do
         Tabulo::Table.new(

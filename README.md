@@ -337,6 +337,13 @@ passing similarly-named options to `add_column`, e.g.:
 table.add_column("Doubled", align_header: :right, align_body: :left) { |n| n * 2 }
 ```
 
+If a table title is present, it is center-aligned by default. This can be changed using the
+`align_title` option when initializing the table:
+
+```ruby
+table = Tabulo::Table.new([1, 2], :itself, :even?, title: "Numbers", align_title: :left)
+```
+
 ### Column width, wrapping and truncation
 
 <a name="fixed-column-widths"></a>
@@ -703,7 +710,7 @@ To apply colours or other styling to the table title, if present, use the `title
 when initializing the table. This accepts a single-parameter callable:
 
 ```ruby
-table = Tabulo::Table.new(1..5, :itself, :even?, :odd?, title_styler: -> (s) { "\033[32m#{s}\033[0m" })
+table = Tabulo::Table.new(1..5, :itself, :even?, :odd?, title: "Numbers", title_styler: -> (s) { "\033[32m#{s}\033[0m" })
 
 <a name="default-styles"></a>
 #### Setting default styles
