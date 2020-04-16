@@ -108,7 +108,7 @@ module Tabulo
 
     # @!visibility private
     def self.from(initializer, styler = nil)
-      new(options(initializer).merge(styler: styler))
+      new(**options(initializer).merge(styler: styler))
     end
 
     # @!visibility private
