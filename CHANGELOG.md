@@ -1,5 +1,11 @@
 # Changelog
 
+### v2.4.1
+
+* Fix warnings under Ruby 2.7
+* Fix minor error in README
+* Minor documentation tweaks
+
 ### v2.4.0
 
 * Add additional, optional `CellData` parameter to `styler` and `formatter` callbacks
