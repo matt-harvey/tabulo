@@ -594,7 +594,7 @@ module Tabulo
     def formatted_title
       columns = get_columns
       num_fudged_columns = columns.count - 1
-      basic_width = columns.sum(&:width)
+      basic_width = columns.inject(0) { |total_width, column| total_width + column.width }
       extra_for_internal_dividers = (@border == :blank ? 0 : 1)
       extra_for_internal_padding = @left_column_padding + @right_column_padding
       extra_total = num_fudged_columns * (extra_for_internal_dividers + extra_for_internal_padding)
