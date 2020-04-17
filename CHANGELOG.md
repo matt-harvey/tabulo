@@ -1,5 +1,9 @@
 # Changelog
 
+### v2.5.0
+
+* Add option of table title, together with options for styling and aligning the title
+
 ### v2.4.1
 
 * Fix warnings under Ruby 2.7
