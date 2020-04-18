@@ -292,11 +292,10 @@ table.remove_column(:even?)
 <a name="title"></a>
 ### Adding a title
 
-You can optionally give your table a title, using the `title` option when initializing the table:
+You can give your table a title, using the `title` option:
 
 ```ruby
-table = Tabulo::Table.new([1, 2, 3], :itself, :odd?, title: "Numbers")
-table.add_column(:even?, before: :odd?)
+table = Tabulo::Table.new([1, 2, 3], :itself, :even?, :odd?, title: "Numbers")
 ```
 
 ```
