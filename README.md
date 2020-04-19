@@ -90,6 +90,7 @@ Tabulo has also been ported to Crystal (with some modifications): see [Tablo](ht
         * [Automating column widths](#automating-column-widths)
         * [Configuring padding](#configuring-padding)
         * [Overflow handling](#overflow-handling)
+        * [Manual cell wrapping](#manual-wrapping)
      * [Formatting cell values](#formatting-cell-values)
      * [Colours and other styling](#colours-and-styling)
         * [Styling cell content](#styling-cell-content)
@@ -570,6 +571,32 @@ table = Tabulo::Table.new(
 
 The character used to indicate truncation, which defaults to `~`, can be configured using the
 `truncation_indicator` option passed to `Table.new`.
+
+<a name="manual-wrapping"></a>
+#### Manual cell wrapping
+
+You can &ldquo;manually&rdquo; wrap the content of a title, header or body cell at a particular
+point, simply by placing a newline character at that point:
+
+```ruby
+table = Tabulo::Table.new(1..3) do |t|
+  t.add_column("The number\nitself", &:itself)
+  t.add_column("Even?", &:even?)
+  t.add_column("Odd?", &:odd?)
+end
+```
+
+```
+> puts table
++--------------+--------------+--------------+
+|  The number  |     Even?    |     Odd?     |
+|    itself    |              |              |
++--------------+--------------+--------------+
+|            1 |     false    |     true     |
+|            2 |     true     |     false    |
+|            3 |     false    |     true     |
++--------------+--------------+--------------+
+```
 
 <a name="formatting-cell-values"></a>
 ### Formatting cell values
