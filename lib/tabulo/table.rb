@@ -331,7 +331,7 @@ module Tabulo
       if column_registry.any?
         bottom_edge = horizontal_rule(:bottom)
         rows = map(&:to_s)
-        bottom_edge.empty? ? join_lines(rows) : join_lines(rows + [bottom_edge])
+        bottom_edge.empty? ? Util.join_lines(rows) : Util.join_lines(rows + [bottom_edge])
       else
         ""
       end
@@ -425,22 +425,21 @@ module Tabulo
     #   Table will refuse to shrink itself.
     # @return [Table] the Table itself
     def pack(max_table_width: :auto)
-      get_columns.each { |column| column.width = wrapped_width(column.header) }
+      get_columns.each { |column| column.width = Util.wrapped_width(column.header) }
 
       @sources.each_with_index do |source, row_index|
         get_columns.each_with_index do |column, column_index|
           cell = column.body_cell(source, row_index: row_index, column_index: column_index)
-          cell_width = wrapped_width(cell.formatted_content)
+          cell_width = Util.wrapped_width(cell.formatted_content)
           column.width = Util.max(column.width, cell_width)
         end
       end
 
-      if max_table_width
-        shrink_to(max_table_width == :auto ? TTY::Screen.width : max_table_width)
-      end
+      shrink_to(max_table_width == :auto ? TTY::Screen.width : max_table_width) if max_table_width
 
       if @title
-        expand_to(Unicode::DisplayWidth.of(@title) + total_column_padding + (@border == :blank ? 0 : 2))
+        border_edge_width = (@border == :blank ? 0 : 2)
+        expand_to(Unicode::DisplayWidth.of(@title) + total_column_padding + border_edge_width)
       end
 
       self
@@ -530,33 +529,14 @@ module Tabulo
       inner = format_row(cells, @wrap_body_cells_to)
 
       if @title && header == :top
-        join_lines([
-          horizontal_rule(:title_top),
-          formatted_title,
-          horizontal_rule(:title_bottom),
-          formatted_header,
-          horizontal_rule(:middle),
-          inner
-        ].reject(&:empty?))
+        Util.condense_lines([horizontal_rule(:title_top), formatted_title, horizontal_rule(:title_bottom),
+          formatted_header, horizontal_rule(:middle), inner])
       elsif header == :top
-        join_lines([
-          horizontal_rule(:top),
-          formatted_header,
-          horizontal_rule(:middle),
-          inner
-        ].reject(&:empty?))
+        Util.condense_lines([horizontal_rule(:top), formatted_header, horizontal_rule(:middle), inner])
       elsif header
-        join_lines([
-          horizontal_rule(:middle),
-          formatted_header,
-          horizontal_rule(:middle),
-          inner
-        ].reject(&:empty?))
+        Util.condense_lines([horizontal_rule(:middle), formatted_header, horizontal_rule(:middle), inner])
       elsif divider
-        join_lines([
-          horizontal_rule(:middle),
-          inner
-        ].reject(&:empty?))
+        Util.condense_lines([horizontal_rule(:middle), inner])
       else
         inner
       end
@@ -625,7 +605,7 @@ module Tabulo
         @border_instance.join_cell_contents(subrow_components)
       end
 
-      join_lines(subrows)
+      Util.join_lines(subrows)
     end
 
     # @!visibility private
@@ -709,12 +689,7 @@ module Tabulo
         @border_instance.join_cell_contents(subrow_components)
       end
 
-      join_lines(subrows)
-    end
-
-    # @!visibility private
-    def join_lines(lines)
-      lines.join($/)  # join strings with cross-platform newline
+      Util.join_lines(subrows)
     end
 
     # @!visibility private
@@ -732,13 +707,5 @@ module Tabulo
       c
     end
 
-    # @!visibility private
-    # @return [Integer] the length of the longest segment of str when split by newlines
-    def wrapped_width(str)
-      segments = str.split($/)
-      segments.inject(1) do |longest_length_so_far, segment|
-        Util.max(longest_length_so_far, Unicode::DisplayWidth.of(segment))
-      end
-    end
   end
 end
