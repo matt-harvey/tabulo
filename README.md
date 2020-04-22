@@ -1,4 +1,3 @@
-<a name="top"></a>
 # Tabulo
 
 [![Gem Version][GV img]][Gem Version]
@@ -127,8 +126,6 @@ Or install it yourself:
 
     $ gem install tabulo
 
-[\[return to top\]](#top)
-
 ## Detailed usage
 
 ### Requiring the gem
@@ -151,8 +148,6 @@ other_table = Tabulo::Table.new(User.all)
 ```
 
 For the table to be useful, however, it must also contain columns&hellip;
-
-[\[return to top\]](#top)
 
 <a name="adding-columns"></a>
 ### Adding columns
@@ -178,8 +173,6 @@ table = Tabulo::Table.new([1, 2, 5], :itself, :even?, :odd?)
 |            5 |     false    |     true     |
 +--------------+--------------+--------------+
 ```
-
-[\[return to top\]](#top)
 
 <a name="full-api"></a>
 #### Full API
@@ -297,8 +290,6 @@ the label of the column you want to remove:
 table.remove_column(:even?)
 ```
 
-[\[return to top\]](#top)
-
 <a name="title"></a>
 ### Adding a title
 
@@ -324,8 +315,6 @@ table = Tabulo::Table.new([1, 2, 3], :itself, :even?, :odd?, title: "Numbers")
 There is a caveat: Using the `title` option with the `:markdown` [border type](#borders) will cause
 the rendered table to cease being valid Markdown, as unfortunately almost no markdown engines support
 adding a captions (i.e. titles) to tables.
-
-[\[return to top\]](#top)
 
 <a name="cell-alignment"></a>
 ### Cell alignment
@@ -354,8 +343,6 @@ If a table title is present, it is center-aligned by default. This can be change
 ```ruby
 table = Tabulo::Table.new([1, 2], :itself, :even?, title: "Numbers", align_title: :left)
 ```
-
-[\[return to top\]](#top)
 
 ### Column width, wrapping and truncation
 
@@ -675,8 +662,6 @@ containing additional information about the cell that may be useful in determini
 it&mdash;see the [documentation](https://www.rubydoc.info/gems/tabulo/2.5.0/Tabulo/CellData.html)
 for details.
 
-[\[return to top\]](#top)
-
 <a name="colours-and-styling"></a>
 ### Colours and other styling
 
@@ -779,8 +764,6 @@ table = Tabulo::Table.new(1..5, :itself, :even?, :odd?, header_styler: -> (s) { 
 Now, all columns in the table will have automatically have green header text, unless overridden
 by another header styler being passed to `#add_column`.
 
-[\[return to top\]](#top)
-
 <a name="repeating-headers"></a>
 ### Repeating headers
 
@@ -818,8 +801,6 @@ table = Tabulo::Table.new(1..10, :itself, :even?, header_frequency: 5)
 
 Note that if the table has a [title](#title), it will not be repeated; only column headers are repeated.
 
-[\[return to top\]](#top)
-
 <a name="enumerator"></a>
 ### Using a Table Enumerator
 
@@ -848,8 +829,6 @@ Note the use of `.find_each`: we can start printing the table without having to 
 underlying collection. (This is negated if we [pack](#pack) the table, however, since
 in that case the entire collection must be traversed up front in order for column widths to be
 calculated.)
-
-[\[return to top\]](#top)
 
 <a name="accessing-cell-values"></a>
 ### Accessing cell values
@@ -887,8 +866,6 @@ table.each do |row|
 end
 ```
 
-[\[return to top\]](#top)
-
 <a name="accessing-sources"></a>
 ### Accessing the underlying enumerable
 
@@ -924,8 +901,6 @@ table.each do |row|
 end
 ```
 
-[\[return to top\]](#top)
-
 <a name="transposition"></a>
 ### Transposing rows and columns
 
@@ -956,8 +931,6 @@ By default, a header row is added to the new table, showing the string value of 
 represented in that column. This can be configured, however, along with other aspects of
 `transpose`&#8217;s behaviour. For details, see the
 [documentation](https://www.rubydoc.info/gems/tabulo/2.5.0/Tabulo/Table#transpose-instance_method).
-
-[\[return to top\]](#top)
 
 <a name="borders"></a>
 ### Configuring borders
@@ -1128,8 +1101,6 @@ but without a bottom border:
 Note that, by default, none of the border options includes lines drawn _between_ rows in the body of the table.
 These are configured via a separate option: see [below](#dividers).
 
-[\[return to top\]](#top)
-
 <a name="dividers"></a>
 ### Row dividers
 
@@ -1168,8 +1139,6 @@ If you want a line before every row, pass `1` to `row_divider_frequency`. For ex
 │            3 │     false    │     true     │
 └──────────────┴──────────────┴──────────────┘
 ```
-
-[\[return to top\]](#top)
 
 <a name="freezing-a-table"></a>
 ### Using a table as a snapshot rather than as a dynamic view
@@ -1240,8 +1209,6 @@ rather than the table itself:
 ```ruby
 rendered_table = Tabulo::Table.new(1..10, :itself, :even?, :odd?).pack.to_s
 ```
-
-[\[return to top\]](#top)
 
 <a name="motivation"></a>
 ## Comparison with other libraries
@@ -1328,8 +1295,6 @@ well suited to quickly displaying ActiveRecord collections from the Rails consol
 environment seems cumbersome. Moreover, it seems no longer to be maintained. At the time of writing,
 its last commit was in March 2015.
 
-[\[return to top\]](#top)
-
 <a name="contributing"></a>
 ## Contributing
 
@@ -1341,8 +1306,6 @@ install dependencies.
 `bin/console` will give you an interactive prompt that will allow you to experiment; and
 `bundle exec rake spec` will run the test suite. For a list of other Rake tasks that are available in
 the development environment, run `bundle exec rake -T`.
-
-[\[return to top\]](#top)
 
 ## License
 
