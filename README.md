@@ -738,6 +738,16 @@ when initializing the table. This accepts a single-parameter callable:
 table = Tabulo::Table.new(1..5, :itself, :even?, :odd?, title: "Numbers", title_styler: -> (s) { "\033[32m#{s}\033[0m" })
 ```
 
+<a name="border-styling"></a>
+#### Styling borders
+
+Styling can also be applied to borders and dividing lines, using the `border_styler` option when
+initializing the table, e.g.:
+
+```ruby
+table = Tabulo::Table.new(1..5, :itself, :even?, :odd?, border_styler: -> (s) { "\033[32m#{s}\033[0m" })
+```
+
 <a name="default-styles"></a>
 #### Setting default styles
 
@@ -753,16 +763,6 @@ table = Tabulo::Table.new(1..5, :itself, :even?, :odd?, header_styler: -> (s) { 
 
 Now, all columns in the table will have automatically have green header text, unless overridden
 by another header styler being passed to `#add_column`.
-
-<a name="border-styling"></a>
-#### Styling borders
-
-Styling can also be applied to borders and dividing lines, using the `border_styler` option when
-initializing the table, e.g.:
-
-```ruby
-table = Tabulo::Table.new(1..5, :itself, :even?, :odd?, border_styler: -> (s) { "\033[32m#{s}\033[0m" })
-```
 
 <a name="repeating-headers"></a>
 ### Repeating headers
