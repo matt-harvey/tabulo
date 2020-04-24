@@ -724,7 +724,7 @@ to cells in the table body, use the `header_styler` option, e.g.:
 table.add_column(:even?, header_styler: -> (s) { "\033[32m#{s}\033[0m" })
 ```
 
-The `header_styler` option accepts either a 1- or 2-parameter callable. See the
+The `header_styler` option accepts a 1-, 2- or 3-parameter callable. See the
 [documentation](https://www.rubydoc.info/gems/tabulo/2.5.0/Tabulo/Table#add_column-instance_method)
 for details.
 

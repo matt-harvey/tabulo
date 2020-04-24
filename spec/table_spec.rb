@@ -1818,7 +1818,33 @@ describe Tabulo::Table do
                |            5 |           10 |           15 |
                +--------------+--------------+--------------+).gsub(/^ +/, "")
         end
+      end
 
+      context "when passed a 3-parameter callable" do
+        it "styles the header cell content by calling the header_styler on the header text without "\
+          "affecting width calcutions, passing the header content, the column index and the line index" do
+          line_indices_encountered = []
+          header_styler = -> (str, column_index, line_index) do
+            expect(column_index).to eq(2)
+            line_indices_encountered.append << line_index
+            line_index.even? ? "\033[31;1;4m#{str}\033[0m" : str
+          end
+          table.add_column("Multiplied by three\nOK?", header_styler: header_styler) { |n| n * 3 }
+
+          expect(table.to_s).to eq \
+            %Q(+--------------+--------------+--------------+
+               |       N      |    Doubled   | \033[31;1;4mMultiplied b\033[0m |
+               |              |              |    y three   |
+               |              |              |      \033[31;1;4mOK?\033[0m     |
+               +--------------+--------------+--------------+
+               |            1 |            2 |            3 |
+               |            2 |            4 |            6 |
+               |            3 |            6 |            9 |
+               |            4 |            8 |           12 |
+               |            5 |           10 |           15 |
+               +--------------+--------------+--------------+).gsub(/^ +/, "")
+          expect(line_indices_encountered).to eq([0, 1, 2])
+        end
       end
     end
 

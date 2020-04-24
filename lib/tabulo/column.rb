@@ -28,10 +28,15 @@ module Tabulo
       @index = index
 
       @header_styler =
-        if header_styler && (header_styler.arity == 2)
-          -> (_, str, cell_data) { header_styler.call(str, cell_data.column_index) }
-        elsif header_styler
-          -> (_, str) { header_styler.call(str) }
+        if header_styler
+          case header_styler.arity
+          when 3
+            -> (_, str, cell_data, line_index) { header_styler.call(str, cell_data.column_index, line_index) }
+          when 2
+            -> (_, str, cell_data) { header_styler.call(str, cell_data.column_index) }
+          else
+            -> (_, str) { header_styler.call(str) }
+          end
         else
           -> (_, str) { str }
         end
@@ -43,7 +48,7 @@ module Tabulo
     end
 
     def header_cell
-      if @header_styler.arity == 3
+      if @header_styler.arity >= 3
         cell_data = CellData.new(nil, nil, @index)
       end
       Cell.new(

@@ -210,7 +210,7 @@ module Tabulo
     #   the column's label will also be used as its header text.
     # @param [nil, #to_proc] header_styler (nil) A lambda or other callable object that will
     #   determine the colors or other styling applied to the header content. Can be passed
-    #   <tt>nil</tt>, or can be passed a callable that takes either 1 or 2 parameters:
+    #   <tt>nil</tt>, or can be passed a callable that takes 1, 2 or 3 parameters:
     #   * If passed <tt>nil</tt>, then no additional styling will be applied to the cell content
     #     (other than what was already applied by the <tt>formatter</tt>).
     #   * If passed a callable, then that callable will be called for each line of content within
@@ -227,6 +227,12 @@ module Tabulo
     #       second parameter is an Integer representing the positional index of this header's {Column},
     #       with the leftmost column having index 0, the next having index 1 etc.. This can be
     #       used, for example, to apply different styles to alternating {Column}s.
+    #     * If the passed callable takes 3 parameters, then the first and second parameters are as above,
+    #       and the third parameter is an Integer representing the index of the line within the
+    #       header cell that is currently being styled. For example, if the cell content is wrapped over 3
+    #       lines, then the callable will be called first with a line index of 0, to style the first line,
+    #       then with a line index of 1, to style the second line, and finally with a line index of 2, for
+    #       the third and final wrapped line of the cell.
     #
     #   Note that if the header content is truncated, then any <tt>header_styler</tt> will be applied to the
     #   truncation indicator character as well as to the truncated content.

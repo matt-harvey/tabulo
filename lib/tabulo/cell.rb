@@ -60,8 +60,11 @@ module Tabulo
       end
     end
 
-    def apply_styler(content)
-      if @styler.arity == 3
+    def apply_styler(content, line_index)
+      case @styler.arity
+      when 4
+        @styler.call(@value, content, @cell_data, line_index)
+      when 3
         @styler.call(@value, content, @cell_data)
       else
         @styler.call(@value, content)
@@ -76,7 +79,7 @@ module Tabulo
       lpad = @padding_character * padding_amount_left
       rpad =
         if append_truncator
-          styled_truncation_indicator + padding(padding_amount_right - 1)
+          styled_truncation_indicator(subcell_index) + padding(padding_amount_right - 1)
         else
           padding(padding_amount_right)
         end
@@ -88,31 +91,35 @@ module Tabulo
       @padding_character * amount
     end
 
-    def styled_truncation_indicator
-      apply_styler(@truncation_indicator)
+    def styled_truncation_indicator(line_index)
+      apply_styler(@truncation_indicator, line_index)
     end
 
     def calculate_subcells
+      line_index = 0
       formatted_content.split($/, -1).flat_map do |substr|
         subsubcells, subsubcell, subsubcell_width = [], String.new(""), 0
 
         substr.scan(/\X/).each do |grapheme_cluster|
           grapheme_cluster_width = Unicode::DisplayWidth.of(grapheme_cluster)
           if subsubcell_width + grapheme_cluster_width > @width
-            subsubcells << style_and_align_cell_content(subsubcell)
+            subsubcells << style_and_align_cell_content(subsubcell, line_index)
             subsubcell_width = 0
             subsubcell.clear
+            line_index += 1
           end
 
           subsubcell << grapheme_cluster
           subsubcell_width += grapheme_cluster_width
         end
 
-        subsubcells << style_and_align_cell_content(subsubcell)
+        subsubcells << style_and_align_cell_content(subsubcell, line_index)
+        line_index += 1
+        subsubcells
       end
     end
 
-    def style_and_align_cell_content(content)
+    def style_and_align_cell_content(content, line_index)
       padding = Util.max(@width - Unicode::DisplayWidth.of(content), 0)
       left_padding, right_padding =
         case real_alignment
@@ -125,7 +132,7 @@ module Tabulo
           [padding, 0]
         end
 
-      "#{' ' * left_padding}#{apply_styler(content)}#{' ' * right_padding}"
+      "#{' ' * left_padding}#{apply_styler(content, line_index)}#{' ' * right_padding}"
     end
 
     def real_alignment
