@@ -43,9 +43,9 @@ end
 
 ## Features
 
-* Presents a [DRY initialization interface](#adding-columns): by being &ldquo;column based&rdquo; rather than
-  &ldquo;row based&rdquo;, it spares the developer the burden of syncing the ordering within the header row
-  with that of the body rows.
+* Presents a [DRY initialization interface](#adding-columns): by being &ldquo;column based&rdquo;
+  rather than &ldquo;row based&rdquo;, it spares you the burden of syncing the ordering within the
+  header row with that of the body rows.
 * Lets you set [fixed column widths](#fixed-column-widths), then either [wrap](#overflow-handling)
   or [truncate](#overflow-handling) the overflow.
 * Alternatively, you can [&ldquo;pack&rdquo;](#pack) the table so that each column is automatically just
@@ -56,8 +56,7 @@ end
 * Since a `Tabulo::Table` is itself also an `Enumerable`, you can [step through it](#enumerator) a
   row at a time, printing as you go, without waiting for the entire underlying collection to load.
   In other words, you get a [streaming interface](#enumerator) for free.
-* Each `Tabulo::Row` is also an `Enumerable`, [providing access](#accessing-cell-values) to the
-  underlying cell values.
+* Add an optional [title](#title) to your table.
 * The header row can be [repeated](#repeating-headers) at arbitrary intervals.
 * Newlines within cell content are correctly handled.
 * Multibyte Unicode characters are correctly handled.
@@ -65,7 +64,6 @@ end
 * Easily [transpose](#transposition) the table, so that rows are swapped with columns.
 * Choose from multiple [border configurations](#borders), including Markdown, &ldquo;ASCII&rdquo;, and smoothly
   joined Unicode border characters.
-* Optionally add a [title](#title) to your table.
 
 Tabulo has also been ported to Crystal (with some modifications): see [Tablo](https://github.com/hutou/tablo).
 
@@ -804,8 +802,8 @@ in the table to be green, you could do:
 table = Tabulo::Table.new(1..5, :itself, :even?, :odd?, header_styler: -> (s) { "\033[32m#{s}\033[0m" })
 ```
 
-Now, all columns in the table will have automatically have green header text, unless overridden
-by another header styler being passed to `#add_column`.
+Now, all columns in the table will automatically have green header text, unless overridden by another
+header styler being passed to `#add_column`.
 
 [&#x1f51d;](#contents)
 
