@@ -74,7 +74,6 @@ Tabulo has also been ported to Crystal (with some modifications): see [Tablo](ht
   * [Table of contents](#table-of-contents)
   * [Installation](#installation)
   * [Detailed usage](#detailed-usage)
-     * [Requiring the gem](#requiring-the-gem)
      * [Creating a table](#table-initialization)
      * [Adding columns](#adding-columns)
         * [Quick API](#quick-api)
@@ -131,18 +130,17 @@ Or install it yourself:
 
 ## Detailed usage
 
-### Requiring the gem
-
-```ruby
-require 'tabulo'
-```
-
-[&#x1f51d;](#contents)
-
 <a name="table-initialization"></a>
 ### Creating a table
 
-You instantiate a `Tabulo::Table` by passing it an underlying `Enumerable`, being the collection of
+Ensure you have `require`d the gem:
+
+```ruby
+require "tabulo"
+```
+
+You can then instantiate a `Tabulo::Table` by passing it an underlying `Enumerable`, being the
+collection of
 things that you want to tabulate. Each member of this collection will end up
 corresponding to a row of the table. The collection can be any `Enumerable`, for example a Ruby
 `Array`, or an ActiveRecord relation:
