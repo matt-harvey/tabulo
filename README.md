@@ -11,11 +11,8 @@ Tabulo is a terminal table generator for Ruby. It is both highly configurable an
 
 _Quick API:_
 
-```ruby
-puts Tabulo::Table.new(User.all, :id, :first_name, :last_name, border: :modern).pack
 ```
-
-```
+> puts Tabulo::Table.new(User.all, :id, :first_name, :last_name, border: :modern).pack
 ┌────┬────────────┬───────────┐
 │ id │ first_name │ last_name │
 ├────┼────────────┼───────────┤
@@ -26,16 +23,16 @@ puts Tabulo::Table.new(User.all, :id, :first_name, :last_name, border: :modern).
 
 _Full API:_
 
-```ruby
+```
 table = Tabulo::Table.new(User.all, border: :modern) do |t|
   t.add_column("ID", &:id)
   t.add_column("First name", &:first_name)
   t.add_column("Last name") { |user| user.last_name.upcase }
 end
-puts table.pack
 ```
 
 ```
+> puts table.pack
 ┌────┬────────────┬───────────┐
 │ ID │ First name │ Last name │
 ├────┼────────────┼───────────┤
