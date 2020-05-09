@@ -106,9 +106,7 @@ Tabulo has also been ported to Crystal (with some modifications): see [Tablo](ht
   * [Contributing](#contributing)
   * [License](#license)
 
-[&#x1f51d;](#contents)
-
-## Installation
+## Installation [&#x2191;](#contents)
 
 Add this line to your application&#8217;s Gemfile:
 
@@ -130,10 +128,8 @@ To use the gem, you need to require it in your source code as follows:
 require 'tabulo'
 ```
 
-[&#x1f51d;](#contents)
-
 <a name="table-initialization"></a>
-### Creating a table
+### Creating a table [&#x2191;](#contents)
 
 You instantiate a `Tabulo::Table` by passing it an underlying `Enumerable`, being the collection of
 things that you want to tabulate. Each member of this collection will end up
@@ -147,13 +143,11 @@ other_table = Tabulo::Table.new(User.all)
 
 For the table to be useful, however, it must also contain columns&hellip;
 
-[&#x1f51d;](#contents)
-
 <a name="adding-columns"></a>
-### Adding columns
+### Adding columns [&#x2191;](#contents)
 
 <a name="quick-api"></a>
-#### Quick API
+#### Quick API [&#x2191;](#contents)
 
 When the columns correspond to methods on members of the underlying enumerable, you can use
 the &ldquo;quick API&rdquo;, by passing a symbol directly to `Tabulo::Table.new` for each column.
@@ -174,10 +168,8 @@ table = Tabulo::Table.new([1, 2, 5], :itself, :even?, :odd?)
 +--------------+--------------+--------------+
 ```
 
-[&#x1f51d;](#contents)
-
 <a name="full-api"></a>
-#### Full API
+#### Full API [&#x2191;](#contents)
 
 Columns can also be added to the table one-by-one using `add_column`. This &ldquo;full API&rdquo; is
 more verbose, but provides greater configurability:
@@ -245,10 +237,8 @@ end
 +--------------+--------------+
 ```
 
-[&#x1f51d;](#contents)
-
 <a name="labels-headers"></a>
-#### Column labels _vs_ headers
+#### Column labels _vs_ headers [&#x2191;](#contents)
 
 The first argument to `add_column` is the called the _label_ for that column. It serves as the
 column&#8217;s unique identifier: only one column may have a given label per table.
@@ -261,10 +251,8 @@ table.add_column(:itself2, header: "N", &:itself)  # header need not be unique
 # table.add_column(:itself)  # would raise Tabulo::InvalidColumnLabelError, as label must be unique
 ```
 
-[&#x1f51d;](#contents)
-
 <a name="column-positioning"></a>
-#### Positioning columns
+#### Positioning columns [&#x2191;](#contents)
 
 By default, each new column is added to the right of all the other columns so far added to the
 table. However, if you want to insert a new column into some other position, you can use the
@@ -286,10 +274,8 @@ table.add_column(:even?, before: :odd?)
 +--------------+--------------+--------------+
 ```
 
-[&#x1f51d;](#contents)
-
 <a name="removing-columns"></a>
-### Removing columns
+### Removing columns [&#x2191;](#contents)
 
 There is also a `#remove_column` method, for deleting an existing column from a table. Pass it
 the label of the column you want to remove:
@@ -298,10 +284,8 @@ the label of the column you want to remove:
 table.remove_column(:even?)
 ```
 
-[&#x1f51d;](#contents)
-
 <a name="title"></a>
-### Adding a title
+### Adding a title [&#x2191;](#contents)
 
 You can give your table a title, using the `title` option:
 
@@ -326,10 +310,8 @@ There is a caveat: Using the `title` option with the `:markdown` [border type](#
 the rendered table to cease being valid Markdown, as unfortunately almost no markdown engines support
 adding a captions (i.e. titles) to tables.
 
-[&#x1f51d;](#contents)
-
 <a name="cell-alignment"></a>
-### Cell alignment
+### Cell alignment [&#x2191;](#contents)
 
 By default, column header text is center-aligned, while the content of each body cell is aligned
 according to its data type. Numbers are right-aligned, text is left-aligned, and booleans (`false`
@@ -356,12 +338,10 @@ If a table title is present, it is center-aligned by default. This can be change
 table = Tabulo::Table.new([1, 2], :itself, :even?, title: "Numbers", align_title: :left)
 ```
 
-[&#x1f51d;](#contents)
-
-### Column width, wrapping and truncation
+### Column width, wrapping and truncation [&#x2191;](#contents)
 
 <a name="fixed-column-widths"></a>
-#### Configuring fixed widths
+#### Configuring fixed widths [&#x2191;](#contents)
 
 By default, column width is fixed at 12 characters, plus 1 character of padding on either side.
 This can be adjusted on a column-by-column basis using the `width` option of `add_column`:
@@ -402,10 +382,8 @@ table = Tabulo::Table.new([1, 2], :itself, :even?, column_width: 6)
 
 Widths set for individual columns always override the default column width for the table.
 
-[&#x1f51d;](#contents)
-
 <a name="pack"></a>
-#### Automating column widths
+#### Automating column widths [&#x2191;](#contents)
 
 Instead of setting column widths &ldquo;manually&rdquo;, you can tell the table to sort out the widths
 itself, so that each column is just wide enough for its header and contents (plus a character
@@ -493,10 +471,8 @@ resized yet again on printing. This is a consequence of the table always being e
 table itself. There are [ways around this](#freezing-a-table), however, if this is not the desired
 behaviour&mdash;see [below](#freezing-a-table).
 
-[&#x1f51d;](#contents)
-
 <a name="configuring-padding"></a>
-#### Configuring padding
+#### Configuring padding [&#x2191;](#contents)
 
 The single character of padding either side of each column is not counted in the column width.
 The amount of this extra padding can be configured for the table as a whole, using the `column_padding`
@@ -538,10 +514,8 @@ table = Tabulo::Table.new([1, 2, 5], :itself, :even?, :odd?, column_padding: [0,
 +--------------+--------------+--------------+
 ```
 
-[&#x1f51d;](#contents)
-
 <a name="overflow-handling"></a>
-#### Overflow handling
+#### Overflow handling [&#x2191;](#contents)
 
 By default, if cell contents exceed their column width, they are wrapped for as many rows as
 required:
@@ -592,10 +566,8 @@ table = Tabulo::Table.new(
 The character used to indicate truncation, which defaults to `~`, can be configured using the
 `truncation_indicator` option passed to `Table.new`.
 
-[&#x1f51d;](#contents)
-
 <a name="manual-wrapping"></a>
-#### Manual cell wrapping
+#### Manual cell wrapping [&#x2191;](#contents)
 
 You can &ldquo;manually&rdquo; wrap the content of a title, header or body cell at a particular
 point, simply by placing a newline character at that point:
@@ -620,10 +592,8 @@ end
 +--------------+--------------+--------------+
 ```
 
-[&#x1f51d;](#contents)
-
 <a name="formatting-cell-values"></a>
-### Formatting cell values
+### Formatting cell values [&#x2191;](#contents)
 
 While the callable passed to `add_column` determines the underyling, calculated value in each
 cell of the column, there is a separate concept, of a &ldquo;formatter&rdquo;, that determines how
@@ -686,13 +656,11 @@ containing additional information about the cell that may be useful in determini
 it&mdash;see the [documentation](https://www.rubydoc.info/gems/tabulo/2.5.0/Tabulo/CellData.html)
 for details.
 
-[&#x1f51d;](#contents)
-
 <a name="colours-and-styling"></a>
-### Colours and other styling
+### Colours and other styling [&#x2191;](#contents)
 
 <a name="styling-cell-content"></a>
-#### Styling cell content
+#### Styling cell content [&#x2191;](#contents)
 
 In most terminals, if you want to print text that is coloured, or has certain other styles such as
 underlining, you need to use ANSI escape sequences, either directly, or by means of a library such
@@ -740,10 +708,8 @@ per line, so that each line of the cell will have the escape sequence applied to
 If the content of a cell has been [truncated](#overflow-handling), then whatever colours or other
 styling apply to the cell content will also be applied the truncation indicator character.
 
-[&#x1f51d;](#contents)
-
 <a name="styling-column-headers"></a>
-#### Styling column headers
+#### Styling column headers [&#x2191;](#contents)
 
 If you want to apply colours or other styling to the content of a column header, as opposed
 to cells in the table body, use the `header_styler` option, e.g.:
@@ -756,10 +722,8 @@ The `header_styler` option accepts either a 1- or 2-parameter callable. See the
 [documentation](https://www.rubydoc.info/gems/tabulo/2.5.0/Tabulo/Table#add_column-instance_method)
 for details.
 
-[&#x1f51d;](#contents)
-
 <a name="styling-title"></a>
-#### Styling the table title
+#### Styling the table title [&#x2191;](#contents)
 
 To apply colours or other styling to the table title, if present, use the `title_styler` option
 when initializing the table. This accepts a single-parameter callable:
@@ -768,10 +732,7 @@ when initializing the table. This accepts a single-parameter callable:
 table = Tabulo::Table.new(1..5, :itself, :even?, :odd?, title: "Numbers", title_styler: -> (s) { "\033[32m#{s}\033[0m" })
 ```
 
-[&#x1f51d;](#contents)
-
-<a name="border-styling"></a>
-#### Styling borders
+#### Styling borders [&#x2191;](#contents)
 
 Styling can also be applied to borders and dividing lines, using the `border_styler` option when
 initializing the table, e.g.:
@@ -780,10 +741,8 @@ initializing the table, e.g.:
 table = Tabulo::Table.new(1..5, :itself, :even?, :odd?, border_styler: -> (s) { "\033[32m#{s}\033[0m" })
 ```
 
-[&#x1f51d;](#contents)
-
 <a name="default-styles"></a>
-#### Setting default styles
+#### Setting default styles [&#x2191;](#contents)
 
 By default, no styling is applied to the headers or body content of a column unless configured to do
 so via the `header_styler` or `styler` option when calling `add_column` for that particular column.
@@ -798,10 +757,8 @@ table = Tabulo::Table.new(1..5, :itself, :even?, :odd?, header_styler: -> (s) { 
 Now, all columns in the table will automatically have green header text, unless overridden by another
 header styler being passed to `#add_column`.
 
-[&#x1f51d;](#contents)
-
 <a name="repeating-headers"></a>
-### Repeating headers
+### Repeating headers [&#x2191;](#contents)
 
 By default, headers are only shown once, at the top of the table (`header_frequency: :start`). If
 `header_frequency` is passed `nil`, headers are not shown at all; or, if passed an `Integer` N,
@@ -837,10 +794,8 @@ table = Tabulo::Table.new(1..10, :itself, :even?, header_frequency: 5)
 
 Note that if the table has a [title](#title), it will not be repeated; only column headers are repeated.
 
-[&#x1f51d;](#contents)
-
 <a name="enumerator"></a>
-### Using a Table Enumerator
+### Using a Table Enumerator [&#x2191;](#contents)
 
 Because it&#8217;s an `Enumerable`, a `Tabulo::Table` can also give you an `Enumerator`,
 which is useful when you want to step through rows one at a time. In a Rails console,
@@ -868,10 +823,8 @@ underlying collection. (This is negated if we [pack](#pack) the table, however, 
 in that case the entire collection must be traversed up front in order for column widths to be
 calculated.)
 
-[&#x1f51d;](#contents)
-
 <a name="accessing-cell-values"></a>
-### Accessing cell values
+### Accessing cell values [&#x2191;](#contents)
 
 Each `Tabulo::Table` is an `Enumerable` of which each element is a `Tabulo::Row`. Each `Tabulo::Row`
 is itself an `Enumerable`, of `Tabulo::Cell`. The `Tabulo::Cell#value` method will return the
@@ -906,10 +859,8 @@ table.each do |row|
 end
 ```
 
-[&#x1f51d;](#contents)
-
 <a name="accessing-sources"></a>
-### Accessing the underlying enumerable
+### Accessing the underlying enumerable [&#x2191;](#contents)
 
 The underlying enumerable for a table can be retrieved by calling the `sources` getter:
 
@@ -943,10 +894,8 @@ table.each do |row|
 end
 ```
 
-[&#x1f51d;](#contents)
-
 <a name="transposition"></a>
-### Transposing rows and columns
+### Transposing rows and columns [&#x2191;](#contents)
 
 By default, Tabulo generates a table in which each row corresponds to a _record_, i.e. an element of
 the underlying enumerable, and each column to a _field_. However, there are times when one instead
@@ -976,10 +925,8 @@ represented in that column. This can be configured, however, along with other as
 `transpose`&#8217;s behaviour. For details, see the
 [documentation](https://www.rubydoc.info/gems/tabulo/2.5.0/Tabulo/Table#transpose-instance_method).
 
-[&#x1f51d;](#contents)
-
 <a name="borders"></a>
-### Configuring borders
+### Configuring borders [&#x2191;](#contents)
 
 You can configure the kind of border and divider characters that are used when the table is printed.
 This is done using the `border` option passed to `Table.new`. The options are as follows.
@@ -1147,10 +1094,8 @@ but without a bottom border:
 Note that, by default, none of the border options includes lines drawn _between_ rows in the body of the table.
 These are configured via a separate option: see [below](#dividers).
 
-[&#x1f51d;](#contents)
-
 <a name="dividers"></a>
-### Row dividers
+### Row dividers [&#x2191;](#contents)
 
 To add lines between rows in the table body, use the `row_divider_frequency` option when initializing
 the table. The default value for this option is `nil`, meaning there are no dividing lines between
@@ -1188,10 +1133,8 @@ If you want a line before every row, pass `1` to `row_divider_frequency`. For ex
 └──────────────┴──────────────┴──────────────┘
 ```
 
-[&#x1f51d;](#contents)
-
 <a name="freezing-a-table"></a>
-### Using a table as a snapshot rather than as a dynamic view
+### Using a table as a snapshot rather than as a dynamic view [&#x2191;](#contents)
 
 The nature of a `Tabulo::Table` is that of a dynamic view onto the underlying `sources` enumerable
 from which it was initialized (or which was subsequently assigned to its `sources` attribute). That
@@ -1260,10 +1203,8 @@ rather than the table itself:
 rendered_table = Tabulo::Table.new(1..10, :itself, :even?, :odd?).pack.to_s
 ```
 
-[&#x1f51d;](#contents)
-
 <a name="motivation"></a>
-## Comparison with other libraries
+## Comparison with other libraries [&#x2191;](#contents)
 
 There are other libraries for generating plain text tables in Ruby. Popular among these are:
 
@@ -1347,10 +1288,8 @@ well suited to quickly displaying ActiveRecord collections from the Rails consol
 environment seems cumbersome. Moreover, it seems no longer to be maintained. At the time of writing,
 its last commit was in March 2015.
 
-[&#x1f51d;](#contents)
-
 <a name="contributing"></a>
-## Contributing
+## Contributing [&#x2191;](#contents)
 
 Issues and pull requests are welcome on GitHub at https://github.com/matt-harvey/tabulo.
 
@@ -1361,14 +1300,10 @@ install dependencies.
 `bundle exec rake spec` will run the test suite. For a list of other Rake tasks that are available in
 the development environment, run `bundle exec rake -T`.
 
-[&#x1f51d;](#contents)
-
-## License
+## License [&#x2191;](#contents)
 
 The gem is available as open source under the terms of the [MIT
 License](http://opensource.org/licenses/MIT).
-
-[&#x1f51d;](#contents)
 
 [Gem Version]: https://rubygems.org/gems/tabulo
 [Documentation]: http://www.rubydoc.info/gems/tabulo/2.5.0
