@@ -93,7 +93,7 @@ Tabulo has also been ported to Crystal (with some modifications): see [Tablo](ht
         * [Styling column headers](#styling-column-headers)
         * [Styling the table title](#styling-title)
         * [Setting default styles](#default-styles)
-        * [Styling borders](#border-styling)
+        * [Styling borders](#styling-borders)
      * [Repeating headers](#repeating-headers)
      * [Using a Table Enumerator](#using-a-table-enumerator)
      * [Accessing cell values](#accessing-cell-values)
@@ -732,6 +732,7 @@ when initializing the table. This accepts a single-parameter callable:
 table = Tabulo::Table.new(1..5, :itself, :even?, :odd?, title: "Numbers", title_styler: -> (s) { "\033[32m#{s}\033[0m" })
 ```
 
+<a name="styling-borders"></a>
 #### Styling borders [&#x2191;](#contents)
 
 Styling can also be applied to borders and dividing lines, using the `border_styler` option when
