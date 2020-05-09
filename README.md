@@ -11,8 +11,11 @@ Tabulo is a terminal table generator for Ruby. It is both highly configurable an
 
 _Quick API:_
 
+```ruby
+puts Tabulo::Table.new(User.all, :id, :first_name, :last_name, border: :modern).pack
 ```
-> puts Tabulo::Table.new(User.all, :id, :first_name, :last_name, border: :modern).pack
+
+```
 ┌────┬────────────┬───────────┐
 │ id │ first_name │ last_name │
 ├────┼────────────┼───────────┤
@@ -29,10 +32,10 @@ table = Tabulo::Table.new(User.all, border: :modern) do |t|
   t.add_column("First name", &:first_name)
   t.add_column("Last name") { |user| user.last_name.upcase }
 end
+puts table.pack
 ```
 
 ```
-> puts table.pack
 ┌────┬────────────┬───────────┐
 │ ID │ First name │ Last name │
 ├────┼────────────┼───────────┤
@@ -72,7 +75,6 @@ Tabulo has also been ported to Crystal (with some modifications): see [Tablo](ht
   * [Table of contents](#table-of-contents)
   * [Installation](#installation)
   * [Detailed usage](#detailed-usage)
-     * [Requiring the gem](#requiring-the-gem)
      * [Creating a table](#table-initialization)
      * [Adding columns](#adding-columns)
         * [Quick API](#quick-api)
@@ -125,11 +127,7 @@ Or install it yourself:
 
     $ gem install tabulo
 
-[&#x1f51d;](#contents)
-
-## Detailed usage
-
-### Requiring the gem
+To use the gem, you need to require it in your source code as follows:
 
 ```ruby
 require 'tabulo'
