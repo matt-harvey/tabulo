@@ -23,7 +23,7 @@ _Quick API:_
 
 _Full API:_
 
-```
+```ruby
 table = Tabulo::Table.new(User.all, border: :modern) do |t|
   t.add_column("ID", &:id)
   t.add_column("First name", &:first_name)
