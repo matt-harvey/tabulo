@@ -56,7 +56,7 @@ puts table.pack
   left)
 * Tabulate any `Enumerable`: the underlying collection need not be an array
 * [Step through](#enumerator) your table a row at a time, printing as you go, without waiting for the
-  underlying collection to load. In other words, you get a [streaming interface](#enumerator) for free.
+  underlying collection to load. In other words, have a [streaming interface](#enumerator) for free.
 * Add an optional [title](#title) to your table
 * The header row can be [repeated](#repeating-headers) at arbitrary intervals
 * Newlines within cell content are correctly handled
