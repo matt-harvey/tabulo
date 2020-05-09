@@ -43,27 +43,25 @@ end
 
 ## Features
 
-* Presents a [DRY initialization interface](#adding-columns): by being &ldquo;column based&rdquo;
-  rather than &ldquo;row based&rdquo;, it spares you the burden of syncing the ordering within the
-  header row with that of the body rows.
-* Lets you set [fixed column widths](#fixed-column-widths), then either [wrap](#overflow-handling)
-  or [truncate](#overflow-handling) the overflow.
-* Alternatively, you can [&ldquo;pack&rdquo;](#pack) the table so that each column is automatically just
-  wide enough for its contents, but [without overflowing the terminal horizontally](#max-table-width).
-* Alignment of cell content is [configurable](#cell-alignment), but has helpful content-based
-  defaults (numbers right, strings left).
-* Tabulate any `Enumerable`: the underlying collection need not be an array.
-* Since a `Tabulo::Table` is itself also an `Enumerable`, you can [step through it](#enumerator) a
-  row at a time, printing as you go, without waiting for the entire underlying collection to load.
-  In other words, you get a [streaming interface](#enumerator) for free.
-* Add an optional [title](#title) to your table.
-* The header row can be [repeated](#repeating-headers) at arbitrary intervals.
-* Newlines within cell content are correctly handled.
-* Multibyte Unicode characters are correctly handled.
-* Apply [colours](#colours-and-styling) and other styling to table content and borders, without breaking the table.
-* Easily [transpose](#transposition) the table, so that rows are swapped with columns.
+* Presents a [DRY API](#adding-columns): column- not row-based, so that header and body rows are automatically
+  in sync
+* Set [fixed column widths](#fixed-column-widths), then either [wrap](#overflow-handling)
+  or [truncate](#overflow-handling) the overflow
+* Alternatively, [&ldquo;pack&rdquo;](#pack) the table so that columns are auto-sized to their
+  contents, but [without overflowing the terminal](#max-table-width)
+* Cell alignment is [configurable](#cell-alignment), but has helpful content-based defaults (numbers right, strings
+  left)
+* Tabulate any `Enumerable`: the underlying collection need not be an array
+* [Step through](#enumerator) your table a row at a time, printing as you go, without waiting for the
+  underlying collection to load. In other words, you get a [streaming interface](#enumerator) for free.
+* Add an optional [title](#title) to your table
+* The header row can be [repeated](#repeating-headers) at arbitrary intervals
+* Newlines within cell content are correctly handled
+* Multibyte Unicode characters are correctly handled
+* Apply [colours](#colours-and-styling) and other styling to table content and borders, without breaking the table
+* Easily [transpose](#transposition) the table, so that rows are swapped with columns
 * Choose from multiple [border configurations](#borders), including Markdown, &ldquo;ASCII&rdquo;, and smoothly
-  joined Unicode border characters.
+  joined Unicode border characters
 
 Tabulo has also been ported to Crystal (with some modifications): see [Tablo](https://github.com/hutou/tablo).
 
