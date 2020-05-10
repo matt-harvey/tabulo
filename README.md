@@ -10,6 +10,9 @@
 Tabulo is a Ruby library for generating plain text tables (also known as &ldquo;terminal tables&rdquo;
 or &ldquo;ASCII tables&rdquo;). It is both highly configurable and very easy to use.
 
+<a name="overview"></a>
+## Overview
+
 _Quick API:_
 
 ```
@@ -42,9 +45,10 @@ end
 └────┴────────────┴───────────┘
 ```
 
+<a name="features"></a>
 ## Features
 
-* Presents a [DRY API](#adding-columns) that is column-based, not row-based, so that header and body rows are
+* Presents a [DRY API](#adding-columns) that is column-based, not row-based, meaning header and body rows are
   automatically in sync
 * Set [fixed column widths](#fixed-column-widths), then either [wrap](#overflow-handling)
   or [truncate](#overflow-handling) the overflow
@@ -69,6 +73,7 @@ Tabulo has also been ported to Crystal (with some modifications): see [Tablo](ht
 <a name="contents"></a>
 ## Contents
 
+  * [Features](#overview)
   * [Features](#features)
   * [Table of contents](#table-of-contents)
   * [Installation](#installation)
