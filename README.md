@@ -7,7 +7,8 @@
 [![Code Climate][CC img]][Code Climate]
 [![Awesome][AR img]][Awesome Ruby]
 
-Tabulo is a terminal table generator for Ruby. It is both highly configurable and very easy to use.
+Tabulo is a Ruby library for generating plain text tables (also known as &ldquo;terminal tables&rdquo;
+or &ldquo;ASCII tables&rdquo;). It is both highly configurable and very easy to use.
 
 _Quick API:_
 
@@ -43,8 +44,8 @@ end
 
 ## Features
 
-* Presents a [DRY API](#adding-columns): column- not row-based, so that header and body rows are automatically
-  in sync
+* Presents a [DRY API](#adding-columns) that is column-based, not row-based, so that header and body rows are
+  automatically in sync
 * Set [fixed column widths](#fixed-column-widths), then either [wrap](#overflow-handling)
   or [truncate](#overflow-handling) the overflow
 * Alternatively, [&ldquo;pack&rdquo;](#pack) the table so that columns are auto-sized to their
