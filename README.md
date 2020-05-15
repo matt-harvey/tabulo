@@ -50,7 +50,7 @@ end
 
 * Presents a [DRY API](#adding-columns) that is column-based, not row-based, meaning header and body rows are
   automatically in sync
-* Set [fixed column widths](#fixed-column-widths), then either [wrap](#overflow-handling)
+* Lets you set [fixed column widths](#fixed-column-widths), then either [wrap](#overflow-handling)
   or [truncate](#overflow-handling) the overflow
 * Alternatively, [&ldquo;pack&rdquo;](#pack) the table so that columns are auto-sized to their
   contents, but [without overflowing the terminal](#max-table-width)
@@ -73,7 +73,7 @@ Tabulo has also been ported to Crystal (with some modifications): see [Tablo](ht
 <a name="contents"></a>
 ## Contents
 
-  * [Features](#overview)
+  * [Overview](#overview)
   * [Features](#features)
   * [Table of contents](#table-of-contents)
   * [Installation](#installation)
