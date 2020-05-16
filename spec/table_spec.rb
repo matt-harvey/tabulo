@@ -324,21 +324,47 @@ describe Tabulo::Table do
         end
 
         context "when passed a callable" do
-          let(:title_styler) { -> (str) { "\033[31;1;4m#{str}\033[0m" } }
+          context "when the callable takes one parameter" do
+            let(:title_styler) { -> (str) { "\033[31;1;4m#{str}\033[0m" } }
 
-          it "applies styling to the title, without affecting table width calculations" do
-            expect(table.to_s).to eq \
-              %Q(+-----------------------------+
-                 |           \033[31;1;4mNumbers\033[0m           |
-                 +--------------+--------------+
-                 |       N      |    Doubled   |
-                 +--------------+--------------+
-                 |            1 |            2 |
-                 |            2 |            4 |
-                 |            3 |            6 |
-                 |            4 |            8 |
-                 |            5 |           10 |
-                 +--------------+--------------+).gsub(/^ +/, "")
+            it "applies styling to the title, without affecting table width calculations" do
+              expect(table.to_s).to eq \
+                %Q(+-----------------------------+
+                   |           \033[31;1;4mNumbers\033[0m           |
+                   +--------------+--------------+
+                   |       N      |    Doubled   |
+                   +--------------+--------------+
+                   |            1 |            2 |
+                   |            2 |            4 |
+                   |            3 |            6 |
+                   |            4 |            8 |
+                   |            5 |           10 |
+                   +--------------+--------------+).gsub(/^ +/, "")
+            end
+          end
+
+          context "when the callable takes two parameters" do
+            let(:title_styler) do
+              -> (str, line_index) { line_index == 0 ? "\033[31;1;4m#{str}\033[0m" : str }
+            end
+            let(:title) { "Numbers\nTable" }
+
+            it "applies styling to the title, without affecting table width calculations, passing each line of the "\
+              "wrapped title to the first parameter, and the line index to the second" do
+              expect(table.to_s).to eq \
+                %Q(+-----------------------------+
+                   |           \033[31;1;4mNumbers\033[0m           |
+                   |            Table            |
+                   +--------------+--------------+
+                   |       N      |    Doubled   |
+                   +--------------+--------------+
+                   |            1 |            2 |
+                   |            2 |            4 |
+                   |            3 |            6 |
+                   |            4 |            8 |
+                   |            5 |           10 |
+                   +--------------+--------------+).gsub(/^ +/, "")
+            end
           end
         end
       end

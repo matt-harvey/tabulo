@@ -738,6 +738,10 @@ when initializing the table. This accepts a single-parameter callable:
 table = Tabulo::Table.new(1..5, :itself, :even?, :odd?, title: "Numbers", title_styler: -> (s) { "\033[32m#{s}\033[0m" })
 ```
 
+The `title_styler` option accepts a 1- or 2-parameter callable. See the
+[documentation](https://www.rubydoc.info/gems/tabulo/2.5.0/Tabulo/Table#initialize-instance_method)
+for details.
+
 <a name="styling-borders"></a>
 #### Styling borders [&#x2191;](#contents)
 

@@ -99,14 +99,26 @@ module Tabulo
     #   will cause it to cease being valid Markdown when rendered, since Markdown engines do not generally
     #   support adding a caption element (i.e. title) to tables.
     # @param [nil, #to_proc] title_styler (nil) A lambda or other callable object that will
-    #   determine the colors or other styling applied to the table title. If the table doesn't have
-    #   a title, this parameter has no effect. If passed a single-parameter callable, then that
-    #   callable will be called for each line of content within the title, and the resulting string
-    #   rendered in place of that line.
-    #   The extra width of the string returned by the <tt>title_styler</tt> is not taken into
-    #   consideration by the internal table width calculations involved in rendering the
-    #   table. Thus it can be used to apply ANSI escape codes to title content, to color the
-    #   title for example, without breaking the table formatting.
+    #   determine the colors or other styling applied to the table title. Can be passed
+    #   <tt>nil</tt>, or can be passed a callable that takes either 1 or 2 parametes:
+    #   * If passed <tt>nil</tt>, then no additional styling will be applied to the title.
+    #   * If passed a callable, then that callable will be called for each line of
+    #     the title, and the resulting string rendered in place of that line.
+    #     The extra width of the string returned by the <tt>title_styler</tt> is not taken into
+    #     consideration by the internal table and cell width calculations involved in rendering the
+    #     table. Thus it can be used to apply ANSI escape codes to title content, to color the
+    #     content for example, without breaking the table formatting.
+    #     * If the passed callable takes 1 parameter, then the first parameter is a string
+    #       representing a single line within the title. For example, if the title
+    #       is wrapped over three lines, then the <tt>title_styler</tt> will be called
+    #       three times, once for each line of content.
+    #     * If the passed callable takes 2 parameters, then the first parameter is as above, and the
+    #       second parameter is an Integer representing the index of the line within the
+    #       title that is currently being styled. For example, if the title is wrapped over 3
+    #       lines, then the callable will be called first with a line index of 0, to style the first line,
+    #       then with a line index of 1, to style the second line, and finally with a line index of 2, for
+    #       the third and final wrapped line of the cell.
+    #
     # @param [nil, String] truncation_indicator Determines the character used to indicate that a
     #   cell's content has been truncated. If omitted or passed <tt>nil</tt>,
     #   defaults to {DEFAULT_TRUNCATION_INDICATOR}. If passed something other than <tt>nil</tt> or
@@ -585,12 +597,19 @@ module Tabulo
       extra_for_internal_padding = @left_column_padding + @right_column_padding
       extra_total = num_fudged_columns * (extra_for_internal_dividers + extra_for_internal_padding)
       title_cell_width = basic_width + extra_total
+
       styler =
         if @title_styler
-          -> (v, s) { @title_styler.call(s) }
+          case @title_styler.arity
+          when 1
+            -> (_val, str) { @title_styler.call(str) }
+          when 2
+            -> (_val, str, _cell_data, line_index) { @title_styler.call(str, line_index) }
+          end
         else
-          -> (v, s) { s }
+          -> (_val, str) { str }
         end
+
       title_cell = Cell.new(
         alignment: @align_title,
         cell_data: nil,
