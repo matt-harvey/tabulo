@@ -1625,6 +1625,83 @@ describe Tabulo::Table do
       end
     end
 
+    describe "`padding` param" do
+      let(:column_padding) { [1, 2] }
+
+      before do
+        table.add_column("Trebled", padding: padding) { |n| n * 3 }
+      end
+
+      context "when passed nil" do
+        let(:padding) { nil }
+
+        it "inherits the column's padding from the table's `column_padding` setting" do
+          expect(table.to_s).to eq \
+            %q(+---------------+---------------+---------------+
+               |       N       |    Doubled    |    Trebled    |
+               +---------------+---------------+---------------+
+               |            1  |            2  |            3  |
+               |            2  |            4  |            6  |
+               |            3  |            6  |            9  |
+               |            4  |            8  |           12  |
+               |            5  |           10  |           15  |
+               +---------------+---------------+---------------+).gsub(/^ +/, "")
+        end
+      end
+
+      context "when passed a number greater than 1" do
+        let(:padding) { 3 }
+
+        it "determines the amount of padding on either side of the column to be that number" do
+          expect(table.to_s).to eq \
+            %q(+---------------+---------------+------------------+
+               |       N       |    Doubled    |      Trebled     |
+               +---------------+---------------+------------------+
+               |            1  |            2  |              3   |
+               |            2  |            4  |              6   |
+               |            3  |            6  |              9   |
+               |            4  |            8  |             12   |
+               |            5  |           10  |             15   |
+               +---------------+---------------+------------------+).gsub(/^ +/, "")
+        end
+      end
+
+      context "when passed 0" do
+        let(:padding) { 0 }
+
+        it "causes there to be no padding on either side of the column" do
+          expect(table.to_s).to eq \
+            %q(+---------------+---------------+------------+
+               |       N       |    Doubled    |   Trebled  |
+               +---------------+---------------+------------+
+               |            1  |            2  |           3|
+               |            2  |            4  |           6|
+               |            3  |            6  |           9|
+               |            4  |            8  |          12|
+               |            5  |           10  |          15|
+               +---------------+---------------+------------+).gsub(/^ +/, "")
+        end
+      end
+
+      context "when passed a two-element array" do
+        let(:padding) { [2, 1] }
+
+        it "configures the column's left and right padding with the first and second values of the array, "\
+          "respectively" do
+          expect(table.to_s).to eq \
+            %q(+---------------+---------------+---------------+
+               |       N       |    Doubled    |     Trebled   |
+               +---------------+---------------+---------------+
+               |            1  |            2  |             3 |
+               |            2  |            4  |             6 |
+               |            3  |            6  |             9 |
+               |            4  |            8  |            12 |
+               |            5  |           10  |            15 |
+               +---------------+---------------+---------------+).gsub(/^ +/, "")
+        end
+      end
+    end
+
     describe "`formatter` param" do
       context "when passed a 1-parameter callable" do
         it "formats the cell value for display, without changing the underlying cell value or its default alignment" do

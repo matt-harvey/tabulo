@@ -6,6 +6,8 @@ module Tabulo
     attr_accessor :width
     attr_reader :header
     attr_reader :index
+    attr_reader :left_padding
+    attr_reader :right_padding
 
     def initialize(
       align_body:,
@@ -15,7 +17,9 @@ module Tabulo
       header:,
       header_styler:,
       index:,
+      left_padding:,
       padding_character:,
+      right_padding:,
       styler:,
       truncation_indicator:,
       width:)
@@ -26,6 +30,8 @@ module Tabulo
       @formatter = formatter
       @header = header
       @index = index
+      @left_padding = left_padding
+      @right_padding = right_padding
 
       @header_styler =
         if header_styler
@@ -55,7 +61,9 @@ module Tabulo
         alignment: @align_header,
         cell_data: cell_data,
         formatter: -> (s) { s },
+        left_padding: @left_padding,
         padding_character: @padding_character,
+        right_padding: @right_padding,
         styler: @header_styler,
         truncation_indicator: @truncation_indicator,
         value: @header,
@@ -71,7 +79,9 @@ module Tabulo
         alignment: @align_body,
         cell_data: cell_data,
         formatter: @formatter,
+        left_padding: @left_padding,
         padding_character: @padding_character,
+        right_padding: @right_padding,
         styler: @styler,
         truncation_indicator: @truncation_indicator,
         value: body_cell_value(source, row_index: row_index, column_index: column_index),
@@ -85,6 +95,14 @@ module Tabulo
       else
         @extractor.call(source)
       end
+    end
+
+    def padded_width
+      width + total_padding
+    end
+
+    def total_padding
+      @left_padding + @right_padding
     end
 
     private

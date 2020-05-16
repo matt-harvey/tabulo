@@ -13,7 +13,9 @@ module Tabulo
       alignment:,
       cell_data:,
       formatter:,
+      left_padding:,
       padding_character:,
+      right_padding:,
       styler:,
       truncation_indicator:,
       value:,
@@ -21,8 +23,10 @@ module Tabulo
 
       @alignment = alignment
       @cell_data = cell_data
-      @padding_character = padding_character
       @formatter = formatter
+      @left_padding = left_padding
+      @padding_character = padding_character
+      @right_padding = right_padding
       @styler = styler
       @truncation_indicator = truncation_indicator
       @value = value
@@ -35,12 +39,12 @@ module Tabulo
     end
 
     # @!visibility private
-    def padded_truncated_subcells(target_height, padding_amount_left, padding_amount_right)
-      total_padding_amount = padding_amount_left + padding_amount_right
+    def padded_truncated_subcells(target_height)
+      total_padding_amount = @left_padding + @right_padding
       truncated = (height > target_height)
       (0...target_height).map do |subcell_index|
         append_truncator = (truncated && (total_padding_amount != 0) && (subcell_index + 1 == target_height))
-        padded_subcell(subcell_index, padding_amount_left, padding_amount_right, append_truncator)
+        padded_subcell(subcell_index, append_truncator)
       end
     end
 
@@ -75,13 +79,13 @@ module Tabulo
       @subcells ||= calculate_subcells
     end
 
-    def padded_subcell(subcell_index, padding_amount_left, padding_amount_right, append_truncator)
-      lpad = @padding_character * padding_amount_left
+    def padded_subcell(subcell_index, append_truncator)
+      lpad = @padding_character * @left_padding
       rpad =
         if append_truncator
-          styled_truncation_indicator(subcell_index) + padding(padding_amount_right - 1)
+          styled_truncation_indicator(subcell_index) + padding(@right_padding - 1)
         else
-          padding(padding_amount_right)
+          padding(@right_padding)
         end
       inner = subcell_index < height ? subcells[subcell_index] : padding(@width)
       "#{lpad}#{inner}#{rpad}"

@@ -520,6 +520,28 @@ table = Tabulo::Table.new([1, 2, 5], :itself, :even?, :odd?, column_padding: [0,
 +--------------+--------------+--------------+
 ```
 
+Padding can also be configured on a column-by-column basis, using the `padding` option when calling
+`add_column`:
+
+```ruby
+table = Tabulo::Table.new([1, 2, 5], :itself, :even?)
+table.add_column(:odd?, padding: 2)
+```
+
+```
+> puts table
++--------------+--------------+------------------+
+|    itself    |     even?    |       odd?       |
++--------------+--------------+------------------+
+|            1 |     false    |       true       |
+|            2 |     true     |       false      |
+|            5 |     false    |       true       |
++--------------+--------------+------------------+
+```
+
+This column-level `padding` setting always overrides any table-level `column_padding` setting, for
+the column in question.
+
 <a name="overflow-handling"></a>
 #### Overflow handling [&#x2191;](#contents)
 

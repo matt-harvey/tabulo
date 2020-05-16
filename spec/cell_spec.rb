@@ -6,7 +6,9 @@ describe Tabulo::Cell do
       alignment: :right,
       cell_data: cell_data,
       formatter: formatter,
+      left_padding: left_padding,
       padding_character: " ",
+      right_padding: right_padding,
       styler: styler,
       truncation_indicator: ".",
       value: value,
@@ -16,6 +18,8 @@ describe Tabulo::Cell do
   let(:formatter) { -> (source) { source.to_s } }
   let(:row_index) { 5 }
   let(:column_index) { 3 }
+  let(:left_padding) { 2 }
+  let(:right_padding) { 3 }
   let(:source) { "hi" }
   let(:styler) { -> (source, str) { str } }
   let(:value) { 30 }
@@ -32,7 +36,7 @@ describe Tabulo::Cell do
   end
 
   describe "#padded_truncated_subcells" do
-    subject { cell.padded_truncated_subcells(target_height, 2, 3) }
+    subject { cell.padded_truncated_subcells(target_height) }
     let(:value) { "ab\ncde\nfg" }
 
     context "when the target height is greater than required to contain the wrapped cell content" do

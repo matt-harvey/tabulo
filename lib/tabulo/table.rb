@@ -76,7 +76,8 @@ module Tabulo
     #   either side of each column. If passed an Integer, then the given amount of padding is
     #   applied to each side of each column. If passed a two-element Array, then the first element of the
     #   Array indicates the amount of padding to apply to the left of each column, and the second
-    #   element indicates the amount to apply to the right.
+    #   element indicates the amount to apply to the right. This setting can be overridden for
+    #   individual columns using the `padding` option of {#add_column}.
     # @param [Integer, nil] column_width The default column width for columns in this
     #   table, not excluding padding. If <tt>nil</tt>, then {DEFAULT_COLUMN_WIDTH} will be used.
     # @param [nil, #to_proc] formatter (:to_s.to_proc) The default formatter for columns in this
@@ -154,7 +155,7 @@ module Tabulo
       @column_padding = (column_padding || DEFAULT_COLUMN_PADDING)
 
       @left_column_padding, @right_column_padding =
-        Array === @column_padding ? @column_padding : [@column_padding, @column_padding]
+        (Array === @column_padding ? @column_padding : [@column_padding, @column_padding])
 
       @column_width = (column_width || DEFAULT_COLUMN_WIDTH)
       @formatter = formatter
@@ -248,6 +249,13 @@ module Tabulo
     #
     #   Note that if the header content is truncated, then any <tt>header_styler</tt> will be applied to the
     #   truncation indicator character as well as to the truncated content.
+    # @param [nil, Integer, Array] padding (nil) Determines the amount of blank space with which to
+    #   pad either side of the column. If passed nil, then the `column_padding` setting of the
+    #   {Table} will determine the column's padding. (See {#initialize}.) Otherwise, this option
+    #   overrides, for this column, the `column_padding` that was set at the table level: if passed an Integer,
+    #   then the given amount of padding is applied to either side of the column; or if passed a two-element Array,
+    #   then the first element of the Array indicates the amount of padding to apply to the left of the column,
+    #   and the second element indicates the amount to apply to the right.
     # @param [nil, #to_proc] styler (nil) A lambda or other callable object that will determine
     #   the colors or other styling applied to the formatted value of the cell. Can be passed
     #   <tt>nil</tt>, or can be passed a callable that takes either 2 or 3 parameters:
@@ -297,9 +305,16 @@ module Tabulo
     #   Table. (This is case-sensitive, but is insensitive to whether a String or Symbol is passed
     #   to the label parameter.)
     def add_column(label, align_body: nil, align_header: nil, before: nil, formatter: nil,
-      header: nil, header_styler: nil, styler: nil, width: nil, &extractor)
+      header: nil, header_styler: nil, padding: nil, styler: nil, width: nil, &extractor)
 
       column_label = normalize_column_label(label)
+
+      left_padding, right_padding =
+        if padding
+          Array === padding ? padding : [padding, padding]
+        else
+          [@left_column_padding, @right_column_padding]
+        end
 
       if column_registry.include?(column_label)
         raise InvalidColumnLabelError, "Column label already used in this table."
@@ -313,7 +328,9 @@ module Tabulo
         header: (header || label).to_s,
         header_styler: header_styler || @header_styler,
         index: column_registry.count,
+        left_padding: left_padding,
         padding_character: PADDING_CHARACTER,
+        right_padding: right_padding,
         styler: styler || @styler,
         truncation_indicator: @truncation_indicator,
         width: width || @column_width,
@@ -413,7 +430,7 @@ module Tabulo
     # It may be that `:top`, `:middle` and `:bottom` all look the same. Whether
     # this is the case depends on the characters used for the table border.
     def horizontal_rule(position = :bottom)
-      column_widths = get_columns.map { |column| column.width + total_column_padding }
+      column_widths = get_columns.map { |column| column.width + column.total_padding }
       @border_instance.horizontal_rule(column_widths, position)
     end
 
@@ -463,7 +480,13 @@ module Tabulo
 
       if @title
         border_edge_width = (@border == :blank ? 0 : 2)
-        expand_to(Unicode::DisplayWidth.of(@title) + total_column_padding + border_edge_width)
+        columns = get_columns
+        expand_to(
+          Unicode::DisplayWidth.of(@title) +
+          columns.first.left_padding +
+          columns.last.right_padding +
+          border_edge_width
+        )
       end
 
       self
@@ -597,12 +620,14 @@ module Tabulo
     # @visibility private
     def formatted_title
       columns = get_columns
-      num_fudged_columns = columns.count - 1
-      basic_width = columns.inject(0) { |total_width, column| total_width + column.width }
+
       extra_for_internal_dividers = (@border == :blank ? 0 : 1)
-      extra_for_internal_padding = @left_column_padding + @right_column_padding
-      extra_total = num_fudged_columns * (extra_for_internal_dividers + extra_for_internal_padding)
-      title_cell_width = basic_width + extra_total
+
+      title_cell_width = columns.inject(0) do |total_width, column|
+        total_width + column.padded_width + extra_for_internal_dividers
+      end
+
+      title_cell_width -= (columns.first.left_padding + columns.last.right_padding + extra_for_internal_dividers)
 
       styler =
         if @title_styler
@@ -620,7 +645,9 @@ module Tabulo
         alignment: @align_title,
         cell_data: nil,
         formatter: -> (s) { s },
+        left_padding: columns.first.left_padding,
         padding_character: PADDING_CHARACTER,
+        right_padding: columns.last.right_padding,
         styler: styler,
         truncation_indicator: @truncation_indicator,
         value: @title,
@@ -630,7 +657,7 @@ module Tabulo
       max_cell_height = cells.map(&:height).max
       row_height = ([nil, max_cell_height].compact.min || 1)
       subcell_stacks = cells.map do |cell|
-        cell.padded_truncated_subcells(row_height, @left_column_padding, @right_column_padding)
+        cell.padded_truncated_subcells(row_height)
       end
       subrows = subcell_stacks.transpose.map do |subrow_components|
         @border_instance.join_cell_contents(subrow_components)
@@ -653,10 +680,9 @@ module Tabulo
     def expand_to(min_table_width)
       columns = get_columns
       num_columns = columns.count
-      total_columns_width = columns.inject(0) { |sum, column| sum + column.width }
-      total_padding = num_columns * total_column_padding
+      total_columns_padded_width = columns.inject(0) { |sum, column| sum + column.padded_width }
       total_borders = num_columns + 1
-      unadjusted_table_width = total_columns_width + total_padding + total_borders
+      unadjusted_table_width = total_columns_padded_width + total_borders
       required_increase = Util.max(min_table_width - unadjusted_table_width, 0)
 
       required_increase.times do
@@ -672,10 +698,10 @@ module Tabulo
     def shrink_to(max_table_width)
       columns = get_columns
       num_columns = columns.count
-      total_columns_width = columns.inject(0) { |sum, column| sum + column.width }
-      total_padding = num_columns * total_column_padding
+      total_columns_padded_width = columns.inject(0) { |sum, column| sum + column.padded_width }
+      total_padding = columns.inject(0) { |sum, column| sum + column.total_padding }
       total_borders = num_columns + 1
-      unadjusted_table_width = total_columns_width + total_padding + total_borders
+      unadjusted_table_width = total_columns_padded_width + total_borders
 
       # Ensure max table width is at least wide enough to accommodate table borders and padding
       # and one character of content.
@@ -690,11 +716,6 @@ module Tabulo
 
         widest_column.width -= 1
       end
-    end
-
-    # @!visibility private
-    def total_column_padding
-      @left_column_padding + @right_column_padding
     end
 
     # @!visibility private
@@ -714,7 +735,7 @@ module Tabulo
       max_cell_height = cells.map(&:height).max
       row_height = ([wrap_cells_to, max_cell_height].compact.min || 1)
       subcell_stacks = cells.map do |cell|
-        cell.padded_truncated_subcells(row_height, @left_column_padding, @right_column_padding)
+        cell.padded_truncated_subcells(row_height)
       end
       subrows = subcell_stacks.transpose.map do |subrow_components|
         @border_instance.join_cell_contents(subrow_components)

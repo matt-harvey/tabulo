@@ -9,8 +9,10 @@ describe Tabulo::Column do
       formatter: -> (n) { "%.2f" % n },
       header: "X10",
       header_styler: nil,
+      left_padding: 1,
       index: 3,
       padding_character: " ",
+      right_padding: 1,
       styler: nil,
       truncation_indicator: "~",
       width: 10)
