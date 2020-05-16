@@ -1744,7 +1744,6 @@ describe Tabulo::Table do
           "and a CellData instance containing information about the row index, column index and source record "\
           "for the row, without changing the underlying cell value's default alignment, and without affecting "\
           "column width calculations" do
-          puts "yo"
           styler = -> (val, str, cell_data) do
             expect(cell_data.column_index).to eq(2)
             expect(0..4).to include(cell_data.row_index)
@@ -1772,6 +1771,30 @@ describe Tabulo::Table do
           top_right_body_cell = table.first.to_a.last
           expect(top_right_body_cell.value).to eq(3)
           expect(top_right_body_cell.value).to be_a(Integer)
+        end
+      end
+
+      context "when passed a 4-parameter callable" do
+        it "styles the cell value by calling the styler on the underlying cell value, the formatted value, "\
+          "a CellData instance (containing information about the row index, column index and source record "\
+          "for the row), and the line index, without changing the underlying cell value's default alignment, and "\
+          "without affecting column width calculations" do
+          styler = -> (val, str, cell_data, line_index) do
+            line_index == 1 ? "\033[31;1;4m#{str}\033[0m" : str
+          end
+          table.add_column("Word", width: 4, styler: styler) { |n| "a" * n }
+
+          expect(table.to_s).to eq \
+            %Q(+--------------+--------------+------+
+               |       N      |    Doubled   | Word |
+               +--------------+--------------+------+
+               |            1 |            2 | a    |
+               |            2 |            4 | aa   |
+               |            3 |            6 | aaa  |
+               |            4 |            8 | aaaa |
+               |            5 |           10 | aaaa |
+               |              |              | \033[31;1;4ma\033[0m    |
+               +--------------+--------------+------+).gsub(/^ +/, "")
         end
       end
     end

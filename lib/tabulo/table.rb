@@ -271,6 +271,12 @@ module Tabulo
     #       {CellData#row_index} attribute can be inspected to determine whether the {Cell} is an
     #       odd- or even-numbered {Row}, to arrange for different styling to be applied to
     #       alternating rows. See the documentation for {CellData} for more.
+    #     * If the passed callable takes 4 parameters, then the first three parameters are as above,
+    #       and the fourth parameter is an Integer representing the index of the line within the
+    #       cell that is currently being styled. For example, if the cell content is wrapped over 3
+    #       lines, then the callable will be called first with a line index of 0, to style the first
+    #       line, then with a line index of 1, to style the second line, and finally with a line
+    #       index of 2, to style the third and final wrapped line of the cell.
     #
     #   Note that if the content of a cell is truncated, then the whatever styling is applied by the
     #   <tt>styler</tt> to the cell content will also be applied to the truncation indicator character.
