@@ -1,5 +1,13 @@
 # Changelog
 
+### v2.6.0
+
+* Add an additional, optional parameter to `styler`, `header_styler` and `title_styler`
+  callbacks, which will receive the index (0, 1 or etc.) of the line within the cell
+  being styled.
+* Allow padding to be configured on a column-by-column basis.
+* Minor documentation improvements.
+
 ### v2.5.0
 
 * Add option of table title, together with options for styling and aligning the title

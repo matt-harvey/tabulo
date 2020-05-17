@@ -681,7 +681,7 @@ the table.
 The `formatter` callback also has an alternative, 2-parameter version. If `formatter` is passed
 a 2-parameter callable, the second parameter will be given a `CellData` instance,
 containing additional information about the cell that may be useful in determining how to format
-it&mdash;see the [documentation](https://www.rubydoc.info/gems/tabulo/2.5.0/Tabulo/CellData.html)
+it&mdash;see the [documentation](https://www.rubydoc.info/gems/tabulo/2.6.0/Tabulo/CellData.html)
 for details.
 
 <a name="colours-and-styling"></a>
@@ -726,7 +726,7 @@ The first parameter represents the underlying value of the cell (in this case a 
 number is even). The second parameter represents the formatted string value of that cell, i.e. the cell
 content after any processing by the [formatter](#formatting-cell-values). The third and fourth
 parameters are optional, and contain further information about the cell and its contents that may be useful in
-determining how to style it. See the [documentation](https://www.rubydoc.info/gems/tabulo/2.5.0/Tabulo/CellData.html)
+determining how to style it. See the [documentation](https://www.rubydoc.info/gems/tabulo/2.6.0/Tabulo/CellData.html)
 for details.
 
 If the content of a cell is wrapped over multiple lines, then the `styler` will be called once
@@ -747,7 +747,7 @@ table.add_column(:even?, header_styler: -> (s) { "\033[32m#{s}\033[0m" })
 ```
 
 The `header_styler` option accepts a 1-, 2- or 3-parameter callable. See the
-[documentation](https://www.rubydoc.info/gems/tabulo/2.5.0/Tabulo/Table#add_column-instance_method)
+[documentation](https://www.rubydoc.info/gems/tabulo/2.6.0/Tabulo/Table#add_column-instance_method)
 for details.
 
 <a name="styling-title"></a>
@@ -761,7 +761,7 @@ table = Tabulo::Table.new(1..5, :itself, :even?, :odd?, title: "Numbers", title_
 ```
 
 The `title_styler` option accepts a 1- or 2-parameter callable. See the
-[documentation](https://www.rubydoc.info/gems/tabulo/2.5.0/Tabulo/Table#initialize-instance_method)
+[documentation](https://www.rubydoc.info/gems/tabulo/2.6.0/Tabulo/Table#initialize-instance_method)
 for details.
 
 <a name="styling-borders"></a>
@@ -956,7 +956,7 @@ a new table in which the rows and columns are swapped:
 By default, a header row is added to the new table, showing the string value of the element
 represented in that column. This can be configured, however, along with other aspects of
 `transpose`&#8217;s behaviour. For details, see the
-[documentation](https://www.rubydoc.info/gems/tabulo/2.5.0/Tabulo/Table#transpose-instance_method).
+[documentation](https://www.rubydoc.info/gems/tabulo/2.6.0/Tabulo/Table#transpose-instance_method).
 
 <a name="borders"></a>
 ### Configuring borders [&#x2191;](#contents)
@@ -1339,14 +1339,14 @@ The gem is available as open source under the terms of the [MIT
 License](http://opensource.org/licenses/MIT).
 
 [Gem Version]: https://rubygems.org/gems/tabulo
-[Documentation]: http://www.rubydoc.info/gems/tabulo/2.5.0
+[Documentation]: http://www.rubydoc.info/gems/tabulo/2.6.0
 [Build Status]: https://travis-ci.org/matt-harvey/tabulo
 [Coverage Status]: https://coveralls.io/r/matt-harvey/tabulo
 [Code Climate]: https://codeclimate.com/github/matt-harvey/tabulo
 [Awesome Ruby]: https://github.com/markets/awesome-ruby#cli-utilities
 
 [GV img]: https://img.shields.io/gem/v/tabulo.svg
-[DC img]: https://img.shields.io/badge/documentation-v2.5.0-blue.svg
+[DC img]: https://img.shields.io/badge/documentation-v2.6.0-blue.svg
 [BS img]: https://img.shields.io/travis/matt-harvey/tabulo.svg
 [CS img]: https://img.shields.io/coveralls/matt-harvey/tabulo.svg
 [CC img]: https://codeclimate.com/github/matt-harvey/tabulo/badges/gpa.svg
