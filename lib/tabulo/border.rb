@@ -3,107 +3,62 @@ module Tabulo
   # @!visibility private
   class Border
 
+    Style = Struct.new(
+        :corner_top_left, :corner_top_right, :corner_bottom_right, :corner_bottom_left,
+        :edge_top, :edge_right, :edge_bottom, :edge_left,
+        :tee_top, :tee_right, :tee_bottom, :tee_left,
+        :divider_vertical, :divider_horizontal, :intersection)
+
     STYLES = {
-      ascii: {
-        corner_top_left: "+",
-        corner_top_right: "+",
-        corner_bottom_right: "+",
-        corner_bottom_left: "+",
-        edge_top: "-",
-        edge_right: "|",
-        edge_bottom: "-",
-        edge_left: "|",
-        tee_top: "+",
-        tee_right: "+",
-        tee_bottom: "+",
-        tee_left: "+",
-        divider_vertical: "|",
-        divider_horizontal: "-",
-        intersection: "+",
-      },
-      classic: {
-        corner_top_left: "+",
-        corner_top_right: "+",
-        edge_top: "-",
-        edge_right: "|",
-        edge_left: "|",
-        tee_top: "+",
-        tee_right: "+",
-        tee_left: "+",
-        divider_vertical: "|",
-        divider_horizontal: "-",
-        intersection: "+",
-      },
-      reduced_ascii: {
-        corner_top_left: "",
-        corner_top_right: "",
-        corner_bottom_right: "",
-        corner_bottom_left: "",
-        edge_top: "-",
-        edge_right: "",
-        edge_bottom: "-",
-        edge_left: "",
-        tee_top: " ",
-        tee_right: "",
-        tee_bottom: " ",
-        tee_left: "",
-        divider_vertical: " ",
-        divider_horizontal: "-",
-        intersection: " ",
-      },
-      reduced_modern: {
-        corner_top_left: "",
-        corner_top_right: "",
-        corner_bottom_right: "",
-        corner_bottom_left: "",
-        edge_top: "─",
-        edge_right: "",
-        edge_bottom: "─",
-        edge_left: "",
-        tee_top: " ",
-        tee_right: "",
-        tee_bottom: " ",
-        tee_left: "",
-        divider_vertical: " ",
-        divider_horizontal: "─",
-        intersection: " ",
-      },
-      markdown: {
-        corner_top_left: "",
-        corner_top_right: "",
-        corner_bottom_right: "",
-        corner_bottom_left: "",
-        edge_top: "",
-        edge_right: "|",
-        edge_bottom: "",
-        edge_left: "|",
-        tee_top: "",
-        tee_right: "|",
-        tee_bottom: "",
-        tee_left: "|",
-        divider_vertical: "|",
-        divider_horizontal: "-",
-        intersection: "|",
-      },
-      modern: {
-        corner_top_left: "┌",
-        corner_top_right: "┐",
-        corner_bottom_right: "┘",
-        corner_bottom_left: "└",
-        edge_top: "─",
-        edge_right: "│",
-        edge_bottom: "─",
-        edge_left: "│",
-        tee_top: "┬",
-        tee_right: "┤",
-        tee_bottom: "┴",
-        tee_left: "├",
-        divider_vertical: "│",
-        divider_horizontal: "─",
-        intersection: "┼",
-      },
-      blank: {
-      },
+      ascii:
+        Style.new(
+          "+", "+", "+", "+",
+          "-", "|", "-", "|",
+          "+", "+", "+", "+",
+          "|", "-", "+",
+        ),
+      classic:
+        Style.new(
+          "+", "+", "", "",
+          "-", "|", "", "|",
+          "+", "+", "", "+",
+          "|", "-", "+",
+        ),
+      reduced_ascii:
+        Style.new(
+          "", "", "", "",
+          "-", "", "-", "",
+          " ", "", " ", "",
+          " ", "-", " ",
+        ),
+      reduced_modern:
+        Style.new(
+          "", "", "", "",
+          "─", "", "─", "",
+          " ", "", " ", "",
+          " ", "─", " ",
+        ),
+      markdown:
+        Style.new(
+          "", "", "", "",
+          "", "|", "", "|",
+          "", "|", "", "|",
+          "|", "-", "|",
+        ),
+      modern:
+        Style.new(
+          "┌", "┐", "┘", "└",
+          "─", "│", "─", "│",
+          "┬", "┤", "┴", "├",
+          "│", "─", "┼",
+        ),
+      blank:
+        Style.new(
+          "", "", "", "",
+          "", "", "", "",
+          "", "", "", "",
+          "", "", "",
+        ),
     }
 
     # @!visibility private
@@ -147,7 +102,7 @@ module Tabulo
 
     def self.options(kind)
       opts = STYLES[kind]
-      return opts if opts
+      return opts.to_h if opts
       raise InvalidBorderError
     end
 
