@@ -1952,7 +1952,7 @@ describe Tabulo::Table do
           line_indices_encountered = []
           header_styler = -> (str, column_index, line_index) do
             expect(column_index).to eq(2)
-            line_indices_encountered.append << line_index
+            line_indices_encountered << line_index
             line_index.even? ? "\033[31;1;4m#{str}\033[0m" : str
           end
           table.add_column("Multiplied by three\nOK?", header_styler: header_styler) { |n| n * 3 }
