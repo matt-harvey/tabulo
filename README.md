@@ -721,13 +721,13 @@ table.add_column(
 )
 ```
 
-The `styler` option should be passed a callable that takes either two, three or four parameters.
+The `styler` option should be passed a callable that takes either 2, 3 or 4 parameters.
 The first parameter represents the underlying value of the cell (in this case a boolean indicating whether the
 number is even). The second parameter represents the formatted string value of that cell, i.e. the cell
 content after any processing by the [formatter](#formatting-cell-values). The third and fourth
 parameters are optional, and contain further information about the cell and its contents that may be useful in
-determining how to style it. See the [documentation](https://www.rubydoc.info/gems/tabulo/2.6.0/Tabulo/CellData.html)
-for details.
+determining how to style it. See the
+[documentation](https://www.rubydoc.info/gems/tabulo/2.6.0/Tabulo/Table#add_column-instance_method) for details.
 
 If the content of a cell is wrapped over multiple lines, then the `styler` will be called once
 per line, so that each line of the cell will have the escape sequence applied to it separately
