@@ -520,7 +520,7 @@ table = Tabulo::Table.new([1, 2, 5], :itself, :even?, :odd?, column_padding: [0,
 +--------+-------+-------+
 ```
 
-Note how the padding amount is unaffected by calling `pack`.
+Note how the padding amount is completely unaffected by the call `pack`.
 
 Padding can also be configured on a column-by-column basis, using the `padding` option when calling
 `add_column`:
