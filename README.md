@@ -492,14 +492,14 @@ table = Tabulo::Table.new([1, 2, 5], :itself, :even?, :odd?, column_padding: 0)
 ```
 
 ```
-> puts table
-+------------+------------+------------+
-|   itself   |    even?   |    odd?    |
-+------------+------------+------------+
-|           1|    false   |    true    |
-|           2|    true    |    false   |
-|           5|    false   |    true    |
-+------------+------------+------------+
+> puts table.pack
++------+-----+-----+
+|itself|even?| odd?|
++------+-----+-----+
+|     1|false| true|
+|     2| true|false|
+|     5|false| true|
++------+-----+-----+
 ```
 
 Passing an array of _two_ integers to this option configures the left and right padding for each
@@ -510,33 +510,35 @@ table = Tabulo::Table.new([1, 2, 5], :itself, :even?, :odd?, column_padding: [0,
 ```
 
 ```
-> puts table
-+--------------+--------------+--------------+
-|   itself     |    even?     |    odd?      |
-+--------------+--------------+--------------+
-|           1  |    false     |    true      |
-|           2  |    true      |    false     |
-|           5  |    false     |    true      |
-+--------------+--------------+--------------+
+> puts table.pack
++--------+-------+-------+
+|itself  |even?  | odd?  |
++--------+-------+-------+
+|     1  |false  | true  |
+|     2  | true  |false  |
+|     5  |false  | true  |
++--------+-------+-------+
 ```
+
+Note how the padding amount is unaffected by calling `pack`.
 
 Padding can also be configured on a column-by-column basis, using the `padding` option when calling
 `add_column`:
 
 ```ruby
 table = Tabulo::Table.new([1, 2, 5], :itself, :even?)
-table.add_column(:odd?, padding: 2)
+table.add_column(:odd?, padding: 3)
 ```
 
 ```
-> puts table
-+--------------+--------------+------------------+
-|    itself    |     even?    |       odd?       |
-+--------------+--------------+------------------+
-|            1 |     false    |       true       |
-|            2 |     true     |       false      |
-|            5 |     false    |       true       |
-+--------------+--------------+------------------+
+> puts table.pack
++--------+-------+-----------+
+| itself | even? |    odd?   |
++--------+-------+-----------+
+|      1 | false |    true   |
+|      2 |  true |   false   |
+|      5 | false |    true   |
++--------+-------+-----------+
 ```
 
 This column-level `padding` setting always overrides any table-level `column_padding` setting, for
