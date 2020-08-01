@@ -35,17 +35,17 @@ module Tabulo
     #   be unique. Each element of the Array  will be used to create a column whose content is
     #   created by calling the corresponding method on each element of sources. Note
     #   the {#add_column} method is a much more flexible way to set up columns on the table.
-    # @param [:left, :right, :center, :auto] align_body (:auto) Determines the alignment of body cell
+    # @param [:left, :right, :center, :auto] align_body Determines the alignment of body cell
     #   (i.e. non-header) content within columns in this Table. Can be overridden for individual columns
     #   using the <tt>align_body</tt> option passed to {#add_column}. If passed <tt>:auto</tt>,
     #   alignment is determined by cell content, with numbers aligned right, booleans
     #   center-aligned, and other values left-aligned.
-    # @param [:left, :right, :center] align_header (:center) Determines the alignment of header text
+    # @param [:left, :right, :center] align_header Determines the alignment of header text
     #   for columns in this Table. Can be overridden for individual columns using the
     #   <tt>align_header</tt> option passed to {#add_column}
-    # @param [:left, :right, :center] align_header (:center) Determines the alignment of the table
+    # @param [:left, :right, :center] align_header Determines the alignment of the table
     #   title, if present.
-    # @param [:ascii, :markdown, :modern, :blank, nil] border (nil) Determines the characters used
+    # @param [:ascii, :markdown, :modern, :blank, nil] border Determines the characters used
     #   for the Table border, including both the characters around the outside of table, and the lines drawn
     #   within the table to separate columns from each other and the header row from the Table body.
     #   If <tt>nil</tt>, then the value of {DEFAULT_BORDER} will be used.
@@ -63,7 +63,7 @@ module Tabulo
     #                       borders and intersection characters consisting of whitespace only
     #   - `:classic`        Like `:ascii`, but does not have a horizontal line at the bottom of the
     #                       table. This reproduces the default behaviour in `tabulo` v1.
-    # @param [nil, #to_proc] border_styler (nil) A lambda or other callable object taking
+    # @param [nil, #to_proc] border_styler A lambda or other callable object taking
     #   a single parameter, representing a section of the table's borders (which for this purpose
     #   include any horizontal and vertical lines inside the table), and returning a string.
     #   If passed <tt>nil</tt>, then no additional styling will be applied to borders. If passed a
@@ -72,7 +72,7 @@ module Tabulo
     #   <tt>border_styler</tt> is not taken into consideration by the internal table rendering calculations
     #   Thus it can be used to apply ANSI escape codes to border characters, to colour the borders
     #   for example, without breaking the table formatting.
-    # @param [nil, Integer, Array] column_padding (1) Determines the amount of blank space with which to pad
+    # @param [nil, Integer, Array] column_padding Determines the amount of blank space with which to pad
     #   either side of each column. If passed an Integer, then the given amount of padding is
     #   applied to each side of each column. If passed a two-element Array, then the first element of the
     #   Array indicates the amount of padding to apply to the left of each column, and the second
@@ -80,26 +80,26 @@ module Tabulo
     #   individual columns using the `padding` option of {#add_column}.
     # @param [Integer, nil] column_width The default column width for columns in this
     #   table, not excluding padding. If <tt>nil</tt>, then {DEFAULT_COLUMN_WIDTH} will be used.
-    # @param [nil, #to_proc] formatter (:to_s.to_proc) The default formatter for columns in this
+    # @param [nil, #to_proc] formatter The default formatter for columns in this
     #   table. See `formatter` option of {#add_column} for details.
     # @param [:start, nil, Integer] header_frequency (:start) Controls the display of column headers.
     #   If passed <tt>:start</tt>, headers will be shown at the top of the table only. If passed <tt>nil</tt>,
     #   headers will not be shown. If passed an Integer N (> 0), headers will be shown at the top of the table,
     #   then repeated every N rows.
-    # @param [nil, #to_proc] header_styler (nil) The default header styler for columns in this
+    # @param [nil, #to_proc] header_styler The default header styler for columns in this
     #   table. See `header_styler` option of {#add_column} for details.
-    # @param [nil, Integer] row_divider_frequency (nil) Controls the display of horizontal row dividers within
+    # @param [nil, Integer] row_divider_frequency Controls the display of horizontal row dividers within
     #   the table body. If passed <tt>nil</tt>, dividers will not be shown. If passed an Integer N (> 0),
     #   dividers will be shown after every N rows. The characters used to form the dividers are
     #   determined by the `border` option, and are the same as those used to form the bottom edge of the
     #   header row.
-    # @param [nil, #to_proc] styler (nil) The default styler for columns in this table. See `styler`
+    # @param [nil, #to_proc] styler The default styler for columns in this table. See `styler`
     #   option of {#add_column} for details.
-    # @param [nil, String] title (nil) If passed a String, will arrange for a title to be shown at the top
+    # @param [nil, String] title If passed a String, will arrange for a title to be shown at the top
     #   of the table. Note: If the `border` option is set to `:markdown`, adding a title to the table
     #   will cause it to cease being valid Markdown when rendered, since Markdown engines do not generally
     #   support adding a caption element (i.e. title) to tables.
-    # @param [nil, #to_proc] title_styler (nil) A lambda or other callable object that will
+    # @param [nil, #to_proc] title_styler A lambda or other callable object that will
     #   determine the colors or other styling applied to the table title. Can be passed
     #   <tt>nil</tt>, or can be passed a callable that takes either 1 or 2 parametes:
     #   * If passed <tt>nil</tt>, then no additional styling will be applied to the title.
@@ -184,24 +184,24 @@ module Tabulo
     #   a method to be called on each item in the table sources to provide the content
     #   for this column. If a String is passed as the label, then it will be converted to
     #   a Symbol for the purpose of serving as this label.
-    # @param [:left, :center, :right, :auto, nil] align_body (nil) Specifies how the cell body contents
+    # @param [:left, :center, :right, :auto, nil] align_body Specifies how the cell body contents
     #   should be aligned. If <tt>nil</tt> is passed, then the alignment is determined
     #   by the Table-level setting passed to the <tt>align_body</tt> option on Table initialization
     #   (which itself defaults to <tt>:auto</tt>). Otherwise this option determines the alignment of
     #   this column. If <tt>:auto</tt> is passed, the alignment is determined by the type of the cell
     #   value, with numbers aligned right, booleans center-aligned, and other values left-aligned.
     #   Note header text alignment is configured separately using the :align_header param.
-    # @param [:left, :center, :right, nil] align_header (nil) Specifies how the header text
+    # @param [:left, :center, :right, nil] align_header Specifies how the header text
     #   should be aligned. If <tt>nil</tt> is passed, then the alignment is determined
     #   by the Table-level setting passed to the <tt>align_header</tt> (which itself defaults
     #   to <tt>:center</tt>). Otherwise, this option determines the alignment of the header
     #   content for this column.
-    # @param [Symbol, String, Integer, nil] before (nil) The label of the column before (i.e. to
+    # @param [Symbol, String, Integer, nil] before The label of the column before (i.e. to
     #   the left of) which the new column should inserted. If <tt>nil</tt> is passed, it will be
     #   inserted after all other columns. If there is no column with the given label, then an
     #   {InvalidColumnLabelError} will be raised. A non-Integer labelled column can be identified
     #   in either String or Symbol form for this purpose.
-    # @param [#to_proc] formatter (nil) A lambda or other callable object that
+    # @param [#to_proc] formatter A lambda or other callable object that
     #   will be passed the calculated value of each cell to determine how it should be displayed. This
     #   is distinct from the extractor and the styler (see below).
     #   For example, if the extractor for this column generates a Date, then the formatter might format
@@ -219,7 +219,7 @@ module Tabulo
     #     whether the {Cell} is an odd- or even-numbered {Row}, to arrange for different formatting
     #     to be applied to alternating rows.
     #     See the documentation for {CellData} for more.
-    # @param [nil, #to_s] header (nil) Text to be displayed in the column header. If passed nil,
+    # @param [nil, #to_s] header Text to be displayed in the column header. If passed nil,
     #   the column's label will also be used as its header text.
     # @param [nil, #to_proc] header_styler (nil) A lambda or other callable object that will
     #   determine the colors or other styling applied to the header content. Can be passed
@@ -249,14 +249,14 @@ module Tabulo
     #
     #   Note that if the header content is truncated, then any <tt>header_styler</tt> will be applied to the
     #   truncation indicator character as well as to the truncated content.
-    # @param [nil, Integer, Array] padding (nil) Determines the amount of blank space with which to
+    # @param [nil, Integer, Array] padding Determines the amount of blank space with which to
     #   pad either side of the column. If passed nil, then the `column_padding` setting of the
     #   {Table} will determine the column's padding. (See {#initialize}.) Otherwise, this option
     #   overrides, for this column, the `column_padding` that was set at the table level: if passed an Integer,
     #   then the given amount of padding is applied to either side of the column; or if passed a two-element Array,
     #   then the first element of the Array indicates the amount of padding to apply to the left of the column,
     #   and the second element indicates the amount to apply to the right.
-    # @param [nil, #to_proc] styler (nil) A lambda or other callable object that will determine
+    # @param [nil, #to_proc] styler A lambda or other callable object that will determine
     #   the colors or other styling applied to the formatted value of the cell. Can be passed
     #   <tt>nil</tt>, or can be passed a callable that takes either 2 or 3 parameters:
     #   * If passed <tt>nil</tt>, then no additional styling will be applied to the cell content
@@ -288,7 +288,7 @@ module Tabulo
     #
     #   Note that if the content of a cell is truncated, then the whatever styling is applied by the
     #   <tt>styler</tt> to the cell content will also be applied to the truncation indicator character.
-    # @param [Integer] width (nil) Specifies the width of the column, excluding padding. If
+    # @param [Integer] width Specifies the width of the column, excluding padding. If
     #   nil, then the column will take the width provided by the `column_width` param
     #   with which the Table was initialized.
     # @param [#to_proc] extractor A block or other callable that will be passed each of the {Table}
@@ -412,7 +412,7 @@ module Tabulo
     # Produce a horizontal dividing line suitable for printing at the top, bottom or middle
     # of the table.
     #
-    # @param [:top, :middle, :bottom, :title_top, :title_bottom] position (:bottom)
+    # @param [:top, :middle, :bottom, :title_top, :title_bottom] position
     #   Specifies the position for which the resulting horizontal dividing line is intended to
     #   be printed. This determines the border characters that are used to construct the line.
     #   The `:title_top` and `:title_bottom` options are used internally for adding borders
@@ -451,7 +451,7 @@ module Tabulo
     # is called. If the source Enumerable changes between that point, and the point when
     # the Table is printed, then columns will *not* be resized yet again on printing.
     #
-    # @param [nil, Numeric] max_table_width (:auto) With no args, or if passed <tt>:auto</tt>,
+    # @param [nil, Numeric] max_table_width With no args, or if passed <tt>:auto</tt>,
     #   stops the total table width (including padding and borders) from expanding beyond the
     #   bounds of the terminal screen.
     #   If passed <tt>nil</tt>, the table width will not be capped.
@@ -523,13 +523,13 @@ module Tabulo
     #   new Table, which contains the names of "fields" (corresponding to the original Table's
     #   column headings). If this is not provided, then by default this column will be made just
     #   wide enough to accommodate its contents.
-    # @option opts [String] :field_names_header ("") By default the left-most column will have a
+    # @option opts [String] :field_names_header By default the left-most column will have a
     #   blank header; but this can be overridden by passing a String to this option.
-    # @option opts [:left, :center, :right] :field_names_header_alignment (:right) Specifies how the
+    # @option opts [:left, :center, :right] :field_names_header_alignment Specifies how the
     #   header text of the left-most column (if it has header text) should be aligned.
-    # @option opts [:left, :center, :right] :field_names_body_alignment (:right) Specifies how the
+    # @option opts [:left, :center, :right] :field_names_body_alignment Specifies how the
     #   body text of the left-most column should be aligned.
-    # @option opts [#to_proc] :headers (:to_s.to_proc) A lambda or other callable object that
+    # @option opts [#to_proc] :headers A lambda or other callable object that
     #   will be passed in turn each of the elements of the current Table's <tt>sources</tt>
     #   Enumerable, to determine the text to be displayed in the header of each column of the
     #   new Table (other than the left-most column's header, which is determined as described
