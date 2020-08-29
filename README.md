@@ -16,19 +16,19 @@ or &ldquo;ASCII tables&rdquo;). It is both highly configurable and very easy to 
 _Quick API:_
 
 ```
-> puts Tabulo::Table.new(User.all, :id, :first_name, :last_name, border: :modern).pack
-┌────┬────────────┬───────────┐
-│ id │ first_name │ last_name │
-├────┼────────────┼───────────┤
-│  1 │ John       │ Citizen   │
-│  2 │ Jane       │ Doe       │
-└────┴────────────┴───────────┘
+> puts Tabulo::Table.new(User.all, :id, :first_name, :last_name).pack
++----+------------+-----------+
+| id | first_name | last_name |
++----+------------+-----------+
+|  1 | John       | Citizen   |
+|  2 | Jane       | Doe       |
++----+------------+-----------+
 ```
 
 _Full API:_
 
 ```
-table = Tabulo::Table.new(User.all, border: :modern) do |t|
+table = Tabulo::Table.new(User.all) do |t|
   t.add_column("ID", &:id)
   t.add_column("First name", &:first_name)
   t.add_column("Last name") { |user| user.last_name.upcase }
@@ -37,12 +37,12 @@ end
 
 ```
 > puts table.pack
-┌────┬────────────┬───────────┐
-│ ID │ First name │ Last name │
-├────┼────────────┼───────────┤
-│  1 │ John       │ CITIZEN   │
-│  2 │ Jane       │ DOE       │
-└────┴────────────┴───────────┘
++----+------------+-----------+
+| ID | First name | Last name |
++----+------------+-----------+
+|  1 | John       | CITIZEN   |
+|  2 | Jane       | DOE       |
++----+------------+-----------+
 ```
 
 <a name="features"></a>
@@ -1014,6 +1014,10 @@ This is done using the `border` option passed to `Table.new`. The options are as
 └──────────────┴──────────────┴──────────────┘
 ```
 
+_Note: The unicode characters used for the `:modern` border may not render properly
+when viewing this documentation on some browsers or devices. This doesn&#8217;t reflect any brokenness
+in `tabulo` itself._
+
 `:markdown`&mdash;renders a GitHub flavoured Markdown table:
 
 ```
@@ -1103,6 +1107,10 @@ generally support adding a caption (i.e. title) element to tables.
 ────────────── ────────────── ──────────────
 ```
 
+_Note: The unicode characters used for the `:reduced_modern` border may not render properly
+when viewing this documentation on some browsers or devices. This doesn&#8217;t reflect any brokenness
+in `tabulo` itself._
+
 `:classic`&mdash;reproduces the default behaviour in Tabulo v1; this is like the `:ascii` option,
 but without a bottom border:
 
@@ -1156,16 +1164,16 @@ every Nth row. For example:
 If you want a line before every row, pass `1` to `row_divider_frequency`. For example:
 
 ```
-> puts Tabulo::Table.new(1..3, :itself, :even?, :odd?, border: :modern, row_divider_frequency: 1)
-┌──────────────┬──────────────┬──────────────┐
-│    itself    │     even?    │     odd?     │
-├──────────────┼──────────────┼──────────────┤
-│            1 │     false    │     true     │
-├──────────────┼──────────────┼──────────────┤
-│            2 │     true     │     false    │
-├──────────────┼──────────────┼──────────────┤
-│            3 │     false    │     true     │
-└──────────────┴──────────────┴──────────────┘
+> puts Tabulo::Table.new(1..3, :itself, :even?, :odd?, row_divider_frequency: 1)
++--------------+--------------+--------------+
+|    itself    |     even?    |     odd?     |
++--------------+--------------+--------------+
+|            1 |     false    |     true     |
++--------------+--------------+--------------+
+|            2 |     true     |     false    |
++--------------+--------------+--------------+
+|            3 |     false    |     true     |
++--------------+--------------+--------------+
 ```
 
 <a name="freezing-a-table"></a>
