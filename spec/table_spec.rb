@@ -804,8 +804,8 @@ describe Tabulo::Table do
 
     context "when there are newlines in headers or body cell contents" do
       context "with unlimited wrapping" do
-        it "respects newlines within header and cells" do
-          table = Tabulo::Table.new(["Two\nlines", "\nInitial", "Final\n", "Multiple\nnew\nlines"]) do |t|
+        it "respects any platform's newlines within header and cells" do
+          table = Tabulo::Table.new(["Two\r\nlines", "\nInitial", "Final\n", "Multiple\rnew\nlines"]) do |t|
             t.add_column(:itself, header: "Firstpart\nsecondpart", width: 7) { |s| s }
             t.add_column(:length)
             t.add_column("Lines\nin\nheader", align_body: :right) { |s| s }
@@ -818,7 +818,7 @@ describe Tabulo::Table do
                | secondp |              |    header    |
                |   art   |              |              |
                +---------+--------------+--------------+
-               | Two     |            9 |          Two |
+               | Two     |           10 |          Two |
                | lines   |              |        lines |
                |         |            8 |              |
                | Initial |              |      Initial |
@@ -2300,7 +2300,7 @@ describe Tabulo::Table do
 
     before(:each) do
       table.add_column(:to_s)
-      table.add_column("Is it\neven?") { |n| n.even? }
+      table.add_column("Is it\r\neven?") { |n| n.even? }
       table.add_column("dec", formatter: -> (n) { "%.#{n}f" % n }) { |n| n }
       table.add_column("word\nyep", width: 5) { |n| "w" * n * 2 }
       table.add_column("cool") { |n| "two\nlines" if n == 3 }

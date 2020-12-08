@@ -600,7 +600,7 @@ The character used to indicate truncation, which defaults to `~`, can be configu
 #### Manual cell wrapping [&#x2191;](#contents)
 
 You can &ldquo;manually&rdquo; wrap the content of a title, header or body cell at a particular
-point, simply by placing a newline character at that point:
+point, simply by placing a newline character, at that point:
 
 ```ruby
 table = Tabulo::Table.new(1..3) do |t|
@@ -621,6 +621,11 @@ end
 |            3 |     false    |     true     |
 +--------------+--------------+--------------+
 ```
+
+Tabulo will treat any of the character combinations `"\n"`, `"\r\n"` or `"\r"` equally, as a line break,
+regardless of the platform it&#8217;s currently being run on. This ensures things are formatted as
+expected if, for example, you are examining content that was produced on another platform from
+the one you&#8217;re running Tabulo on.
 
 <a name="formatting-cell-values"></a>
 ### Formatting cell values [&#x2191;](#contents)

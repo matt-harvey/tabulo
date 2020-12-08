@@ -3,6 +3,8 @@ module Tabulo
   # @!visibility private
   module Util
 
+    NEWLINE = /\r\n|\n|\r/
+
     # @!visibility private
     def self.condense_lines(lines)
       join_lines(lines.reject(&:empty?))
@@ -34,7 +36,7 @@ module Tabulo
     # @return [Integer] the length of the longest segment of str when split by newlines
     def self.wrapped_width(str)
       return 0 if str.empty?
-      segments = str.split($/)
+      segments = str.split(NEWLINE)
       segments.inject(1) do |longest_length_so_far, segment|
         Util.max(longest_length_so_far, Unicode::DisplayWidth.of(segment))
       end

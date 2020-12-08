@@ -101,7 +101,7 @@ module Tabulo
 
     def calculate_subcells
       line_index = 0
-      formatted_content.split($/, -1).flat_map do |substr|
+      formatted_content.split(Util::NEWLINE, -1).flat_map do |substr|
         subsubcells, subsubcell, subsubcell_width = [], String.new(""), 0
 
         substr.scan(/\X/).each do |grapheme_cluster|
