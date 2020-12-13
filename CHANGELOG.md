@@ -1,5 +1,10 @@
 # Changelog
 
+### v2.6.2
+
+* Ensure line break character sequences are property formatted in output, regardless
+  of whether they are "\r\n", "\r" or "\n".
+
 ### v2.6.1
 
 * Update dependency versions
