@@ -1,5 +1,9 @@
 # Changelog
 
+### v2.6.3
+
+* Update dependency versions
+
 ### v2.6.2
 
 * Ensure line break character sequences are property formatted in output, regardless
