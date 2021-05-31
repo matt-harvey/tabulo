@@ -22,7 +22,7 @@ describe Tabulo::Column do
 
   describe "#initialize" do
     it "create a Column" do
-      is_expected.to be_a(Tabulo::Column)
+      is_expected.to be_a(Integer)
     end
   end
 
