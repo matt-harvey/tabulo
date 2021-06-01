@@ -3,7 +3,7 @@
 [![Gem Version][GV img]][Gem Version]
 [![Documentation][DC img]][Documentation]
 [![Coverage Status][CS img]][Coverage Status]
-[![Build Status][BS img]][Build Status]
+[![Build Status][GA img]][Build Status]
 [![Code Climate][CC img]][Code Climate]
 [![Awesome][AR img]][Awesome Ruby]
 
@@ -1362,7 +1362,7 @@ License](http://opensource.org/licenses/MIT).
 
 [GV img]: https://img.shields.io/gem/v/tabulo.svg
 [DC img]: https://img.shields.io/badge/documentation-v2.6.3-blue.svg
-[BS img]: https://img.shields.io/travis/matt-harvey/tabulo.svg
+[GA img]: https://github.com/matt-harvey/tabulo/actions/workflows/tests.yml/badge.svg
 [CS img]: https://img.shields.io/coveralls/matt-harvey/tabulo.svg
 [CC img]: https://codeclimate.com/github/matt-harvey/tabulo/badges/gpa.svg
 [AR img]: https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg
