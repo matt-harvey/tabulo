@@ -35,7 +35,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake", "~> 12.3.3"
   spec.add_development_dependency "rspec", "~> 3.9"
   spec.add_development_dependency "simplecov"
-  spec.add_development_dependency "coveralls"
+  spec.add_development_dependency "simplecov-lcov"
   spec.add_development_dependency "yard"
   spec.add_development_dependency "redcarpet"
   spec.add_development_dependency "github-markup"
