@@ -20,6 +20,7 @@ describe Tabulo::Table do
       title: title,
       title_styler: title_styler,
       truncation_indicator: truncation_indicator,
+      wrap_preserve: wrap_preserve,
       wrap_body_cells_to: wrap_body_cells_to,
       wrap_header_cells_to: wrap_header_cells_to,
     ) do |t|
@@ -40,6 +41,7 @@ describe Tabulo::Table do
   let(:title) { nil }
   let(:title_styler) { nil }
   let(:truncation_indicator) { nil }
+  let(:wrap_preserve) { :rune }
   let(:wrap_body_cells_to) { nil }
   let(:wrap_header_cells_to) { nil }
 
@@ -1478,6 +1480,156 @@ describe Tabulo::Table do
                \033[31m+--------------+--------------+\033[0m
                \033[31m|\033[0m            1 \033[31m|\033[0m     false    \033[31m|\033[0m
                \033[31m|\033[0m            2 \033[31m|\033[0m     true     \033[31m|\033[0m).gsub(/^ +/, "")
+        end
+      end
+    end
+
+    describe "`wrap_preserve` param" do
+      let(:table) { Tabulo::Table.new(source, :number, :word, align_body: align_body, wrap_preserve: wrap_preserve, column_width: 8) }
+      let(:source) do
+        [
+          OpenStruct.new(number: 1, word: "Here is a long and complex sentence"),
+          OpenStruct.new(number: 2, word: "Supercalifragilisticexpialadocious"),
+          OpenStruct.new(number: 3, word: "All is excellent, is it not?"),
+          OpenStruct.new(number: 4, word: "A double-barrelled word"),
+          OpenStruct.new(number: 5, word: "longishwörd—mdash"),
+        ]
+      end
+      let(:align_body) { :auto }
+
+      context "when passed :rune" do
+        let(:wrap_preserve) { :rune }
+
+        # FIXME Exercise Unicode, m-dashes and n-dashes, and center-justification
+        it "wraps in a way that preserves grapheme clusters but not words" do
+          expect(table.to_s).to eq \
+            %q(+----------+----------+
+               |  number  |   word   |
+               +----------+----------+
+               |        1 | Here is  |
+               |          | a long a |
+               |          | nd compl |
+               |          | ex sente |
+               |          | nce      |
+               |        2 | Supercal |
+               |          | ifragili |
+               |          | sticexpi |
+               |          | aladocio |
+               |          | us       |
+               |        3 | All is e |
+               |          | xcellent |
+               |          | , is it  |
+               |          | not?     |
+               |        4 | A double |
+               |          | -barrell |
+               |          | ed word  |
+               |        5 | longishw |
+               |          | örd—mdas |
+               |          | h        |
+               +----------+----------+).gsub(/^ +/, "")
+        end
+      end
+
+      context "when passed :word" do
+        let(:wrap_preserve) { :word }
+
+        context "when body content is left-aligned" do
+          let(:align_body) { :left }
+
+          it "wraps in a way that perserves words if possible" do
+            expect(table.to_s).to eq \
+              %q(+----------+----------+
+                 |  number  |   word   |
+                 +----------+----------+
+                 | 1        | Here is  |
+                 |          | a long   |
+                 |          | and      |
+                 |          | complex  |
+                 |          | sentence |
+                 | 2        | Supercal |
+                 |          | ifragili |
+                 |          | sticexpi |
+                 |          | aladocio |
+                 |          | us       |
+                 | 3        | All is   |
+                 |          | excellen |
+                 |          | t, is it |
+                 |          | not?     |
+                 | 4        | A        |
+                 |          | double-  |
+                 |          | barrelle |
+                 |          | d word   |
+                 | 5        | longishw |
+                 |          | örd—     |
+                 |          | mdash    |
+                 +----------+----------+).gsub(/^ +/, "")
+          end
+        end
+
+        context "when body content is right-aligned" do
+          let(:align_body) { :right }
+
+          it "wraps in a way that perserves words if possible" do
+            expect(table.to_s).to eq \
+              %q(+----------+----------+
+                 |  number  |   word   |
+                 +----------+----------+
+                 |        1 |  Here is |
+                 |          |   a long |
+                 |          |      and |
+                 |          |  complex |
+                 |          | sentence |
+                 |        2 | Supercal |
+                 |          | ifragili |
+                 |          | sticexpi |
+                 |          | aladocio |
+                 |          |       us |
+                 |        3 |   All is |
+                 |          | excellen |
+                 |          | t, is it |
+                 |          |     not? |
+                 |        4 |        A |
+                 |          |  double- |
+                 |          | barrelle |
+                 |          |   d word |
+                 |        5 | longishw |
+                 |          |     örd— |
+                 |          |    mdash |
+                 +----------+----------+).gsub(/^ +/, "")
+          end
+        end
+
+        context "when body content is center-aligned" do
+          let(:align_body) { :center }
+
+          it "wraps in a way that perserves words if possible" do
+            expect(table.to_s).to eq \
+              %q(+----------+----------+
+                 |  number  |   word   |
+                 +----------+----------+
+                 |     1    |  Here is |
+                 |          |  a long  |
+                 |          |    and   |
+                 |          |  complex |
+                 |          | sentence |
+                 |     2    | Supercal |
+                 |          | ifragili |
+                 |          | sticexpi |
+                 |          | aladocio |
+                 |          |    us    |
+                 |     3    |  All is  |
+                 |          | excellen |
+                 |          | t, is it |
+                 |          |   not?   |
+                 |     4    |     A    |
+                 |          |  double- |
+                 |          | barrelle |
+                 |          |  d word  |
+                 |     5    | longishw |
+                 |          |   örd—   |
+                 |          |   mdash  |
+                 +----------+----------+).gsub(/^ +/, "")
+          end
         end
       end
     end

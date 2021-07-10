@@ -124,6 +124,16 @@ module Tabulo
     #   cell's content has been truncated. If omitted or passed <tt>nil</tt>,
     #   defaults to {DEFAULT_TRUNCATION_INDICATOR}. If passed something other than <tt>nil</tt> or
     #   a single-character String, raises {InvalidTruncationIndicatorError}.
+    # @param [Symbol] wrap_preserve Specifies what unit of text the wrapping mechanism will try to
+    #     preserve intact when wrapping column content when the column width is reached.
+    #   * If passed `:rune` (the default), then it will wrap at the "character" level (approximately
+    #     speaking, the Unicode grapheme cluster level). This means the maximum number of what
+    #     readers usually think of as "characters" will be fit on each line, within the column's allocated
+    #     width, before contininuing to a new line, even if it means splitting a word in the middle.
+    #   * If passed `:word`, then it will wrap in such a way as to avoid splitting words, where
+    #     "words" are defined as units of text separated by spaces or dashes (hyphens, m-dashes and
+    #     n-dashes). Whitespace will be used to pad lines as required. Already-hyphenated may will be split
+    #     at the hyphen, however hyphens will not be inserted in non-hyphenated words.
     # @param [nil, Integer] wrap_body_cells_to Controls wrapping behaviour for table cells (excluding
     #   headers), if their content is longer than the column's fixed width. If passed <tt>nil</tt>, content will
     #   be wrapped for as many rows as required to accommodate it. If passed an Integer N (> 0), content will be
@@ -141,7 +151,7 @@ module Tabulo
     def initialize(sources, *columns, align_body: :auto, align_header: :center, align_title: :center,
       border: nil, border_styler: nil, column_padding: nil, column_width: nil, formatter: :to_s.to_proc,
       header_frequency: :start, header_styler: nil, row_divider_frequency: nil, styler: nil,
-      title: nil, title_styler: nil, truncation_indicator: nil, wrap_body_cells_to: nil,
+      title: nil, title_styler: nil, truncation_indicator: nil, wrap_preserve: :rune, wrap_body_cells_to: nil,
       wrap_header_cells_to: nil)
 
       @sources = sources
@@ -167,6 +177,7 @@ module Tabulo
       @title_styler = title_styler
       @truncation_indicator = validate_character(truncation_indicator,
         DEFAULT_TRUNCATION_INDICATOR, InvalidTruncationIndicatorError, "truncation indicator")
+      @wrap_preserve = wrap_preserve
       @wrap_body_cells_to = wrap_body_cells_to
       @wrap_header_cells_to = wrap_header_cells_to
 
@@ -291,6 +302,11 @@ module Tabulo
     # @param [Integer] width Specifies the width of the column, excluding padding. If
     #   nil, then the column will take the width provided by the `column_width` param
     #   with which the Table was initialized.
+    # @param [Symbol] wrap_preserve Specifies how to wrap column content when the column width is reached.
+    #   * If passed `nil`, or not provided, then the value passed to the `wrap_preserve` param of
+    #     {#initialize} will be used.
+    #   * If passed `rune` or word, then the option passed to {#initialize} will be overridden for
+    #     this column. See the documentation under {#initialize} for the behaviour of each option.
     # @param [#to_proc] extractor A block or other callable that will be passed each of the {Table}
     #   sources to determine the value in each cell of this column.
     #   * If this is not provided, then the column label will be treated as a method to be called on
@@ -305,7 +321,7 @@ module Tabulo
     #   Table. (This is case-sensitive, but is insensitive to whether a String or Symbol is passed
     #   to the label parameter.)
     def add_column(label, align_body: nil, align_header: nil, before: nil, formatter: nil,
-      header: nil, header_styler: nil, padding: nil, styler: nil, width: nil, &extractor)
+      header: nil, header_styler: nil, padding: nil, styler: nil, width: nil, wrap_preserve: nil, &extractor)
 
       column_label = normalize_column_label(label)
 
@@ -333,6 +349,7 @@ module Tabulo
         right_padding: right_padding,
         styler: styler || @styler,
         truncation_indicator: @truncation_indicator,
+        wrap_preserve: wrap_preserve || @wrap_preserve,
         width: width || @column_width,
       )
 
@@ -651,7 +668,8 @@ module Tabulo
         styler: styler,
         truncation_indicator: @truncation_indicator,
         value: @title,
-        width: title_cell_width
+        width: title_cell_width,
+        wrap_preserve: @wrap_preserve,
       )
       cells = [title_cell]
       max_cell_height = cells.map(&:height).max

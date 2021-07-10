@@ -22,6 +22,7 @@ module Tabulo
       right_padding:,
       styler:,
       truncation_indicator:,
+      wrap_preserve:,
       width:)
 
       @align_body = align_body
@@ -50,6 +51,7 @@ module Tabulo
       @padding_character = padding_character
       @styler = styler || -> (_, s) { s }
       @truncation_indicator = truncation_indicator
+      @wrap_preserve = wrap_preserve
       @width = width
     end
 
@@ -67,6 +69,7 @@ module Tabulo
         styler: @header_styler,
         truncation_indicator: @truncation_indicator,
         value: @header,
+        wrap_preserve: @wrap_preserve,
         width: @width,
       )
     end
@@ -85,6 +88,7 @@ module Tabulo
         styler: @styler,
         truncation_indicator: @truncation_indicator,
         value: body_cell_value(source, row_index: row_index, column_index: column_index),
+        wrap_preserve: @wrap_preserve,
         width: @width,
       )
     end

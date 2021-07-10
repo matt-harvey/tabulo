@@ -63,6 +63,7 @@ end
 * The header row can be [repeated](#repeating-headers) at arbitrary intervals
 * Newlines within cell content are correctly handled
 * Multibyte Unicode characters are correctly handled
+* Option to [preserve whole words](#preserve-words) when wrapping content
 * Apply [colours](#colours-and-styling) and other styling to table content and borders, without breaking the table
 * Easily [transpose](#transposition) the table, so that rows are swapped with columns
 * Choose from multiple [border configurations](#borders), including Markdown, &ldquo;ASCII&rdquo;, and smoothly
@@ -595,6 +596,46 @@ table = Tabulo::Table.new(
 
 The character used to indicate truncation, which defaults to `~`, can be configured using the
 `truncation_indicator` option passed to `Table.new`.
+
+<a name="preserve-words"></a>
+#### Wrapping at word boundaries [&#x2191;](#contents)
+
+By passing `:word` to the `wrap_preserve` option on either table initialization (for all columns),
+or when calling `add_column` (for an individual column), whole words can be preserved when wrapping:
+
+```ruby
+sentences = [
+  "Words are preserved.",
+  "Excessively long words may still be split to fit into the configured column width.",
+]
+table = Tabulo::Table.new(sentences, :itself, :length, column_width: 10, wrap_preserve: :word)
+```
+
+```
+> puts table
++------------+------------+
+|   itself   |   length   |
++------------+------------+
+| Words are  |         20 |
+| preserved. |            |
+| Excessivel |         82 |
+| y long     |            |
+| words may  |            |
+| still be   |            |
+| split to   |            |
+| fit into   |            |
+| the        |            |
+| configured |            |
+| column     |            |
+| width.     |            |
++------------+------------+
+```
+
+When wrapping cell content, Tabulo will never insert hyphens itself, although it will recognize existing
+hyphens, m-dashes and n-dashes as word boundaries.
+
+The `wrap_preserve` option defaults to the value `:rune`, meaning by default it will _not_ respect word
+boundaries when wrapping (although it will always preserve whole multibyte Unicode characters).
 
 <a name="manual-wrapping"></a>
 #### Manual cell wrapping [&#x2191;](#contents)

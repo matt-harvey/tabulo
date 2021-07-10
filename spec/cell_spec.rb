@@ -12,6 +12,7 @@ describe Tabulo::Cell do
       styler: styler,
       truncation_indicator: ".",
       value: value,
+      wrap_preserve: wrap_preserve,
       width: width)
   end
 
@@ -24,6 +25,7 @@ describe Tabulo::Cell do
   let(:styler) { -> (source, str) { str } }
   let(:value) { 30 }
   let(:width) { 6 }
+  let(:wrap_preserve) { :rune }
   let(:cell_data) { Tabulo::CellData.new(source, row_index, column_index) }
 
   describe "#height" do

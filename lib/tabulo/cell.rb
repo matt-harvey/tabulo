@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require "unicode/display_width"
 
 module Tabulo
@@ -19,6 +21,7 @@ module Tabulo
       styler:,
       truncation_indicator:,
       value:,
+      wrap_preserve:,
       width:)
 
       @alignment = alignment
@@ -30,6 +33,7 @@ module Tabulo
       @styler = styler
       @truncation_indicator = truncation_indicator
       @value = value
+      @wrap_preserve = wrap_preserve
       @width = width
     end
 
@@ -100,30 +104,86 @@ module Tabulo
     end
 
     def calculate_subcells
-      line_index = 0
-      formatted_content.split(Util::NEWLINE, -1).flat_map do |substr|
-        subsubcells, subsubcell, subsubcell_width = [], String.new(""), 0
+      case @wrap_preserve
+      when :rune
+        line_index = 0
+        formatted_content.split(Util::NEWLINE, -1).flat_map do |substr|
+          subsubcells, subsubcell, subsubcell_width = [], String.new(""), 0
 
-        substr.scan(/\X/).each do |grapheme_cluster|
-          grapheme_cluster_width = Unicode::DisplayWidth.of(grapheme_cluster)
-          if subsubcell_width + grapheme_cluster_width > @width
-            subsubcells << style_and_align_cell_content(subsubcell, line_index)
-            subsubcell_width = 0
-            subsubcell.clear
-            line_index += 1
+          substr.scan(/\X/).each do |rune|
+            rune_width = Unicode::DisplayWidth.of(rune)
+            if subsubcell_width + rune_width > @width
+              subsubcells << style_and_align_cell_content(subsubcell, line_index)
+              subsubcell_width = 0
+              subsubcell.clear
+              line_index += 1
+            end
+
+            subsubcell << rune
+            subsubcell_width += rune_width
           end
 
-          subsubcell << grapheme_cluster
-          subsubcell_width += grapheme_cluster_width
+          subsubcells << style_and_align_cell_content(subsubcell, line_index)
+          line_index += 1
+          subsubcells
         end
+      when :word
+        line_index = 0
+        formatted_content.split(Util::NEWLINE, -1).flat_map do |substr|
+          subsubcells, subsubcell, subsubcell_width = [], String.new(""), 0
 
-        subsubcells << style_and_align_cell_content(subsubcell, line_index)
-        line_index += 1
-        subsubcells
+          substr.split(/(?<= |\-|\—|\–⁠)\b/).each do |word|
+            # Each word looks like "this " or like "this-".
+            word_width = Unicode::DisplayWidth.of(word)
+            combined_width = subsubcell_width + word_width
+            if combined_width - 1 == @width && word[-1] == " "
+              # do nothing, as we're on the final word of the line and
+              # the space at the end will be chopped off.
+            elsif combined_width > @width
+              content = style_and_align_cell_content(subsubcell, line_index)
+              if content.strip.length != 0
+                subsubcells << content
+                subsubcell_width = 0
+                subsubcell.clear
+                line_index += 1
+              end
+            end
+
+            if word_width >= @width
+              word.scan(/\X/).each do |rune|
+                rune_width = Unicode::DisplayWidth.of(rune)
+                if subsubcell_width + rune_width > @width
+                  if rune != " "
+                    content = style_and_align_cell_content(subsubcell, line_index)
+                    subsubcells << content
+                    subsubcell_width = 0
+                    subsubcell.clear
+                    line_index += 1
+                  end
+                end
+
+                subsubcell << rune
+                subsubcell_width += rune_width
+              end
+            else
+              subsubcell << word
+              subsubcell_width += word_width
+            end
+          end
+
+          content = style_and_align_cell_content(subsubcell, line_index)
+          subsubcells << content
+          line_index += 1
+          subsubcells
+        end
       end
     end
 
     def style_and_align_cell_content(content, line_index)
+      if @wrap_preserve == :word
+        content.strip!
+      end
+
       padding = Util.max(@width - Unicode::DisplayWidth.of(content), 0)
       left_padding, right_padding =
         case real_alignment

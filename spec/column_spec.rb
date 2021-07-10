@@ -15,6 +15,7 @@ describe Tabulo::Column do
       right_padding: 1,
       styler: nil,
       truncation_indicator: "~",
+      wrap_preserve: :rune,
       width: 10)
   end
 
