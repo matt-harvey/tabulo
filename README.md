@@ -92,6 +92,7 @@ Tabulo has also been ported to Crystal (with some modifications): see [Tablo](ht
         * [Automating column widths](#automating-column-widths)
         * [Configuring padding](#configuring-padding)
         * [Overflow handling](#overflow-handling)
+        * [Wrapping at word boundaries](#preserve-words)
         * [Manual cell wrapping](#manual-wrapping)
      * [Formatting cell values](#formatting-cell-values)
      * [Colours and other styling](#colours-and-styling)
