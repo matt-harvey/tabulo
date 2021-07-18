@@ -1,5 +1,10 @@
 # Changelog
 
+### v2.7.0
+
+* Add `wrap_preserve` option, allowing whole words to be preserved when wrapping.
+* Internal: Use GitHub actions instead of Travis
+
 ### v2.6.3
 
 * Update dependency versions
