@@ -4,7 +4,6 @@
 [![Documentation][DC img]][Documentation]
 [![Build Status][BS img]][Build Status]
 [![Coverage Status][CS img]][Coverage Status]
-[![Code Climate][CC img]][Code Climate]
 [![Awesome][AR img]][Awesome Ruby]
 
 Tabulo is a Ruby library for generating plain text tables (also known as &ldquo;terminal tables&rdquo;
@@ -1398,12 +1397,10 @@ License](http://opensource.org/licenses/MIT).
 [Documentation]: http://www.rubydoc.info/gems/tabulo/2.7.0
 [Build Status]: https://github.com/matt-harvey/tabulo/actions/workflows/tests.yml
 [Coverage Status]: https://coveralls.io/github/matt-harvey/tabulo
-[Code Climate]: https://codeclimate.com/github/matt-harvey/tabulo
 [Awesome Ruby]: https://github.com/markets/awesome-ruby#cli-utilities
 
 [GV img]: https://img.shields.io/gem/v/tabulo.svg
 [DC img]: https://img.shields.io/badge/documentation-v2.7.0-blue.svg
 [BS img]: https://github.com/matt-harvey/tabulo/actions/workflows/tests.yml/badge.svg
 [CS img]: https://img.shields.io/coveralls/matt-harvey/tabulo.svg
-[CC img]: https://codeclimate.com/github/matt-harvey/tabulo/badges/gpa.svg
 [AR img]: https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg
