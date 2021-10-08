@@ -10,3 +10,4 @@
 **/.*.swp
 coverage
 gh-md-toc
+.ruby-version
