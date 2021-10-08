@@ -84,6 +84,7 @@ Tabulo has also been ported to Crystal (with some modifications): see [Tablo](ht
         * [Full API](#quick-api)
         * [Column labels _vs_ headers](#labels-headers)
         * [Positioning columns](#column-positioning)
+        * [Extracting column content from a hash or array](#from-arrays-hashes)
      * [Removing columns](#removing-columns)
      * [Adding a title](#title)
      * [Cell alignment](#cell-alignment)
@@ -280,6 +281,69 @@ table.add_column(:even?, before: :odd?)
 |            5 |     false    |     true     |
 +--------------+--------------+--------------+
 ```
+
+<a name="from-arrays-hashes"></a>
+#### Extracting column content from a hash or array [&#x2191;](#contents)
+
+Sometimes the data source for the table may be a collection of hashes or arrays. For example:
+
+```ruby
+data = [
+  { english: "hello", portuguese: "bom dia" },
+  { english: "goodbye", portuguese: "adeus" },
+]
+```
+
+or
+
+```ruby
+data = [
+  ["hello", "bom dia"],
+  ["goodbye", "adeus"],
+]
+```
+
+To tabulate such a collection, simply use the same mechanism as described above, passing a block to
+the `add_column` method to tell Tabulo how to extract the data for each column from a row. For
+example, to tabulate the first example above, you could do something like this:
+
+```ruby
+table = Tabulo::Table.new(data) do |t|
+  t.add_column("English") { |h| h[:english] }
+  t.add_column("Portuguese") { |h| h[:portuguese] }
+end
+
+puts table
+```
+
+For the second example, you could do the following:
+
+```ruby
+table = Tabulo::Table.new(data) do |t|
+  t.add_column("English") { |a| a[0] }
+  t.add_column("Portuguese") { |a| a[1] }
+end
+
+puts table
+```
+
+In both cases, the output will be as follows:
+
+```
++--------------+--------------+
+|    English   |  Portuguese  |
++--------------+--------------+
+| hello        | bom dia      |
+| goodbye      | adeus        |
++--------------+--------------+
+```
+
+If you have previously used other terminal tabulation libraries, you may be accustomed to being _required_
+to place your data into an array of hashes or arrays before you can tabulate them. Tabulo, however,
+offers an API that is more general and flexible than this; your data source can be _any_
+enumerable collection (not just an array), and each item in that collection can be _any_ object (not
+necessarily an array or a hash). However, as shown above, it is still straightforward to tabulate an
+array of hashes or arrays, if your data source happens to take that form.
 
 <a name="removing-columns"></a>
 ### Removing columns [&#x2191;](#contents)
