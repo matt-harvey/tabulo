@@ -1,5 +1,10 @@
 # Changelog
 
+### v2.7.1
+
+* Dependency version upgrades
+* Minor documentation improvements and tweaks
+
 ### v2.7.0
 
 * Add `wrap_preserve` option, allowing whole words to be preserved when wrapping.
