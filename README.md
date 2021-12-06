@@ -103,7 +103,7 @@ Tabulo has also been ported to Crystal (with some modifications): see [Tablo](ht
         * [Setting default styles](#default-styles)
         * [Styling borders](#styling-borders)
      * [Repeating headers](#repeating-headers)
-     * [Using a Table Enumerator](#using-a-table-enumerator)
+     * [Using a Table Enumerator](#enumerator)
      * [Accessing cell values](#accessing-cell-values)
      * [Accessing the underlying enumerable](#accessing-sources)
      * [Transposing rows and columns](#transposition)
