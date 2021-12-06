@@ -420,7 +420,7 @@ module Tabulo
     end
 
     # @return [String] a graphical representation of the Table column headers formatted with fixed
-    #   width plain text.
+    #   width plain text, excluding any horizontal borders above or below.
     def formatted_header
       cells = get_columns.map(&:header_cell)
       format_row(cells, @wrap_header_cells_to)
