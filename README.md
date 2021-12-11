@@ -938,6 +938,12 @@ table = Tabulo::Table.new(1..10, :itself, :even?, header_frequency: 5)
 
 Note that if the table has a [title](#title), it will not be repeated; only column headers are repeated.
 
+One can achieve even finer-grained control over printing of headers within the table body by stepping
+through the table a row at a time (using `.each` or other methods of `Enumerable`) and calling the
+the [`formatted_header`](https://www.rubydoc.info/gems/tabulo/Tabulo/Table#formatted_header-instance_method)
+method in combination with [`horizontal_rule`](https://www.rubydoc.info/gems/tabulo/Tabulo%2FTable:horizontal_rule)
+to produce headers at arbitrary points in the output.
+
 <a name="enumerator"></a>
 ### Using a Table Enumerator [&#x2191;](#contents)
 
@@ -1284,6 +1290,11 @@ If you want a line before every row, pass `1` to `row_divider_frequency`. For ex
 |            3 |     false    |     true     |
 +--------------+--------------+--------------+
 ```
+
+In addition to these options, it is also possible to print horizontal dividers at any chosen
+point in the table output, by stepping through the table one row at a time
+and calling the [`horizontal_rule`](https://www.rubydoc.info/gems/tabulo/Tabulo%2FTable:horizontal_rule)
+method as required.
 
 <a name="freezing-a-table"></a>
 ### Using a table as a snapshot rather than as a dynamic view [&#x2191;](#contents)
