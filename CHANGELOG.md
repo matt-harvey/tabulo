@@ -1,5 +1,10 @@
 # Changelog
 
+### v2.7.2
+
+* Minor documentation improvements and tweaks
+* Upgrade Ruby patch versions in CI config
+
 ### v2.7.1
 
 * Dependency version upgrades
