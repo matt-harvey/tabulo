@@ -6,8 +6,7 @@
 [![Coverage Status][CS img]][Coverage Status]
 [![Awesome][AR img]][Awesome Ruby]
 
-Tabulo is a Ruby library for generating plain text tables (also known as &ldquo;terminal tables&rdquo;
-or &ldquo;ASCII tables&rdquo;). It is both highly configurable and very easy to use.
+Tabulo is a Ruby library for generating plain text tables. It is both highly configurable and very easy to use.
 
 <a name="overview"></a>
 ## Overview
