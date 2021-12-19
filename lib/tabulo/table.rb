@@ -125,7 +125,7 @@ module Tabulo
     #   defaults to {DEFAULT_TRUNCATION_INDICATOR}. If passed something other than <tt>nil</tt> or
     #   a single-character String, raises {InvalidTruncationIndicatorError}.
     # @param [Symbol] wrap_preserve Specifies what unit of text the wrapping mechanism will try to
-    #     preserve intact when wrapping column content when the column width is reached.
+    #   preserve intact when wrapping column content when the column width is reached:
     #   * If passed `:rune` (the default), then it will wrap at the "character" level (approximately
     #     speaking, the Unicode grapheme cluster level). This means the maximum number of what
     #     readers usually think of as "characters" will be fit on each line, within the column's allocated
