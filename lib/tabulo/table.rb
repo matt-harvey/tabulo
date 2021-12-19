@@ -302,6 +302,8 @@ module Tabulo
     # @param [Integer] width Specifies the width of the column, excluding padding. If
     #   nil, then the column will take the width provided by the `column_width` param
     #   with which the Table was initialized.
+    # @param [Integer] min_width Specifies the minimum width of the column, excluding padding.
+    #   When given, {#pack} will not shrink the column below this width.
     # @param [Symbol] wrap_preserve Specifies how to wrap column content when the column width is reached.
     #   * If passed `nil`, or not provided, then the value passed to the `wrap_preserve` param of
     #     {#initialize} will be used.
@@ -321,7 +323,8 @@ module Tabulo
     #   Table. (This is case-sensitive, but is insensitive to whether a String or Symbol is passed
     #   to the label parameter.)
     def add_column(label, align_body: nil, align_header: nil, before: nil, formatter: nil,
-      header: nil, header_styler: nil, padding: nil, styler: nil, width: nil, wrap_preserve: nil, &extractor)
+      header: nil, header_styler: nil, min_width: nil, padding: nil, styler: nil, width: nil,
+      wrap_preserve: nil, &extractor)
 
       column_label = normalize_column_label(label)
 
@@ -351,6 +354,7 @@ module Tabulo
         truncation_indicator: @truncation_indicator,
         wrap_preserve: wrap_preserve || @wrap_preserve,
         width: width || @column_width,
+        min_width: min_width,
       )
 
       if before == nil
@@ -492,6 +496,8 @@ module Tabulo
           column.width = Util.max(column.width, cell_width)
         end
       end
+
+      get_columns.each { |column| column.width = Util.max(column.width, column.min_width) }
 
       shrink_to(max_table_width == :auto ? TTY::Screen.width : max_table_width) if max_table_width
 
@@ -728,11 +734,15 @@ module Tabulo
       required_reduction = Util.max(unadjusted_table_width - max_table_width, 0)
 
       required_reduction.times do
-        widest_column = columns.inject(columns.first) do |widest, column|
-          column.width >= widest.width ? column : widest
+        # Find the widest column that has not yet reached its min_width.
+        column_to_shrink = columns.inject(columns.first) do |widest, column|
+          column.width >= widest.width && column.width > column.min_width ? column : widest
         end
 
-        widest_column.width -= 1
+        # Stop if all columns have reached their min_width.
+        break if column_to_shrink.width <= column_to_shrink.min_width
+
+        column_to_shrink.width -= 1
       end
     end
 

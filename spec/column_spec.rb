@@ -10,6 +10,7 @@ describe Tabulo::Column do
       header: "X10",
       header_styler: nil,
       left_padding: 1,
+      min_width: nil,
       index: 3,
       padding_character: " ",
       right_padding: 1,

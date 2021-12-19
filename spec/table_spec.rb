@@ -2791,6 +2791,23 @@ describe Tabulo::Table do
                +-----+-----+).gsub(/^ +/, "")
         end
       end
+
+      context "when a column has a `min_width`" do
+        it 'does not shrink the column below this width' do
+          table = Tabulo::Table.new(%w(hi there)) do |t|
+            t.add_column(:itself) { |s| s }
+            t.add_column(:length, min_width: 20)
+          end
+          table.pack
+          expect(table.to_s).to eq \
+            %q(+--------+----------------------+
+               | itself |        length        |
+               +--------+----------------------+
+               | hi     |                    2 |
+               | there  |                    5 |
+               +--------+----------------------+).gsub(/^ +/, '')
+        end
+      end
     end
   end
 

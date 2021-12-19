@@ -3,6 +3,7 @@ module Tabulo
   # @!visibility private
   class Column
 
+    attr_accessor :min_width
     attr_accessor :width
     attr_reader :header
     attr_reader :index
@@ -18,6 +19,7 @@ module Tabulo
       header_styler:,
       index:,
       left_padding:,
+      min_width:,
       padding_character:,
       right_padding:,
       styler:,
@@ -32,6 +34,7 @@ module Tabulo
       @header = header
       @index = index
       @left_padding = left_padding
+      @min_width = min_width || 1
       @right_padding = right_padding
 
       @header_styler =
@@ -52,7 +55,7 @@ module Tabulo
       @styler = styler || -> (_, s) { s }
       @truncation_indicator = truncation_indicator
       @wrap_preserve = wrap_preserve
-      @width = width
+      @width = Util.max(width, @min_width)
     end
 
     def header_cell
