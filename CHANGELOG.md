@@ -1,5 +1,9 @@
 # Changelog
 
+### v2.7.3
+
+* Fix malformed YARD documentation for Tabulo::Table#initialize method
+
 ### v2.7.2
 
 * Minor documentation improvements and tweaks
