@@ -74,13 +74,13 @@ Tabulo has also been ported to Crystal (with some modifications): see [Tablo](ht
 
   * [Overview](#overview)
   * [Features](#features)
-  * [Table of contents](#table-of-contents)
+  * [Table of contents](#contents)
   * [Installation](#installation)
   * [Detailed usage](#detailed-usage)
      * [Creating a table](#table-initialization)
      * [Adding columns](#adding-columns)
         * [Quick API](#quick-api)
-        * [Full API](#quick-api)
+        * [Full API](#full-api)
         * [Column labels _vs_ headers](#labels-headers)
         * [Positioning columns](#column-positioning)
         * [Extracting column content from a hash or array](#from-arrays-hashes)
@@ -113,6 +113,7 @@ Tabulo has also been ported to Crystal (with some modifications): see [Tablo](ht
   * [Contributing](#contributing)
   * [License](#license)
 
+<a name="installation"></a>
 ## Installation [&#x2191;](#contents)
 
 Add this line to your application&#8217;s Gemfile:
@@ -135,6 +136,7 @@ To use the gem, you need to require it in your source code as follows:
 require 'tabulo'
 ```
 
+<a name="detailed-usage"></a>
 <a name="table-initialization"></a>
 ### Creating a table [&#x2191;](#contents)
 
@@ -408,9 +410,11 @@ If a table title is present, it is center-aligned by default. This can be change
 table = Tabulo::Table.new([1, 2], :itself, :even?, title: "Numbers", align_title: :left)
 ```
 
+<a name="column-width-wrapping-and-truncation"></a>
 ### Column width, wrapping and truncation [&#x2191;](#contents)
 
 <a name="fixed-column-widths"></a>
+<a name="configuring-fixed-widths"></a>
 #### Configuring fixed widths [&#x2191;](#contents)
 
 By default, column width is fixed at 12 characters, plus 1 character of padding on either side.
@@ -453,6 +457,7 @@ table = Tabulo::Table.new([1, 2], :itself, :even?, column_width: 6)
 Widths set for individual columns always override the default column width for the table.
 
 <a name="pack"></a>
+<a name="automating-column-widths"></a>
 #### Automating column widths [&#x2191;](#contents)
 
 Instead of setting column widths &ldquo;manually&rdquo;, you can tell the table to sort out the widths
@@ -1463,6 +1468,7 @@ install dependencies.
 `bundle exec rake spec` will run the test suite. For a list of other Rake tasks that are available in
 the development environment, run `bundle exec rake -T`.
 
+<a name="license"></a>
 ## License [&#x2191;](#contents)
 
 The gem is available as open source under the terms of the [MIT
