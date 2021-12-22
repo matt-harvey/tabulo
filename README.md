@@ -534,6 +534,12 @@ necessary (see [Overflow handling](#overflow-handling)). Under the hood, a chara
 is deducted column by column&mdash;the widest column being targetted each time&mdash;until
 the table will fit.
 
+To resize only specific columns, `pack` takes an `except:` argument, which can be a single column
+label or an Array of column labels. E.g. `pack(except: :id)` will exclude the `id` column from
+resizing and let it keep its current width. This is useful if you want to prevent the addition of
+linebreaks in your data. When using this option, other columns might be shrunk more to still make
+the table fit within the `max_table_width`.
+
 Note that `pack`ing the table necessarily involves traversing the entire collection up front as
 the maximum cell width needs to be calculated for each column. You may not want to do this
 if the collection is very large.
