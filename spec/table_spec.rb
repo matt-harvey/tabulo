@@ -2559,9 +2559,7 @@ describe Tabulo::Table do
              +------------------+------------------+).gsub(/^ +/, "")
         )
       end
-    end
 
-    context "when `max_table_width` is nil" do
       context "when column_padding is > 1" do
         let(:column_padding) { 2 }
 
@@ -2749,7 +2747,7 @@ describe Tabulo::Table do
       context "when `max_table_width` is very small" do
         it "only reduces column widths to the extent that there is at least a character's width "\
           "available in each column for content, plus one character of padding on either side" do
-          table = Tabulo::Table.new(%w(hi there)) do |t|
+          table = Tabulo::Table.new(%w[hi there]) do |t|
             t.add_column(:itself) { |s| s }
             t.add_column(:length)
           end
@@ -2790,6 +2788,34 @@ describe Tabulo::Table do
                |   3 | 3.0 |
                +-----+-----+).gsub(/^ +/, "")
         end
+      end
+    end
+
+    context "when `except` is passed" do
+      it 'resizes only the other columns' do
+        # Check that an Array argument works
+        table = Tabulo::Table.new(%w[hello hi there], :to_s, :length, :upcase)
+        table.pack(except: [:to_s, :length])
+        expect(table.to_s).to eq \
+          %q(+--------------+--------------+--------+
+             |     to_s     |    length    | upcase |
+             +--------------+--------------+--------+
+             | hello        |            5 | HELLO  |
+             | hi           |            2 | HI     |
+             | there        |            5 | THERE  |
+             +--------------+--------------+--------+).gsub(/^ +/, '')
+
+        # Check that a single argument works
+        table = Tabulo::Table.new(%w[hello hi there], :to_s, :length, :upcase)
+        table.pack(except: :length)
+        expect(table.to_s).to eq \
+          %q(+-------+--------------+--------+
+             |  to_s |    length    | upcase |
+             +-------+--------------+--------+
+             | hello |            5 | HELLO  |
+             | hi    |            2 | HI     |
+             | there |            5 | THERE  |
+             +-------+--------------+--------+).gsub(/^ +/, '')
       end
     end
   end

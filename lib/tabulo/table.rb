@@ -207,11 +207,10 @@ module Tabulo
     #   by the Table-level setting passed to the <tt>align_header</tt> (which itself defaults
     #   to <tt>:center</tt>). Otherwise, this option determines the alignment of the header
     #   content for this column.
-    # @param [Symbol, String, Integer, nil] before The label of the column before (i.e. to
-    #   the left of) which the new column should inserted. If <tt>nil</tt> is passed, it will be
-    #   inserted after all other columns. If there is no column with the given label, then an
-    #   {InvalidColumnLabelError} will be raised. A non-Integer labelled column can be identified
-    #   in either String or Symbol form for this purpose.
+    # @param [Symbol, Integer, nil] before The label of the column before (i.e. to the left of) which the
+    #   new column should inserted. If <tt>nil</tt> is passed, it will be inserted after all other columns.
+    #   If there is no column with the given label, then an {InvalidColumnLabelError} will be raised.
+    #   A non-Integer labelled column can be identified in Symbol form for this purpose.
     # @param [#to_proc] formatter A lambda or other callable object that
     #   will be passed the calculated value of each cell to determine how it should be displayed. This
     #   is distinct from the extractor and the styler (see below).
@@ -481,28 +480,39 @@ module Tabulo
     #   1 character of right padding in each column, together with border characters (1 on each side
     #   of the table and 1 between adjacent columns). I.e. there is a certain width below width the
     #   Table will refuse to shrink itself.
+    # @param [nil, Symbol, Array[Symbol]] except If passed one or multiple column labels,
+    #   these columns will be excluded from resizing and will keep their current width.
     # @return [Table] the Table itself
-    def pack(max_table_width: :auto)
-      get_columns.each { |column| column.width = Util.wrapped_width(column.header) }
+    def pack(max_table_width: :auto, except: nil)
+      column_labels = except ? column_registry.keys - Array(except) : column_registry.keys
+      columns = column_labels.map { |label| column_registry[label] }
+
+      columns.each { |column| column.width = Util.wrapped_width(column.header) }
 
       @sources.each_with_index do |source, row_index|
-        get_columns.each_with_index do |column, column_index|
+        columns.each_with_index do |column, column_index|
           cell = column.body_cell(source, row_index: row_index, column_index: column_index)
           cell_width = Util.wrapped_width(cell.formatted_content)
           column.width = Util.max(column.width, cell_width)
         end
       end
 
-      shrink_to(max_table_width == :auto ? TTY::Screen.width : max_table_width) if max_table_width
+      if max_table_width
+        shrink_to(
+          max_table_width == :auto ? TTY::Screen.width : max_table_width,
+          columns: columns
+        )
+      end
 
       if @title
         border_edge_width = (@border == :blank ? 0 : 2)
-        columns = get_columns
+        all_columns = get_columns
         expand_to(
           Unicode::DisplayWidth.of(@title) +
-          columns.first.left_padding +
-          columns.last.right_padding +
-          border_edge_width
+          all_columns.first.left_padding +
+          all_columns.last.right_padding +
+          border_edge_width,
+          columns: columns
         )
       end
 
@@ -695,8 +705,7 @@ module Tabulo
     end
 
     # @!visibility private
-    def expand_to(min_table_width)
-      columns = get_columns
+    def expand_to(min_table_width, columns:)
       num_columns = columns.count
       total_columns_padded_width = columns.inject(0) { |sum, column| sum + column.padded_width }
       total_borders = num_columns + 1
@@ -713,8 +722,7 @@ module Tabulo
     end
 
     # @!visibility private
-    def shrink_to(max_table_width)
-      columns = get_columns
+    def shrink_to(max_table_width, columns:)
       num_columns = columns.count
       total_columns_padded_width = columns.inject(0) { |sum, column| sum + column.padded_width }
       total_padding = columns.inject(0) { |sum, column| sum + column.total_padding }
