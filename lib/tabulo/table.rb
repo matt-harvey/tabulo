@@ -512,7 +512,7 @@ module Tabulo
           all_columns.first.left_padding +
           all_columns.last.right_padding +
           border_edge_width,
-          columns: columns
+          only_columns: columns
         )
       end
 
@@ -705,7 +705,8 @@ module Tabulo
     end
 
     # @!visibility private
-    def expand_to(min_table_width, columns:)
+    def expand_to(min_table_width, only_columns:)
+      columns = get_columns
       num_columns = columns.count
       total_columns_padded_width = columns.inject(0) { |sum, column| sum + column.padded_width }
       total_borders = num_columns + 1
@@ -713,7 +714,7 @@ module Tabulo
       required_increase = Util.max(min_table_width - unadjusted_table_width, 0)
 
       required_increase.times do
-        narrowest_column = columns.inject(columns.first) do |narrowest, column|
+        narrowest_column = only_columns.inject(only_columns.first) do |narrowest, column|
           column.width <= narrowest.width ? column : narrowest
         end
 

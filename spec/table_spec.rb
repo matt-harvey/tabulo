@@ -2829,6 +2829,21 @@ describe Tabulo::Table do
              | hi           |            2 | HI    |
              | there        |            5 | THERE |
              +--------------+--------------+-------+).gsub(/^ +/, '')
+
+        # Check that other columns will be resized as required to accommodate title
+        title = "01234567890123456789012345678901234567890123456789"
+        table = Tabulo::Table.new(%w[hello hi there], :to_s, :length, :upcase, title: title)
+        table.pack(except: [:to_s, :length])
+        expect(table.to_s).to eq \
+          %q(+----------------------------------------------------+
+             | 01234567890123456789012345678901234567890123456789 |
+             +--------------+--------------+----------------------+
+             |     to_s     |    length    |        upcase        |
+             +--------------+--------------+----------------------+
+             | hello        |            5 | HELLO                |
+             | hi           |            2 | HI                   |
+             | there        |            5 | THERE                |
+             +--------------+--------------+----------------------+).gsub(/^ +/, '')
       end
     end
   end
