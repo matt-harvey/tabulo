@@ -2816,6 +2816,19 @@ describe Tabulo::Table do
              | hi    |            2 | HI     |
              | there |            5 | THERE  |
              +-------+--------------+--------+).gsub(/^ +/, '')
+
+        # Check that other columns will be resized as required to fit the passed maximum width
+        table = Tabulo::Table.new(%w[hello hi there], :to_s, :length, :upcase)
+        table.pack(except: [:to_s, :length], max_table_width: 39)
+        expect(table.to_s).to eq \
+          %q(+--------------+--------------+-------+
+             |     to_s     |    length    | upcas |
+             |              |              |   e   |
+             +--------------+--------------+-------+
+             | hello        |            5 | HELLO |
+             | hi           |            2 | HI    |
+             | there        |            5 | THERE |
+             +--------------+--------------+-------+).gsub(/^ +/, '')
       end
     end
   end

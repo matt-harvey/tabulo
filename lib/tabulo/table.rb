@@ -500,7 +500,7 @@ module Tabulo
       if max_table_width
         shrink_to(
           max_table_width == :auto ? TTY::Screen.width : max_table_width,
-          columns: columns
+          only_columns: columns
         )
       end
 
@@ -722,7 +722,8 @@ module Tabulo
     end
 
     # @!visibility private
-    def shrink_to(max_table_width, columns:)
+    def shrink_to(max_table_width, only_columns:)
+      columns = get_columns
       num_columns = columns.count
       total_columns_padded_width = columns.inject(0) { |sum, column| sum + column.padded_width }
       total_padding = columns.inject(0) { |sum, column| sum + column.total_padding }
@@ -736,7 +737,7 @@ module Tabulo
       required_reduction = Util.max(unadjusted_table_width - max_table_width, 0)
 
       required_reduction.times do
-        widest_column = columns.inject(columns.first) do |widest, column|
+        widest_column = only_columns.inject(only_columns.first) do |widest, column|
           column.width >= widest.width ? column : widest
         end
 
