@@ -2994,6 +2994,30 @@ describe Tabulo::Table do
              +-------+-------+-------+).gsub(/^ +/, '')
       end
 
+      context "when `:screen` is passed to max_table_width" do
+        let(:max_table_width) { :screen }
+
+        before do
+          allow(TTY::Screen).to receive(:width).and_return(24)
+        end
+
+        it "resizes columns so as to just accommodate the table within the terminal as calculated by TTY::Screen" do
+          subject
+
+          expect(table.to_s).to eq \
+            %q(+-------+-------+------+
+               |  to_s | lengt | upca |
+               |       |   h   |  se  |
+               +-------+-------+------+
+               | hello |     5 | HELL |
+               |       |       | O    |
+               | hi    |     2 | HI   |
+               | there |     5 | THER |
+               |       |       | E    |
+               +-------+-------+------+).gsub(/^ +/, '')
+        end
+      end
+
       context "when the passed max table width is equal to the existing table width" do
         let(:max_table_width) { 28 }
 
