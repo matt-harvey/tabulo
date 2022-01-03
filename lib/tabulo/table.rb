@@ -480,7 +480,7 @@ module Tabulo
     #   1 character of right padding in each column, together with border characters (1 on each side
     #   of the table and 1 between adjacent columns). I.e. there is a certain width below width the
     #   Table will refuse to shrink itself.
-    # @param [nil, Symbol, Array[Symbol]] except If passed one or multiple column labels,
+    # @param [nil, Symbol, Array[Symbol|Integer]] except If passed one or multiple column labels,
     #   these columns will be excluded from resizing and will keep their current width.
     # @return [Table] the Table itself
     def pack(max_table_width: :auto, except: nil)
