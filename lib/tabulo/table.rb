@@ -452,8 +452,8 @@ module Tabulo
 
     # Resets all the column widths so that each column is *just* wide enough to accommodate
     # its header text as well as the formatted content of each its cells for the entire
-    # collection, together with a single character of padding on either side of the column,
-    # without any wrapping.
+    # collection, together with padding (by default 1 character on either side of the column),
+    # without wrapping. Other adjustments may also be performed (see below).
     #
     # In addition, if the table has a title but is not wide enough to
     # accommodate (without wrapping) the title text (with a character of padding either side),
@@ -477,10 +477,10 @@ module Tabulo
     #   deducted from the width of the widest column until the target is reached. When the
     #   table is printed, wrapping or truncation will then occur in these columns as required
     #   (depending on how they were configured).
-    #   Note that regardless of the value passed to max_table_width, the table will always be left wide
-    #   enough to accommodate at least 1 character's width of content, 1 character of left padding and
-    #   1 character of right padding in each column, together with border characters (1 on each side
-    #   of the table and 1 between adjacent columns). I.e. there is a certain width below width the
+    #   Note that regardless of the value passed to `max_table_width`, the table will always be left wide
+    #   enough to accommodate at least 1 character's width of content for each column, and the padding
+    #   configured for each column (by default 1 character either side), together with border characters
+    #   (1 on each side of the table and 1 between adjacent columns). I.e. there is a certain width below width the
     #   Table will refuse to shrink itself.
     # @param [nil, Symbol, Integer, Array[Symbol|Integer]] except If passed one or multiple column labels,
     #   these columns will be excluded from resizing and will keep their current width.
@@ -511,8 +511,7 @@ module Tabulo
 
     # Resets all the column widths so that each column is *just* wide enough to accommodate
     # its header text as well as the formatted content of each its cells for the entire
-    # collection, together with a single character of padding on either side of the column,
-    # without any wrapping.
+    # collection, together with padding (by default 1 character either side), without wrapping.
     #
     # @param [nil, Symbol, Integer, Array[Symbol|Integer]] except If passed one or multiple column labels,
     #   these columns will be excluded from resizing and will keep their current width.
@@ -532,20 +531,19 @@ module Tabulo
       self
     end
 
-    # If the total width of the table exceeds the passed `max_table_width`, then this method is a no-op.
-    #
     # If `max_table_width` is passed an integer, then column widths will be adjusted downward so
-    # that the total table width is reduced to the passed target width.
+    # that the total table width is reduced to the passed target width. (If the total width of the
+    # table exceeds the passed `max_table_width`, then this method is a no-op.)
     #
     # Width is deducted from columns if required to achieve this, with one character progressively
     # deducted from the width of the widest column until the target is reached. When the
     # table is printed, wrapping or truncation will then occur in these columns as required
     # (depending on how they were configured).
     #
-    # Note that regardless of the value passed to max_table_width, the table will always be left wide
-    # enough to accommodate at least 1 character's width of content, 1 character of left padding and
-    # 1 character of right padding in each column, together with border characters (1 on each side
-    # of the table and 1 between adjacent columns). I.e. there is a certain width below width the
+    # Note that regardless of the value passed to `max_table_width`, the table will always be left wide
+    # enough to accommodate at least 1 character's width of content for each column, and the padding
+    # configured for each column (by default 1 character either side), together with border characters
+    # (1 on each side of the table and 1 between adjacent columns). I.e. there is a certain width below width the
     # Table will refuse to shrink itself.
     #
     # If `max_table_width` is passed the symbol `:screen`, then this method will behave as if it
