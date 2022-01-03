@@ -453,7 +453,9 @@ module Tabulo
     # Resets all the column widths so that each column is *just* wide enough to accommodate
     # its header text as well as the formatted content of each its cells for the entire
     # collection, together with a single character of padding on either side of the column,
-    # without any wrapping. In addition, if the table has a title but is not wide enough to
+    # without any wrapping.
+    #
+    # In addition, if the table has a title but is not wide enough to
     # accommodate (without wrapping) the title text (with a character of padding either side),
     # widens the columns roughly evenly until the table as a whole is just wide enough to
     # accommodate the title text.
@@ -482,6 +484,8 @@ module Tabulo
     #   Table will refuse to shrink itself.
     # @param [nil, Symbol, Array[Symbol|Integer]] except If passed one or multiple column labels,
     #   these columns will be excluded from resizing and will keep their current width.
+    #   (Note if using integers, these are not necessarily positional: only columns _explicitly_
+    #   given an integer label will have these as labels.)
     # @return [Table] the Table itself
     def pack(max_table_width: :auto, except: nil)
       autosize_columns(except: except)
@@ -502,6 +506,29 @@ module Tabulo
         )
       end
 
+      self
+    end
+
+    # Resets all the column widths so that each column is *just* wide enough to accommodate
+    # its header text as well as the formatted content of each its cells for the entire
+    # collection, together with a single character of padding on either side of the column,
+    # without any wrapping.
+    #
+    # @param [nil, Symbol, Array[Symbol|Integer]] except If passed one or multiple column labels,
+    #   these columns will be excluded from resizing and will keep their current width.
+    #   (Note if using integers, these are not necessarily positional: only columns _explicitly_
+    #   given an integer label will have these as labels.)
+    # @return [Table] the Table itself
+    def autosize_columns(except: nil)
+      columns = get_columns(except: except)
+      columns.each { |column| column.width = Util.wrapped_width(column.header) }
+      @sources.each_with_index do |source, row_index|
+        columns.each_with_index do |column, column_index|
+          cell = column.body_cell(source, row_index: row_index, column_index: column_index)
+          cell_width = Util.wrapped_width(cell.formatted_content)
+          column.width = Util.max(column.width, cell_width)
+        end
+      end
       self
     end
 
@@ -693,23 +720,6 @@ module Tabulo
       when String
         label.to_sym
       end
-    end
-
-    # @!visibility private
-    # @param [nil, Symbol, Array[Symbol|Integer]] except If passed one or multiple column labels,
-    #   these columns will be excluded from resizing and will keep their current width.
-    # @return [Table] the Table itself
-    def autosize_columns(except: nil)
-      columns = get_columns(except: except)
-      columns.each { |column| column.width = Util.wrapped_width(column.header) }
-      @sources.each_with_index do |source, row_index|
-        columns.each_with_index do |column, column_index|
-          cell = column.body_cell(source, row_index: row_index, column_index: column_index)
-          cell_width = Util.wrapped_width(cell.formatted_content)
-          column.width = Util.max(column.width, cell_width)
-        end
-      end
-      self
     end
 
     # @!visibility private

@@ -2848,6 +2848,121 @@ describe Tabulo::Table do
     end
   end
 
+  describe "#autosize_columns" do
+    subject do
+      table.autosize_columns(except: except)
+    end
+
+    let(:table) do
+      Tabulo::Table.new(%w[hello hi there], :to_s, :length, :upcase, column_width: 8)
+    end
+
+    context "when `except` is passed nil" do
+      let(:except) { nil }
+
+      it "returns the Table itself" do
+        is_expected.to eq(table)
+      end
+
+      it "resizes all the columns to be just wide enough for their contents" do
+        subject
+
+        expect(table.to_s).to eq \
+          %q(+-------+--------+--------+
+             |  to_s | length | upcase |
+             +-------+--------+--------+
+             | hello |      5 | HELLO  |
+             | hi    |      2 | HI     |
+             | there |      5 | THERE  |
+             +-------+--------+--------+).gsub(/^ +/, '')
+      end
+    end
+
+    context "when `except` is passed an empty array" do
+      let(:except) { [] }
+
+      it "returns the Table itself" do
+        is_expected.to eq(table)
+      end
+
+      it "resizes all the columns to be just wide enough for their contents" do
+        subject
+
+        expect(table.to_s).to eq \
+          %q(+-------+--------+--------+
+             |  to_s | length | upcase |
+             +-------+--------+--------+
+             | hello |      5 | HELLO  |
+             | hi    |      2 | HI     |
+             | there |      5 | THERE  |
+             +-------+--------+--------+).gsub(/^ +/, '')
+      end
+    end
+
+    context "when `except` is passed a single label" do
+      let(:except) { :length }
+
+      it "returns the Table itself" do
+        is_expected.to eq(table)
+      end
+
+      it "resizes all the columns to be just wide enough for their contents, except the passed one" do
+        subject
+
+        expect(table.to_s).to eq \
+          %q(+-------+----------+--------+
+             |  to_s |  length  | upcase |
+             +-------+----------+--------+
+             | hello |        5 | HELLO  |
+             | hi    |        2 | HI     |
+             | there |        5 | THERE  |
+             +-------+----------+--------+).gsub(/^ +/, '')
+      end
+    end
+
+    context "when `except` is passed an array containing a single label" do
+      let(:except) { [:length] }
+
+      it "returns the Table itself" do
+        is_expected.to eq(table)
+      end
+
+      it "resizes all the columns to be just wide enough for their contents, except the passed one" do
+        subject
+
+        expect(table.to_s).to eq \
+          %q(+-------+----------+--------+
+             |  to_s |  length  | upcase |
+             +-------+----------+--------+
+             | hello |        5 | HELLO  |
+             | hi    |        2 | HI     |
+             | there |        5 | THERE  |
+             +-------+----------+--------+).gsub(/^ +/, '')
+      end
+    end
+
+    context "when `except` is passed an array containing multiple labels" do
+      let(:except) { [:length, :upcase] }
+
+      it "returns the Table itself" do
+        is_expected.to eq(table)
+      end
+
+      it "resizes all the columns to be just wide enough for their contents, except the passed ones" do
+        subject
+
+        expect(table.to_s).to eq \
+          %q(+-------+----------+----------+
+             |  to_s |  length  |  upcase  |
+             +-------+----------+----------+
+             | hello |        5 | HELLO    |
+             | hi    |        2 | HI       |
+             | there |        5 | THERE    |
+             +-------+----------+----------+).gsub(/^ +/, '')
+      end
+    end
+  end
+
   describe "#transpose" do
     let(:source) { 1..3 }
     let(:column_width) { 9 }
