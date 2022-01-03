@@ -484,24 +484,10 @@ module Tabulo
     #   these columns will be excluded from resizing and will keep their current width.
     # @return [Table] the Table itself
     def pack(max_table_width: :auto, except: nil)
-      column_labels = except ? column_registry.keys - Array(except) : column_registry.keys
-      columns = column_labels.map { |label| column_registry[label] }
-
-      columns.each { |column| column.width = Util.wrapped_width(column.header) }
-
-      @sources.each_with_index do |source, row_index|
-        columns.each_with_index do |column, column_index|
-          cell = column.body_cell(source, row_index: row_index, column_index: column_index)
-          cell_width = Util.wrapped_width(cell.formatted_content)
-          column.width = Util.max(column.width, cell_width)
-        end
-      end
+      autosize_columns(except: except)
 
       if max_table_width
-        shrink_to(
-          max_table_width == :auto ? TTY::Screen.width : max_table_width,
-          only_columns: columns
-        )
+        shrink_to(max_table_width == :auto ? :screen : max_table_width, except: except)
       end
 
       if @title
@@ -512,7 +498,7 @@ module Tabulo
           all_columns.first.left_padding +
           all_columns.last.right_padding +
           border_edge_width,
-          only_columns: columns
+          except: except,
         )
       end
 
@@ -619,8 +605,13 @@ module Tabulo
     private
 
     # @!visibility private
-    def get_columns
-      column_registry.values
+    def get_columns(except: nil)
+      if except
+        column_labels = except ? column_registry.keys - Array(except) : column_registry.keys
+        column_labels.map { |label| column_registry[label] }
+      else
+        column_registry.values
+      end
     end
 
     # @!visibility private
@@ -705,16 +696,52 @@ module Tabulo
     end
 
     # @!visibility private
-    def expand_to(min_table_width, only_columns:)
-      columns = get_columns
-      num_columns = columns.count
-      total_columns_padded_width = columns.inject(0) { |sum, column| sum + column.padded_width }
-      total_borders = num_columns + 1
-      unadjusted_table_width = total_columns_padded_width + total_borders
-      required_increase = Util.max(min_table_width - unadjusted_table_width, 0)
+    # @param [nil, Symbol, Array[Symbol|Integer]] except If passed one or multiple column labels,
+    #   these columns will be excluded from resizing and will keep their current width.
+    # @return [Table] the Table itself
+    def autosize_columns(except: nil)
+      columns = get_columns(except: except)
+      columns.each { |column| column.width = Util.wrapped_width(column.header) }
+      @sources.each_with_index do |source, row_index|
+        columns.each_with_index do |column, column_index|
+          cell = column.body_cell(source, row_index: row_index, column_index: column_index)
+          cell_width = Util.wrapped_width(cell.formatted_content)
+          column.width = Util.max(column.width, cell_width)
+        end
+      end
+      self
+    end
 
+    # @!visibility private
+    # @return [Integer] the total combined width of padding characters
+    def total_padding_width
+      get_columns.inject(0) { |sum, column| sum + column.total_padding }
+    end
+
+    # @!visibility private
+    # @return [Integer] the total combined width of vertical border characters
+    def total_borders_width
+      num_columns + 1
+    end
+
+    # @!visibility private
+    # @return [Integer] the total combined width of column contents (excludes borders and padding)
+    def total_column_content_width
+      get_columns.inject(0) { |sum, column| sum + column.width }
+    end
+
+    # @!visibility private
+    # @return [Integer] the total actual width of the table as a whole
+    def total_table_width
+      total_column_content_width + total_padding_width + total_borders_width
+    end
+
+    # @!visibility private
+    def expand_to(min_table_width, except: nil)
+      required_increase = Util.max(min_table_width - total_table_width, 0)
+      expandable_columns = get_columns(except: except)
       required_increase.times do
-        narrowest_column = only_columns.inject(only_columns.first) do |narrowest, column|
+        narrowest_column = expandable_columns.inject(expandable_columns.first) do |narrowest, column|
           column.width <= narrowest.width ? column : narrowest
         end
 
@@ -723,22 +750,24 @@ module Tabulo
     end
 
     # @!visibility private
-    def shrink_to(max_table_width, only_columns:)
-      columns = get_columns
-      num_columns = columns.count
-      total_columns_padded_width = columns.inject(0) { |sum, column| sum + column.padded_width }
-      total_padding = columns.inject(0) { |sum, column| sum + column.total_padding }
-      total_borders = num_columns + 1
-      unadjusted_table_width = total_columns_padded_width + total_borders
+    def num_columns
+      column_registry.count
+    end
 
-      # Ensure max table width is at least wide enough to accommodate table borders and padding
-      # and one character of content.
-      min_table_width = total_padding + total_borders + column_registry.count
+    # @!visibility private
+    def shrink_to(max_table_width, except: nil)
+      min_content_width_per_column = 1
+      min_total_column_content_width = num_columns * min_content_width_per_column
+      min_table_width = total_padding_width + total_borders_width + min_total_column_content_width
+
+      max_table_width = (max_table_width == :screen ? TTY::Screen.width : max_table_width)
       max_table_width = Util.max(min_table_width, max_table_width)
-      required_reduction = Util.max(unadjusted_table_width - max_table_width, 0)
 
+      required_reduction = Util.max(total_table_width - max_table_width, 0)
+
+      shrinkable_columns = get_columns(except: except)
       required_reduction.times do
-        widest_column = only_columns.inject(only_columns.first) do |widest, column|
+        widest_column = shrinkable_columns.inject(shrinkable_columns.first) do |widest, column|
           column.width >= widest.width ? column : widest
         end
 
