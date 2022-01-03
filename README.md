@@ -540,6 +540,10 @@ resizing and let it keep its current width. This is useful if you want to preven
 linebreaks in your data. When using this option, other columns might be shrunk more to still make
 the table fit within the `max_table_width`.
 
+For even finer-grained control over column and table resizing, see the
+for the [`#autosize_columns`](https://www.rubydoc.info/gems/tabulo/2.7.3/Tabulo/Table#autosize_columns-instance_method)
+and [`#shrink_to`](https://www.rubydoc.info/gems/tabulo/2.7.3/Tabulo/Table#autosize_columns-instance_method) methods.
+
 Note that `pack`ing the table necessarily involves traversing the entire collection up front as
 the maximum cell width needs to be calculated for each column. You may not want to do this
 if the collection is very large.
