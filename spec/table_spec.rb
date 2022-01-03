@@ -2963,6 +2963,124 @@ describe Tabulo::Table do
     end
   end
 
+  describe "#shrink_to" do
+    subject do
+      table.shrink_to(max_table_width, except: except)
+    end
+
+    let(:table) do
+      Tabulo::Table.new(%w[hello hi there], :to_s, :length, :upcase, column_width: 6)
+    end
+    let(:max_table_width) { 25 }
+
+    context "when `except` is passed nil" do
+      let(:except) { nil }
+
+      it "returns the Table itself" do
+        is_expected.to eq(table)
+      end
+
+      it "resizes columns so as to just accommodate the table within the passed width" do
+        subject
+
+        expect(table.to_s).to eq \
+          %q(+-------+-------+-------+
+             |  to_s | lengt | upcas |
+             |       |   h   |   e   |
+             +-------+-------+-------+
+             | hello |     5 | HELLO |
+             | hi    |     2 | HI    |
+             | there |     5 | THERE |
+             +-------+-------+-------+).gsub(/^ +/, '')
+      end
+
+      context "when the passed max table width is equal to the existing table width" do
+        let(:max_table_width) { 28 }
+
+        it "does not adjust the table at all" do
+          subject
+
+          expect(table.to_s).to eq \
+            %q(+--------+--------+--------+
+               |  to_s  | length | upcase |
+               +--------+--------+--------+
+               | hello  |      5 | HELLO  |
+               | hi     |      2 | HI     |
+               | there  |      5 | THERE  |
+               +--------+--------+--------+).gsub(/^ +/, '')
+        end
+      end
+
+      context "when the passed max table width is greater than the existing table width" do
+        let(:max_table_width) { 60 }
+
+        it "does not adjust the table at all" do
+          subject
+
+          expect(table.to_s).to eq \
+            %q(+--------+--------+--------+
+               |  to_s  | length | upcase |
+               +--------+--------+--------+
+               | hello  |      5 | HELLO  |
+               | hi     |      2 | HI     |
+               | there  |      5 | THERE  |
+               +--------+--------+--------+).gsub(/^ +/, '')
+        end
+      end
+    end
+
+    context "when `except` is passed a single column label" do
+      let(:except) { :length }
+
+      it "returns the Table itself" do
+        is_expected.to eq(table)
+      end
+
+      it "resizes columns except the passed one, so as to just accommodate the table within the passed width" do
+        subject
+
+        expect(table.to_s).to eq \
+          %q(+-------+--------+------+
+             |  to_s | length | upca |
+             |       |        |  se  |
+             +-------+--------+------+
+             | hello |      5 | HELL |
+             |       |        | O    |
+             | hi    |      2 | HI   |
+             | there |      5 | THER |
+             |       |        | E    |
+             +-------+--------+------+).gsub(/^ +/, '')
+      end
+    end
+
+    context "when `except` is passed an array of column labels" do
+      let(:except) { [:length, :upcase] }
+      let(:max_table_width) { 24 }
+
+      it "returns the Table itself" do
+        is_expected.to eq(table)
+      end
+
+      it "resizes columns except the passed ones, so as to just accommodate the table within the passed width" do
+        subject
+
+        expect(table.to_s).to eq \
+          %q(+----+--------+--------+
+             | to | length | upcase |
+             | _s |        |        |
+             +----+--------+--------+
+             | he |      5 | HELLO  |
+             | ll |        |        |
+             | o  |        |        |
+             | hi |      2 | HI     |
+             | th |      5 | THERE  |
+             | er |        |        |
+             | e  |        |        |
+             +----+--------+--------+).gsub(/^ +/, '')
+      end
+    end
+  end
+
   describe "#transpose" do
     let(:source) { 1..3 }
     let(:column_width) { 9 }

@@ -469,7 +469,7 @@ module Tabulo
     # is called. If the source Enumerable changes between that point, and the point when
     # the Table is printed, then columns will *not* be resized yet again on printing.
     #
-    # @param [nil, Numeric] max_table_width With no args, or if passed <tt>:auto</tt>,
+    # @param [nil, :auto, Numeric] max_table_width With no args, or if passed <tt>:auto</tt>,
     #   stops the total table width (including padding and borders) from expanding beyond the
     #   bounds of the terminal screen.
     #   If passed <tt>nil</tt>, the table width will not be capped.
@@ -482,9 +482,9 @@ module Tabulo
     #   1 character of right padding in each column, together with border characters (1 on each side
     #   of the table and 1 between adjacent columns). I.e. there is a certain width below width the
     #   Table will refuse to shrink itself.
-    # @param [nil, Symbol, Array[Symbol|Integer]] except If passed one or multiple column labels,
+    # @param [nil, Symbol, Integer, Array[Symbol|Integer]] except If passed one or multiple column labels,
     #   these columns will be excluded from resizing and will keep their current width.
-    #   (Note if using integers, these are not necessarily positional: only columns _explicitly_
+    #   (Note if passing integers, these are not necessarily positional: only columns _explicitly_
     #   given an integer label will have these as labels.)
     # @return [Table] the Table itself
     def pack(max_table_width: :auto, except: nil)
@@ -514,7 +514,7 @@ module Tabulo
     # collection, together with a single character of padding on either side of the column,
     # without any wrapping.
     #
-    # @param [nil, Symbol, Array[Symbol|Integer]] except If passed one or multiple column labels,
+    # @param [nil, Symbol, Integer, Array[Symbol|Integer]] except If passed one or multiple column labels,
     #   these columns will be excluded from resizing and will keep their current width.
     #   (Note if using integers, these are not necessarily positional: only columns _explicitly_
     #   given an integer label will have these as labels.)
@@ -529,6 +529,53 @@ module Tabulo
           column.width = Util.max(column.width, cell_width)
         end
       end
+      self
+    end
+
+    # If the total width of the table exceeds the passed `max_table_width`, then this method is a no-op.
+    #
+    # If `max_table_width` is passed an integer, then column widths will be adjusted downward so
+    # that the total table width is reduced to the passed target width.
+    #
+    # Width is deducted from columns if required to achieve this, with one character progressively
+    # deducted from the width of the widest column until the target is reached. When the
+    # table is printed, wrapping or truncation will then occur in these columns as required
+    # (depending on how they were configured).
+    #
+    # Note that regardless of the value passed to max_table_width, the table will always be left wide
+    # enough to accommodate at least 1 character's width of content, 1 character of left padding and
+    # 1 character of right padding in each column, together with border characters (1 on each side
+    # of the table and 1 between adjacent columns). I.e. there is a certain width below width the
+    # Table will refuse to shrink itself.
+    #
+    # If `max_table_width` is passed the symbol `:screen`, then this method will behave as if it
+    # were passed an integer, with that integer being the width of the terminal.
+    #
+    # @param [Integer, :screen] the desired maximum table width
+    # @param [nil, Symbol, Integer, Array[Symbol|Integer]] except If passed one or multiple column labels,
+    #   these columns will be excluded from resizing and will keep their current width.
+    #   (Note if passing integers, these are not necessarily positional: only columns _explicitly_
+    #   given an integer label will have these as labels.)
+    # @return [Table] the Table itself
+    def shrink_to(max_table_width, except: nil)
+      min_content_width_per_column = 1
+      min_total_column_content_width = num_columns * min_content_width_per_column
+      min_table_width = total_padding_width + total_borders_width + min_total_column_content_width
+
+      max_table_width = (max_table_width == :screen ? TTY::Screen.width : max_table_width)
+      max_table_width = Util.max(min_table_width, max_table_width)
+
+      required_reduction = Util.max(total_table_width - max_table_width, 0)
+
+      shrinkable_columns = get_columns(except: except)
+      required_reduction.times do
+        widest_column = shrinkable_columns.inject(shrinkable_columns.first) do |widest, column|
+          column.width >= widest.width ? column : widest
+        end
+
+        widest_column.width -= 1
+      end
+
       self
     end
 
@@ -762,27 +809,6 @@ module Tabulo
     # @!visibility private
     def num_columns
       column_registry.count
-    end
-
-    # @!visibility private
-    def shrink_to(max_table_width, except: nil)
-      min_content_width_per_column = 1
-      min_total_column_content_width = num_columns * min_content_width_per_column
-      min_table_width = total_padding_width + total_borders_width + min_total_column_content_width
-
-      max_table_width = (max_table_width == :screen ? TTY::Screen.width : max_table_width)
-      max_table_width = Util.max(min_table_width, max_table_width)
-
-      required_reduction = Util.max(total_table_width - max_table_width, 0)
-
-      shrinkable_columns = get_columns(except: except)
-      required_reduction.times do
-        widest_column = shrinkable_columns.inject(shrinkable_columns.first) do |widest, column|
-          column.width >= widest.width ? column : widest
-        end
-
-        widest_column.width -= 1
-      end
     end
 
     # @!visibility private
