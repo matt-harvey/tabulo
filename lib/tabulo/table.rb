@@ -490,20 +490,23 @@ module Tabulo
     def pack(max_table_width: :auto, except: nil)
       autosize_columns(except: except)
 
+      max_width = nil
       if max_table_width
-        shrink_to(max_table_width == :auto ? :screen : max_table_width, except: except)
+        max_width = (max_table_width == :auto ? TTY::Screen.width : max_table_width)
+        shrink_to(max_width, except: except)
       end
 
       if @title
         border_edge_width = (@border == :blank ? 0 : 2)
         all_columns = get_columns
-        expand_to(
+        min_width =
           Unicode::DisplayWidth.of(@title) +
           all_columns.first.left_padding +
           all_columns.last.right_padding +
-          border_edge_width,
-          except: except,
-        )
+          border_edge_width
+
+        min_width = max_width if max_width && max_width < min_width
+        expand_to(min_width, except: except)
       end
 
       self

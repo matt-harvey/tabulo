@@ -2744,6 +2744,39 @@ describe Tabulo::Table do
         end
       end
 
+      context "when title is longer than 'max_table_width'" do
+        it "does not expand beyond the passed 'max_table_width' even if the title is longer than it" do
+          titled_table = Tabulo::Table.new(1..3, title: "Here are some numbers that are here") do |t|
+            t.add_column("N", width: 5) { |n| n }
+            t.add_column("X2", width: 18) { |n| n * 2 }
+          end
+
+          expect { titled_table.pack(max_table_width: 38) }.to change(titled_table, :to_s).from(
+            %q(+----------------------------+
+               | Here are some numbers that |
+               |           are here         |
+               +-------+--------------------+
+               |   N   |         X2         |
+               +-------+--------------------+
+               |     1 |                  2 |
+               |     2 |                  4 |
+               |     3 |                  6 |
+               +-------+--------------------+).gsub(/^ +/, "")
+          ).to(
+            %q(+------------------------------------+
+               | Here are some numbers that are her |
+               |                  e                 |
+               +-----------------+------------------+
+               |        N        |        X2        |
+               +-----------------+------------------+
+               |               1 |                2 |
+               |               2 |                4 |
+               |               3 |                6 |
+               +-----------------+------------------+).gsub(/^ +/, "")
+          )
+        end
+      end
+
       context "when `max_table_width` is very small" do
         it "only reduces column widths to the extent that there is at least a character's width "\
           "available in each column for content, plus one character of padding on either side" do
