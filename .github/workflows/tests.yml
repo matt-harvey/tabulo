@@ -26,6 +26,7 @@ jobs:
           '2.6.9',
           '2.7.5',
           '3.0.3',
+          '3.1.0',
         ]
     steps:
     - uses: actions/checkout@v2
