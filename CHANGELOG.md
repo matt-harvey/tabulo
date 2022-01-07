@@ -1,8 +1,26 @@
 # Changelog
 
+### v2.8.0
+
+* Add `except:` param to `Tabulo::Table#pack` method, allowing specific
+  columns to be excluded from the action of `.pack`
+* Provide method `Tabulo::Table#autosize_columns`, allowing columns to be auto-sized
+  to fit their contents' widths, without having to call `.pack` (which also has
+  other effects on the table). This method also has an `except:` param allowing columns
+  to be excluded from its action.
+* Provide method `Tabulo::Table#shrink_to`, allowing the table's width to be reduced
+  so as not to exceed a given target number of characters (or the argument `:screen`
+  meaning "width of terminal"), independently of the `.pack` method.
+  This method also has an `except:` param allowing columns to be excluded from its action.
+* Fix `max_table_width:` param to `.pack` not being respected if table title was
+  wider than terminal.
+* Documentation improvements
+* Fix broken documentation links
+* Add Ruby 3.1 to CI config
+
 ### v2.7.3
 
-* Fix malformed YARD documentation for Tabulo::Table#initialize method
+* Fix malformed YARD documentation for `Tabulo::Table#initialize` method
 
 ### v2.7.2
 
