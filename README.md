@@ -544,8 +544,8 @@ linebreaks in your data. When using this option, other columns might be shrunk m
 the table fit within the `max_table_width`.
 
 For even finer-grained control over column and table resizing, see the
-for the [`#autosize_columns`](https://www.rubydoc.info/gems/tabulo/2.8.0/Tabulo/Table#autosize_columns-instance_method)
-and [`#shrink_to`](https://www.rubydoc.info/gems/tabulo/2.8.0/Tabulo/Table#shrink_to-instance_method) methods.
+for the [`#autosize_columns`](https://www.rubydoc.info/gems/tabulo/2.8.1/Tabulo/Table#autosize_columns-instance_method)
+and [`#shrink_to`](https://www.rubydoc.info/gems/tabulo/2.8.1/Tabulo/Table#shrink_to-instance_method) methods.
 
 Note that `pack`ing the table necessarily involves traversing the entire collection up front as
 the maximum cell width needs to be calculated for each column. You may not want to do this
@@ -810,7 +810,7 @@ the table.
 The `formatter` callback also has an alternative, 2-parameter version. If `formatter` is passed
 a 2-parameter callable, the second parameter will be given a `CellData` instance,
 containing additional information about the cell that may be useful in determining how to format
-it&mdash;see the [documentation](https://www.rubydoc.info/gems/tabulo/2.8.0/Tabulo/CellData.html)
+it&mdash;see the [documentation](https://www.rubydoc.info/gems/tabulo/2.8.1/Tabulo/CellData.html)
 for details.
 
 <a name="colours-and-styling"></a>
@@ -856,7 +856,7 @@ number is even). The second parameter represents the formatted string value of t
 content after any processing by the [formatter](#formatting-cell-values). The third and fourth
 parameters are optional, and contain further information about the cell and its contents that may be useful in
 determining how to style it. See the
-[documentation](https://www.rubydoc.info/gems/tabulo/2.8.0/Tabulo/Table#add_column-instance_method) for details.
+[documentation](https://www.rubydoc.info/gems/tabulo/2.8.1/Tabulo/Table#add_column-instance_method) for details.
 
 If the content of a cell is wrapped over multiple lines, then the `styler` will be called once
 per line, so that each line of the cell will have the escape sequence applied to it separately
@@ -876,7 +876,7 @@ table.add_column(:even?, header_styler: -> (s) { "\033[32m#{s}\033[0m" })
 ```
 
 The `header_styler` option accepts a 1-, 2- or 3-parameter callable. See the
-[documentation](https://www.rubydoc.info/gems/tabulo/2.8.0/Tabulo/Table#add_column-instance_method)
+[documentation](https://www.rubydoc.info/gems/tabulo/2.8.1/Tabulo/Table#add_column-instance_method)
 for details.
 
 <a name="styling-title"></a>
@@ -890,7 +890,7 @@ table = Tabulo::Table.new(1..5, :itself, :even?, :odd?, title: "Numbers", title_
 ```
 
 The `title_styler` option accepts a 1- or 2-parameter callable. See the
-[documentation](https://www.rubydoc.info/gems/tabulo/2.8.0/Tabulo/Table#initialize-instance_method)
+[documentation](https://www.rubydoc.info/gems/tabulo/2.8.1/Tabulo/Table#initialize-instance_method)
 for details.
 
 <a name="styling-borders"></a>
@@ -1091,7 +1091,7 @@ a new table in which the rows and columns are swapped:
 By default, a header row is added to the new table, showing the string value of the element
 represented in that column. This can be configured, however, along with other aspects of
 `transpose`&#8217;s behaviour. For details, see the
-[documentation](https://www.rubydoc.info/gems/tabulo/2.8.0/Tabulo/Table#transpose-instance_method).
+[documentation](https://www.rubydoc.info/gems/tabulo/2.8.1/Tabulo/Table#transpose-instance_method).
 
 <a name="borders"></a>
 ### Configuring borders [&#x2191;](#contents)
@@ -1494,7 +1494,7 @@ License](http://opensource.org/licenses/MIT).
 [Awesome Ruby]: https://github.com/markets/awesome-ruby#cli-utilities
 
 [GV img]: https://img.shields.io/gem/v/tabulo.svg
-[DC img]: https://img.shields.io/badge/documentation-v2.8.0-blue.svg
+[DC img]: https://img.shields.io/badge/documentation-v2.8.1-blue.svg
 [BS img]: https://github.com/matt-harvey/tabulo/actions/workflows/tests.yml/badge.svg
 [CS img]: https://img.shields.io/coveralls/matt-harvey/tabulo.svg
 [AR img]: https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg
