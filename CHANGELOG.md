@@ -1,9 +1,24 @@
 # Changelog
 
+### v2.8.2
+
+* Relax dependencies to address incompatibility with recent Rubocop version.
+  Thanks to Fabrizio Monti ([@delphaber](https://github.com/delphaber)) for this fix:
+  https://github.com/matt-harvey/tabulo/pull/23.
+* Add CI coverage for Ruby 3.2
+* Upgrade dependency versions in Github action to address deprecation warnings
+
+### v2.8.1
+
+* Upgrade dependency versions
+* Minor documentation fixes
+
 ### v2.8.0
 
 * Add `except:` param to `Tabulo::Table#pack` method, allowing specific
-  columns to be excluded from the action of `.pack`
+  columns to be excluded from the action of `.pack`.
+  Thanks to Janosch Müller ([@jaynetics](https://github.com/jaynetics)) for this feature:
+  https://github.com/matt-harvey/tabulo/pull/21.
 * Provide method `Tabulo::Table#autosize_columns`, allowing columns to be auto-sized
   to fit their contents' widths, without having to call `.pack` (which also has
   other effects on the table). This method also has an `except:` param allowing columns
@@ -15,7 +30,9 @@
 * Fix `max_table_width:` param to `.pack` not being respected if table title was
   wider than terminal.
 * Documentation improvements
-* Fix broken documentation links
+* Fix broken documentation links.
+  Thanks to Janosch Müller ([@jaynetics](https://github.com/jaynetics)):
+  https://github.com/matt-harvey/tabulo/pull/19.
 * Add Ruby 3.1 to CI config
 
 ### v2.7.3
