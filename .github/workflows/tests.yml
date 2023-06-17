@@ -19,15 +19,8 @@ jobs:
     strategy:
       matrix:
         ruby-version: [
-          '2.2.10',
-          '2.3.8',
-          '2.4.10',
-          '2.5.9',
-          '2.6.10',
-          '2.7.7',
-          '3.0.5',
-          '3.1.3',
-          '3.2.0',
+          '3.1.4',
+          '3.2.2',
         ]
     steps:
     - uses: actions/checkout@v3
@@ -37,6 +30,7 @@ jobs:
       uses: ruby/setup-ruby@v1 # Was: uses: ruby/setup-ruby@473e4d8fe5dd94ee328fdfca9f8c9c7afc9dae5e
       with:
         ruby-version: ${{ matrix.ruby-version }}
+        bundler: 2.4.14
         bundler-cache: true # runs 'bundle install' and caches installed gems automatically
     - name: Run tests
       run: bundle exec rspec
