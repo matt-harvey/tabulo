@@ -1,5 +1,12 @@
 # Changelog
 
+### v3.0.0
+
+* Require Ruby >= 3.1
+* Upgrade dependency versions
+* Remove "rake-version" development dependency; it's not essential, and doesn't
+  currently work with Ruby 3.2.
+
 ### v2.8.2
 
 * Relax dependencies to address incompatibility with recent Rubocop version.

@@ -32,12 +32,11 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "unicode-display_width", "~> 2.2"
 
   spec.add_development_dependency "bundler", "~> 2.4"
-  spec.add_development_dependency "rake", "~> 13.0"
+  spec.add_development_dependency "rake", "~> 13.0.6"
   spec.add_development_dependency "rspec", "~> 3.11"
   spec.add_development_dependency "simplecov"
   spec.add_development_dependency "simplecov-lcov"
   spec.add_development_dependency "yard"
   spec.add_development_dependency "redcarpet"
   spec.add_development_dependency "github-markup"
-  spec.add_development_dependency "rake-version", "~> 1.0"
 end
