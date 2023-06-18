@@ -6,24 +6,16 @@ module Tabulo
     NEWLINE = /\r\n|\n|\r/
 
     # @!visibility private
-    def self.condense_lines(lines)
-      join_lines(lines.reject(&:empty?))
-    end
+    def self.condense_lines(lines) = join_lines(lines.reject(&:empty?))
 
     # @!visibility private
-    def self.divides?(smaller, larger)
-      larger % smaller == 0
-    end
+    def self.divides?(smaller, larger) = larger % smaller == 0
 
     # @!visibility private
-    def self.join_lines(lines)
-      lines.join($/)
-    end
+    def self.join_lines(lines) = lines.join($/)
 
     # @!visibility private
-    def self.max(x, y)
-      x > y ? x : y
-    end
+    def self.max(x, y) = x > y ? x : y
 
     # @!visibility private
     def self.slice_hash(hash, *keys)

@@ -101,13 +101,9 @@ module Tabulo
       end
     end
 
-    def padded_width
-      width + total_padding
-    end
+    def padded_width = width + total_padding
 
-    def total_padding
-      @left_padding + @right_padding
-    end
+    def total_padding = @left_padding + @right_padding
 
     private
 
