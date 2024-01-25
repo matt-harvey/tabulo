@@ -1,5 +1,10 @@
 # Changelog
 
+### v3.0.1
+
+* Upgrade dependency versions
+* Cover Ruby 3.3 in CI config
+
 ### v3.0.0
 
 * Require Ruby >= 3.1
