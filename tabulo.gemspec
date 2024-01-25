@@ -28,8 +28,8 @@ Gem::Specification.new do |spec|
     "changelog_uri"   => "https://raw.githubusercontent.com/matt-harvey/tabulo/master/CHANGELOG.md"
   }
 
-  spec.add_runtime_dependency "tty-screen", "0.8.1"
-  spec.add_runtime_dependency "unicode-display_width", "~> 2.2"
+  spec.add_runtime_dependency "tty-screen", "0.8.2"
+  spec.add_runtime_dependency "unicode-display_width", "~> 2.5"
 
   spec.add_development_dependency "bundler", "~> 2.4"
   spec.add_development_dependency "rake", "~> 13.0.6"
