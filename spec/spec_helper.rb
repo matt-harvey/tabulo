@@ -1,3 +1,4 @@
+require "ostruct"
 require "simplecov"
 require "simplecov-lcov"
 
