@@ -1,5 +1,12 @@
 # Changelog
 
+### v3.0.3
+
+* Improved Unicode support via updated version of the `unicode-display_width` dependency.
+  Thanks, Janosch Müller ([@jaynetics](https://github.com/jaynetics)):
+  https://github.com/matt-harvey/tabulo/pull/24.
+* Cover Ruby 3.4 in CI config
+
 ### v3.0.2
 
 * Upgrade dependency versions
